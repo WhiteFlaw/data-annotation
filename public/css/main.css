@@ -1,0 +1,1083 @@
+
+
+.theme-dark {
+	--font-color: #ffffff;
+	--background-color: #121212;
+	--widget-background-color: #333333;
+	--window-background-color: #222222;
+	--widget-color: gray;
+	--highlight-background-color: darkgray;
+	--highlight-color: yellow;
+	--highlight-color-editor: #ffff0020;
+
+	--highlight-background-transparent-color: #aaaaaa44;
+}
+
+.theme-light {
+	--font-color: #000000;
+	--background-color: #ffffff;
+	--widget-background-color: #cccccc;
+	--window-background-color: #dddddd;
+	--widget-color: darkgray;
+	--highlight-background-color: gray;
+	--highlight-color: blue;
+	--highlight-color-editor: #0000ff20;
+
+	--highlight-background-transparent-color: #22222244;
+}
+
+html,body {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	background-color: var(--background-color);
+	color: var(--font-color);
+	/*font-family: Monospace;*/
+	font-family: sans-serif, 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana;
+	font-size: calc(1em * 0.875);
+	line-height: 24px;	
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+
+
+.red {
+	color: red;
+}
+
+ 
+a {
+	color: var(--font-color);
+	text-decoration: none;
+	/* pointer-events: auto; */
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+button {
+	cursor: pointer;
+	/*text-transform: uppercase;*/
+}
+
+canvas {
+	display: block;
+}
+
+
+
+#main-editor{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+}
+
+#batch-editor{
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+}
+
+#main-ui{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	/*overflow: hidden;*/
+	
+}
+
+#main-ui #content {
+	position:relative;
+	/* height: 90%; */
+}
+
+#container{
+	position: relative;
+	width: 100%;
+	/* height: 100%; */
+}
+
+#global-info {
+	/* position: absolute; */
+	top: 0px;
+	color: var(--font-color);
+	background-color: var(--widget-background-color);
+	width: auto;
+	font-size: inherit;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: left;	
+	z-index: 3; /* TODO Solve this in HTML */
+	font-size: smaller;
+	display: flex;
+
+}
+
+
+#selectors {
+	background-color: inherit;
+	color: inherit;
+	border-width: 0;
+	display: inline-flex;
+}
+
+#object-category-selector, 
+#object-track-id-editor, #attr-input, #scene-selector, 
+#frame-selector, #object-selector, 
+#camera-selector, #obj-ids-of-scene
+{
+	background-color: inherit;
+	color: inherit;
+	border-width: 0;	
+	display: inline-block;	
+}
+
+#camera-selector {
+	position: relative;	
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+#camera-list {
+	position: absolute;
+	top: 100%;
+	left: 0%;
+	background-color: inherit;
+	width: 250px;
+	z-index: 1;
+}
+
+.camera-item {
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+
+	float: left;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.camera-selected {
+	color: var(--highlight-color);
+}
+
+.camera-item:hover {
+	background-color: var(--highlight-background-color);
+}
+
+
+#object-track-id-editor, #attr-input
+{
+	border-bottom-width: 1px;
+}
+
+#attr-input
+{
+	margin-right: 5px;
+	line-height: 24px;
+}
+#object-category-attribute, #obj-ids-of-scene{
+	display: none;
+}
+
+
+.alarm-mark:hover {
+	background-color: lightgray;	
+}
+
+
+#static-buttons {
+	display: flex;
+}
+
+#changed-mark {
+	position: relative;
+}
+
+#log-button {
+	stroke-width: 5px;
+	display: none;
+}
+
+#log-wrapper #tabs{
+	display: flex;
+}
+
+#log-wrapper .tab-button{
+	color: var(--widget-color);    
+    text-align: center;
+	width: 40px;
+	cursor:default;
+}
+
+#log-wrapper .tab-selected{
+	color: var(--font-color);
+	border-bottom-color: var(--font-color);
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+#changed-world-list-wrapper {
+	position: absolute;
+	top: 100%;
+	right: 0%;
+	display: none;
+	width: 400px;
+	background-color: var(--background-color);
+	line-height: 1.5;
+	z-index: 1;
+}
+
+.modified-world-item {
+	padding: 0;
+	border: 0;
+	margin: 0;
+}
+
+#header #buttons
+{
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#config-button {
+    width: 20px;
+    height: 20px;
+}
+
+/* .header-button {
+	height: 20px;
+	width: 20px;
+	padding: 2px;
+} */
+
+
+
+#maincanvas-svg {
+	position: absolute;
+	top: 0%;
+	width: 100%;
+	height:100%;
+	border: 0px;
+	padding: 0px;
+}
+
+.image-wrapper #move-handle{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 90%;	
+}
+
+.image-wrapper #header{
+	position: absolute;
+	top: 0%;
+	left: 0%;	
+	color: red;
+	padding-left: 5px;
+}
+
+/* line {
+	stroke-width: 2;
+} */
+
+/* .box-svg :hover{
+	stroke-width: 5px;
+} */
+
+
+.box-svg{
+	stroke-width: 3px;
+}
+
+/* 
+this css can be moved to dynamic css in main.js, after obj-type css being set 
+for now when a box is selected, its objtype class in css is removed so the color is set by selected state.
+dynamic set obj-type css has higher priority than this one.
+*/
+.box-svg-selected{
+	stroke: #ff00ff88;
+	fill: #ff00ff22;
+	stroke-width: 2px;
+}
+
+.maincanvas-line{
+	stroke: #00ff0088;
+	stroke-width: 2px;
+	fill: #00ff0022;
+}
+
+.radar-points{
+	stroke: #ff0000aa;
+	stroke-width: 2px;
+	fill: #ff0000aa;
+}
+
+.radar-tracks{
+	stroke: #00ff00aa;
+	stroke-width: 2px;
+	fill: #00ff00aa;
+
+}
+
+.image-wrapper {
+	position: absolute;
+	resize:both;
+	overflow:hidden;
+    top: 0%;
+	left: 20%;
+	width: 30%;
+	height: 30%;
+	padding: 0px;
+    margin: 0px;
+}
+
+
+#resize-handle {
+	position: absolute;
+	width: 30px;
+	height: 30px;
+	right: 0px;
+	bottom: 0px;
+}
+#resize-handle:hover{
+	cursor: se-resize;
+}
+
+
+#maincanvas-c {
+	position: relative;
+	top: 0%;
+	left: 0%;
+	width: inherit;
+	height: 100%;
+
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: left;
+	align-content: left;	
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+
+#obj-editor{
+	position: absolute;
+	/*color: #ff00ff; */
+	background-color:var(--widget-background-color); 
+	font-size: inherit;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: left;
+	display: none; /* defult hidden */
+}
+
+#obj-label {
+	display: none;
+}
+
+
+#attr-editor {
+	position: relative;	
+}
+
+#attr-selector {
+	position: absolute;
+	top: 100%;
+	left: 0%;
+	background-color: var(--widget-background-color);
+	width: 250px;
+}
+
+.attr-item {
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+
+	float: left;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.attr-selected {
+	color: var(--highlight-color);
+}
+
+.attr-item:hover {
+	background-color: var(--highlight-background-color);
+}
+
+#camera {
+	width:100%;
+	height:100%;
+}
+
+#main-view-grid {
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 100%;	
+}
+
+#context-menu-wrapper {
+	position: absolute;
+	display: none;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 100%;
+	z-index: 10;
+	line-height: 1.5;
+}
+
+#context-menu, #object-context-menu, #box-editor-context-menu, #box-editor-manager-context-menu, #config-menu {
+	position: absolute;
+	display: block;	
+	background-color: var(--widget-background-color);
+}
+
+#new-submenu, #saveall-submenu, #play-submenu, #goto-submenu, #cm-fit-submenu, #cm-this-submenu {
+	display: none;
+	position: absolute;	
+	/* left:100%;
+	top: 0%; */
+	padding-left: 3px;
+	min-width: 150px;
+	background-color: var(--widget-background-color);
+}
+
+#new-submenu {
+	width: 250px;
+}
+
+.cm-new-item {
+	float: left;
+}
+
+.menu-item-arrow {
+	display: inline;
+    position: absolute;
+    right: 0;
+}
+
+.menu-item, .menu-nonclickable-item{
+	padding-left: 10px;
+	padding-right: 10px;
+	position: relative;	
+}
+
+#context-menu，#object-context-menu，#box-editor-context-menu, #box-editor-manager-context-menu{
+	width: 150px;
+}
+#config-menu{
+	width: 300px;
+}
+
+#cfg-experimental-submenu, #cfg-data-submenu {
+	display: none;
+	position: absolute;	
+	right:100%;
+	top: 0%;
+	padding-left: 3px;
+	min-width: 400px;
+	background-color: var(--widget-background-color);
+}
+
+.cfg-widget-group {
+	display: inline-flex;
+	position: absolute;
+	right: 10px;
+}
+
+.cfg-widget {
+	background-color: var(--widget-background-color);
+	color: var(--font-color);
+}
+
+.menu-button {
+	display: inline;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.menu-button:hover {
+	background-color: var(--highlight-background-color);	
+}
+
+.menu-item:hover {
+	background-color:  var(--highlight-background-color);	
+}
+
+.menu-item-icon {
+	display: inline;	
+	height: 20px;
+	width: 20px;	
+}
+
+
+.menu-item-text {
+	display: inline;
+}
+
+.menu-seperator {
+	padding-top: 1px;
+	background-color:var(--widget-color);
+}
+
+
+#config-wrapper{
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 100%;
+}
+
+.dg.ac {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 2 !important; /* TODO Solve this in HTML */
+}
+
+
+.float-label {
+	color: #0000ff;
+	position: absolute;
+	display:inline-flex;
+}
+
+
+.non-selectable {
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+}
+
+.label-obj-id-text, .label-obj-type-text, .label-obj-attr-text {
+	padding-left: 5px;
+}
+
+.label-out-view {
+	display: none;
+}
+
+
+
+
+
+
+#batch-editor-tools-wrapper{
+	width:auto;
+	display: flex;
+    justify-content: flex-end;
+}
+
+#batch-editor-tools{
+	background-color: var(--widget-background-color);
+	display: inherit;
+}
+
+.obj-editor-row {
+	display: flex;
+	color: inherit;
+	background: inherit;
+	padding: inherit;
+	margin: 2px;
+}
+
+#label-more {
+	position:relative;
+}
+#object-dropdown-menu {
+	position:absolute;
+	/* top: 100%;
+	left: 0%; */
+	background-color: var(--widget-background-color);
+	width: 250px;
+	line-height: 1.5;
+	z-index: 1;
+	display: none;
+}
+
+.ui-button {
+	background-color: var(--widget-background-color);
+	padding-left: 0;
+	padding-right: 0;
+	border-width: 1;
+	border-color: var(--widget-background-color);
+	color:var(--font-color);
+	height: 20px;
+	width: 20px;
+	padding: 2px;
+}
+
+.ui-button:hover {
+	background-color: var(--highlight-background-color);	
+}
+
+.svg-menu-icon{
+	/* pointer-events: none;  */
+	display: block; 
+	width: 100%; 
+	height: 100%; 
+	fill:transparent;
+	stroke: var(--font-color);
+	stroke-width: 1px;
+}
+
+.svg-button{
+	/* pointer-events: none;  */
+	display: block; 
+	width: 100%; 
+	height: 100%; 
+	fill:transparent;
+	stroke: var(--widget-color);
+	stroke-width: 1px;
+}
+
+.alarm-mark .svg-button{
+	/* pointer-events: none;  */
+	display: block; 
+	width: 100%; 
+	height: 100%; 
+	fill:transparent;
+	stroke: red;
+	stroke-width: 1px;
+}
+
+#main-box-editor-wrapper {
+	position: absolute;
+	top: 0%;    
+	left: 0%;
+    width: 0%;
+	height: 100%;
+}
+
+
+
+#main-box-editor-wrapper .v-buttons-wrapper {
+	position: absolute;
+	bottom: 0%;
+	right: 0%;
+	background-color: var(--widget-background-color);;
+	margin: 1px;
+	display: none;
+}
+
+
+#main-box-editor-wrapper #sub-views {
+	display: inline-block;
+	position: relative;	
+    width: 320px;
+    height: 100%;
+	resize: both;
+	overflow: hidden;
+}
+
+#batch-box-editor{
+	position: absolute;
+	top: 0%;    
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	border: 0px;
+}
+
+#batch-box-editor #sub-views {
+	display: inline-block;
+	position: relative;	
+    width: 130px;
+    height: 450px;
+	/* resize: none;
+	overflow: hidden; */
+}
+
+#batch-box-editor .selected {
+	background-color: var(--highlight-color-editor);
+	color:var(--highlight-color);
+}
+
+#batch-box-editor .v-buttons-wrapper {
+	display: none;
+	position: absolute;
+	bottom: 0%;
+	right: 0%;
+	background-color:var(--widget-background-color);
+	margin: 0;
+}
+
+#batch-box-editor .ui-button {
+	display: block;
+	background-color:var(--widget-background-color);
+	padding-left: 0;
+	padding-right: 0;
+	border-width: 1;
+	border-color: var(--widget-background-color);
+	color: yellow;
+	padding: 0;
+    border: 0;
+	margin: 0;
+	height: auto;
+}
+
+#batch-box-editor .ui-button:hover {
+	background-color:  var(--highlight-background-color);;	
+}
+
+
+#box-info{
+	position: absolute;
+	top: 0px;
+	/*color: #ffff00; */
+	/* background-color: var(--widget-background-color);; */
+	width: 100%;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: left;	
+	/*z-index: 3; /* TODO Solve this in HTML */
+	font-size: x-small;
+}
+
+.selected #box-info{
+	background-color: var(--highlight-background-transparent-color);
+}
+
+.view-manipulator {
+	width: 100%;		
+	/*background-color: #00000000;*/
+	border-width: 1px;
+	position: relative;
+	/* resize:both; */
+	overflow: hidden;
+}
+
+#z-view-manipulator {
+	height: 35%;	
+}
+
+#y-view-manipulator {	
+	height: 20%;
+}
+
+#x-view-manipulator {
+	height: 20%;
+}
+
+
+#focuscanvas {
+	color: #ffff00;
+	width: 100%;
+	height: 25%;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: left;
+	align-content: left;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+#view-manipulator:hover{
+	/* border-color: yellow; */
+	
+}
+
+
+.ew-handle:hover{
+	cursor: ew-resize;
+}
+
+.ns-handle:hover{
+	cursor: ns-resize;
+}
+
+
+.nw-handle:hover{
+	cursor: nw-resize;
+}
+.ne-handle:hover{
+	cursor: ne-resize;
+}
+
+.sw-handle:hover{
+	cursor: sw-resize;
+}
+
+.se-handle:hover{
+	cursor: se-resize;
+}
+
+.grab-handle:hover{
+	cursor: move;
+}
+
+.v-table-wrapper {
+	display: none;
+}
+
+
+td {
+	padding: 0px;
+}
+
+
+
+.svg-line{
+	stroke-dasharray: 3,3;
+	stroke: #00000000;
+	stroke-width: 1px;
+	stroke-opacity: 0.6;
+}
+
+
+.subview-svg, .subview-obj-size{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0%;
+	left: 0%;
+}
+
+.subview-obj-size .obj-vertical-size {
+	position: absolute;
+	top: 50%;
+	left: 0%;
+}
+
+
+.origin-point-indicator{
+	position: relative;
+	stroke: #ff0000;
+	stroke-width: 1px;
+	stroke-opacity: 0.7;
+	fill-opacity: 0.0;
+}
+
+#select-box {
+	display: none;
+	position: absolute;
+	border: 1px solid #55aaff;
+	background-color: rgba(75, 160, 255, 0.3);
+	
+}
+
+#main-view-svg{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 100%;
+}
+#grid-lines-wrapper{
+	position: relative;
+}
+.grid-line {
+	
+	stroke-dasharray: 3,3;
+	stroke: gray;
+	stroke-width: 1px;
+	stroke-opacity: 0.2;
+}
+
+
+
+/* */
+
+.popup-window-wrapper #view {
+	position: relative;
+	left: 20%;
+	top: 20%;
+	
+	height: 60%;
+	width: 60%;
+	background-color: var(--window-background-color);
+	border: 1px;
+	border-color: gray;
+	resize: both;
+    overflow: hidden;
+	z-index: 4;
+}
+
+
+.popup-window-wrapper #header {
+	background-color: var(--widget-background-color);
+	min-width: 400px; /*minwidth of dialog*/
+}
+
+.popup-window-wrapper #title {
+	padding-left: 5px;
+}
+
+
+.popup-window-wrapper #buttons {
+	display: inline-flex;
+	float: right;
+}
+
+.popup-window-wrapper #btn-restore {
+	display: none;
+}
+
+
+.popup-window-wrapper {
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	width: 100%;
+	height: 100%;
+	display: none;
+
+}
+
+
+/* trajectory */
+#object-track-svg {
+	width: 100%;
+	height:100%;
+	border: 0px;
+	padding: 0px;
+}
+
+#svg-arrows {
+	stroke: red;
+	fill:none;
+}
+
+
+#svg-scaler {
+	stroke: gray;
+	fill:none;
+}
+
+
+#track-ego-car {
+	stroke: green;
+}
+
+.track-label {
+	width: 150px;
+	height: 28px;
+	/* font-size: 18px; */
+	display: none;
+}
+
+.scaler-label{
+	width: 150px;
+	height: 28px;
+}
+
+
+.object-track-current-frame {
+	stroke: purple;
+}
+
+.one-track:hover {
+	color: yellow;
+	stroke: yellow;
+	z-index: 10;
+}
+
+.one-track:hover .track-label{
+	display: inherit;
+}
+
+.track-wrapper {
+	stroke: #00000000;
+	fill: #00000000;	
+}
+
+
+
+/* info */
+#info-wrapper {
+	background-color: #88888888;
+}
+
+#info-wrapper #view {
+	height: fit-content;
+	width: fit-content;
+	resize: none;
+}
+
+#info-content {
+	padding-left: 5px;
+	height: fit-content;
+    overflow-wrap: break-word;
+}
+
+#info-wrapper #view #info-bottom-buttons{
+	float: right;
+    padding: 5px;
+}
+
+
+/*crop scene */
+#crop-scene-wrapper {
+	width: 0%;
+	height: 0%;
+}
+
+#crop-scene-wrapper #view {
+	left: 200px;
+	top: 200px;
+
+	height: 400px; /*60%;*/
+	width: 600px; /*60%; */
+}
+
+
+#crop-scene-wrapper #content {
+	padding-left: 5px;
+}
+
+
+#log-wrapper {
+	width: 0%;
+	height: 0%;
+	display: inherit;
+}
+
+#log-wrapper #view {
+	left: 400px;
+	top: 400px;
+	height: 400px; /*60%;*/
+	width: 600px; /*60%; */
+}
+
+#log-wrapper #content-logs,#content-errors {
+	height: 100%;
+	width: 100%;
+	line-height: 1.5;
+    overflow-y: auto;
+}
+
+
+
+.log-object-frame-id{
+	cursor: pointer;
+}
+
+#move-handle-wrapper {
+	position: absolute;
+	display: none;
+	cursor: move;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 100%;
+	z-index: 10;	
+}
