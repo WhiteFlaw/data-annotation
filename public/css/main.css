@@ -1081,3 +1081,8 @@ td {
 	width: 100%;
 	z-index: 10;	
 }
+
+/*将标注物体的长宽高高亮显示*/
+span[title="scale"]{
+	color: aqua;
+}

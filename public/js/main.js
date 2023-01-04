@@ -29,7 +29,7 @@ async function createMainEditor(){
   let editorCfg = pointsGlobalConfig;
 
   let dataCfg = pointsGlobalConfig;
-  
+
   let data = new Data(dataCfg);
   await data.init();
 
@@ -37,11 +37,11 @@ async function createMainEditor(){
   window.editor = editor;
   editor.run();
   return editor;
-} 
+}
 
 async function start(){
 
- 
+
   let mainEditor = await createMainEditor();
 
 
@@ -61,4 +61,3 @@ async function start(){
 
 
 start();
-
