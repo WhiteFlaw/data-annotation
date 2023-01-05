@@ -1395,7 +1395,7 @@ function BoxEditorManager(parentUi, viewManager, objectTrackView,
     // });
 
     // this.parentUi.querySelector("#object-track-id-editor").onchange = (ev)=>this.object_track_id_changed(ev);
-    // this.parentUi.querySelector("#object-category-selector").onchange = (ev)=>this.object_category_changed(ev);
+    // this.parentUi.querySelector("#object-category-selector").onchange = (ev) => this.object_category_changed(ev);
 
 
     // this should follow addToolBox

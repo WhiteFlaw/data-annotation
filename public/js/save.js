@@ -55,12 +55,11 @@ var saveDelayTimer = null;
 var pendingSaveList = [];
 
 function saveWorldList(worldList){
-
     //pendingSaveList = pendingSaveList.concat(worldList);
 
     worldList.forEach(w=>{
         if (!pendingSaveList.includes(w))
-            pendingSaveList.push(w);
+            pendingSaveList.push(w); // offline save
     });
 
     if (saveDelayTimer)
@@ -76,6 +75,7 @@ function saveWorldList(worldList){
         let scene = pendingSaveList[0].frameInfo.scene;
         
 
+        console.log("pendingSaveList", pendingSaveList);
         doSaveWorldList(pendingSaveList, ()=>{
             editor.header.updateModifiedStatus();
 
@@ -94,15 +94,13 @@ function saveWorldList(worldList){
 }
 
 
-function doSaveWorldList(worldList, done)
-{
+function doSaveWorldList(worldList, done) {
     if (worldList.length>0){
         if (worldList[0].data.cfg.disableLabels){
             console.log("labels not loaded, save action is prohibitted.")
             return;
         }
     }
-
 
     console.log(worldList.length, "frames");
     let ann = worldList.map(w=>{
@@ -141,7 +139,7 @@ function doSaveWorldList(worldList, done)
     };
 
     var b = JSON.stringify(ann);
-    //console.log(b);
+    console.log(b);
     xhr.send(b);
 }
 

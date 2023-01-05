@@ -1,47 +1,42 @@
 
 
-import {World} from "./world.js";
-import {Debug} from "./debug.js";
-import {logger} from "./log.js"
+import { World } from "./world.js";
+import { Debug } from "./debug.js";
+import { logger } from "./log.js"
 
-class Data
-{
+class Data {
 
-    constructor(cfg)
-    {
+    constructor(cfg) {
         this.cfg = cfg;
-        
+
     }
 
-    async readSceneList()
-    {
+    async readSceneList() {
         const req = new Request("/get_all_scene_desc");
         let init = {
             method: 'GET',
             //body: JSON.stringify({"points": data})
-          };
+        };
         // we defined the xhr
-        
+
         return fetch(req, init)
-        .then(response=>{
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }else{
-                return response.json();
-            }
-        })
-        .then(ret=>
-        {
-            console.log(ret);
-            this.sceneDescList = ret;
-            return ret;
-        })
-        .catch(reject=>{
-            console.log("error read scene list!");
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } else {
+                    return response.json();
+                }
+            })
+            .then(ret => {
+                this.sceneDescList = ret;
+                return ret;
+            })
+            .catch(reject => {
+                console.log("error read scene list!");
+            });
     }
 
-    async init(){
+    async init() {
         await this.readSceneList();
     }
 
@@ -49,51 +44,87 @@ class Data
     // place world by a offset so they don't overlap
     dbg = new Debug();
 
-    worldGap=1000.0;
-    worldList=[];
-    MaxWorldNumber=80;
+    worldGap = 1000.0;
+    worldList = [];
+    MaxWorldNumber = 80;
     createWorldIndex = 0; // this index shall not repeat, so it increases permanently
 
-    async getWorld(sceneName, frame, on_preload_finished){
+    async getWorld(sceneName, frame, on_preload_finished) {
         // find in list
 
-        if (!this.meta[sceneName]){
+        if (!this.meta[sceneName]) {
             await this.readSceneMetaData(sceneName)
         }
 
-        if (!this.meta[sceneName])
-        {
+        if (!this.meta[sceneName]) {
             logger.log("load scene failed", sceneName);
-            return null; 
+            return null;
         }
 
-        let world = this.worldList.find((w)=>{
+        let world = this.worldList.find((w) => {
             return w.frameInfo.scene == sceneName && w.frameInfo.frame == frame;
         })
         if (world) // found!
             return world;
 
-                
+
         world = this._createWorld(sceneName, frame, on_preload_finished);
 
         return world;
     };
 
-    _createWorld(sceneName, frame, on_preload_finished){
+    async changeWorld(oldFrame, newWorld) { // change the world in Scene.
+        let oldWorldIndex = this.worldList.findIndex((w) => {
+            return w.frameInfo.frame === oldFrame
+        })
+        this.worldList[oldWorldIndex] = newWorld;
+        this.worldList[oldWorldIndex].frameInfo.frame = oldFrame;
 
-        let [x,y,z] = this.allocateOffset();
-        console.log("create world",x,y,z);
-        let world = new World(this, sceneName, frame, [this.worldGap*x, this.worldGap*y, this.worldGap*z], on_preload_finished);        
-        world.offsetIndex = [x,y,z];
+        // const nowScene = document.querySelector("#scene-selector").value; // just call saveWorldList() in editor.js--change_world()
+        // const params = []
+        // for (let i = 0; i < this.worldList.length; i++) {
+        //     params.push({
+        //         scene: nowScene,
+        //         frame: this.worldList[i].frameInfo.frame,
+        //         annotation: []
+        //     })
+        //     for (let j = 0; j < this.worldList[i].annotation.boxes.length; j++) {
+        //         const psrRotation = {};
+        //         for (let key in this.worldList[i].annotation.boxes[j].rotation) {
+        //             psrRotation.x = this.worldList[i].annotation.boxes[j].rotation._x;
+        //             psrRotation.y = this.worldList[i].annotation.boxes[j].rotation._y;
+        //             psrRotation.z = this.worldList[i].annotation.boxes[j].rotation._z;
+        //         }
+        //         params[i].annotation.push({
+        //             obj_id: this.worldList[i].annotation.boxes[j].obj_track_id,
+        //             obj_type: this.worldList[i].annotation.boxes[j].obj_type,
+        //             psr: {
+        //                 position: this.worldList[i].annotation.boxes[j].position,
+        //                 rotation: psrRotation,
+        //                 scale: this.worldList[i].annotation.boxes[j].scale
+        //             }
+        //         })
+        //     }
+        // }
+        // console.log(params)
+        return newWorld
+    }
+
+    _createWorld(sceneName, frame, on_preload_finished) {
+
+        let [x, y, z] = this.allocateOffset();
+        console.log("create world", x, y, z);
+        let world = new World(this, sceneName, frame, [this.worldGap * x, this.worldGap * y, this.worldGap * z], on_preload_finished);
+        world.offsetIndex = [x, y, z];
         this.createWorldIndex++;
-        this.worldList.push(world);
-        
+        this.worldList.push(world); // "worldList" from world.js
+
         return world;
 
     };
 
-    findWorld(sceneName, frameIndex){
-        let world = this.worldList.find((w)=>{
+    findWorld(sceneName, frameIndex) {
+        let world = this.worldList.find((w) => {
             return w.frameInfo.scene == sceneName && w.frameInfo.frame_index == frameIndex;
         })
         if (world) // found!
@@ -102,139 +133,130 @@ class Data
             return null;
     };
 
-    offsetList = [[0,0,0]];
-    lastSeedOffset = [0,0,0];
-    offsetsAliveCount  = 0;
-    allocateOffset()
-    {
+    offsetList = [[0, 0, 0]];
+    lastSeedOffset = [0, 0, 0];
+    offsetsAliveCount = 0;
+    allocateOffset() {
 
         // we need to make sure the first frame loaded in a scene 
         // got to locate in [0,0,0]
 
-        if (this.offsetsAliveCount == 0)
-        {
+        if (this.offsetsAliveCount == 0) {
             //reset offsets.
-            this.offsetList = [[0,0,0]];
-            this.lastSeedOffset = [0,0,0];
+            this.offsetList = [[0, 0, 0]];
+            this.lastSeedOffset = [0, 0, 0];
         }
 
 
 
-        if (this.offsetList.length == 0)
-        {
-            let [x,y,z] = this.lastSeedOffset;
+        if (this.offsetList.length == 0) {
+            let [x, y, z] = this.lastSeedOffset;
 
-            if (x == y)
-            {  
-                x = x+1;
+            if (x == y) {
+                x = x + 1;
                 y = 0;
             }
-            else
-            {
-                y = y+1;
+            else {
+                y = y + 1;
             }
 
             this.lastSeedOffset = [x, y, 0];
-            
-            this.offsetList.push([x,y,0]);
-            
-            if (x != 0)  this.offsetList.push([-x,y,0]);
-            if (y != 0)  this.offsetList.push([x,-y,0]);
-            if (x * y != 0)  this.offsetList.push([-x,-y,0]);
+
+            this.offsetList.push([x, y, 0]);
+
+            if (x != 0) this.offsetList.push([-x, y, 0]);
+            if (y != 0) this.offsetList.push([x, -y, 0]);
+            if (x * y != 0) this.offsetList.push([-x, -y, 0]);
 
             if (x != y) {
-                this.offsetList.push([y,x,0]);
-            
-                if (y != 0)  this.offsetList.push([-y,x,0]);
-                if (x != 0)  this.offsetList.push([y,-x,0]);
-                if (x * y != 0)  this.offsetList.push([-y,-x,0]);
+                this.offsetList.push([y, x, 0]);
+
+                if (y != 0) this.offsetList.push([-y, x, 0]);
+                if (x != 0) this.offsetList.push([y, -x, 0]);
+                if (x * y != 0) this.offsetList.push([-y, -x, 0]);
             }
         }
 
-        let ret =  this.offsetList.pop();
+        let ret = this.offsetList.pop();
         this.offsetsAliveCount++;
 
         return ret;
     };
 
-    returnOffset(offset)
-    {
+    returnOffset(offset) {
         this.offsetList.push(offset);
         this.offsetsAliveCount--;
     };
 
-    deleteDistantWorlds(world){
+    deleteDistantWorlds(world) {
         let currentWorldIndex = world.frameInfo.frame_index;
 
-        let disposable = (w)=>{
-            let distant = Math.abs(w.frameInfo.frame_index - currentWorldIndex)>this.MaxWorldNumber;
-            let active  = w.everythingDone;
-            if (w.annotation.modified)
-            {
+        let disposable = (w) => {
+            let distant = Math.abs(w.frameInfo.frame_index - currentWorldIndex) > this.MaxWorldNumber;
+            let active = w.everythingDone;
+            if (w.annotation.modified) {
                 console.log("deleting world not saved. stop.");
             }
-            
+
             return distant && !active && !w.annotation.modified;
         }
 
-        let distantWorldList = this.worldList.filter(w=>disposable(w));
+        let distantWorldList = this.worldList.filter(w => disposable(w));
 
-        distantWorldList.forEach(w=>{
+        distantWorldList.forEach(w => {
             this.returnOffset(w.offsetIndex);
             w.deleteAll();
         });
 
-        
-        this.worldList = this.worldList.filter(w=>!disposable(w));
+
+        this.worldList = this.worldList.filter(w => !disposable(w));
 
     };
 
-    deleteOtherWorldsExcept=function(keepScene){
+    deleteOtherWorldsExcept = function (keepScene) {
         // release resources if scene changed
-        this.worldList.forEach(w=>{
-            if (w.frameInfo.scene != keepScene){
+        this.worldList.forEach(w => {
+            if (w.frameInfo.scene != keepScene) {
                 this.returnOffset(w.offsetIndex);
                 w.deleteAll();
 
                 this.removeRefEgoPoseOfScene(w.frameInfo.scene);
             }
         })
-        this.worldList = this.worldList.filter(w=>w.frameInfo.scene==keepScene);
+        this.worldList = this.worldList.filter(w => w.frameInfo.scene == keepScene);
     };
-    
 
-    refEgoPose={};
-    getRefEgoPose(sceneName, currentPose)
-    {
-        if (this.refEgoPose[sceneName]){
+
+    refEgoPose = {};
+    getRefEgoPose(sceneName, currentPose) {
+        if (this.refEgoPose[sceneName]) {
             return this.refEgoPose[sceneName];
         }
-        else{
+        else {
             this.refEgoPose[sceneName] = currentPose;
             return currentPose;
         }
     }
 
-    removeRefEgoPoseOfScene(sceneName)
-    {
+    removeRefEgoPoseOfScene(sceneName) {
         if (this.refEgoPose[sceneName])
             delete this.refEgoPose[sceneName];
     }
 
-    forcePreloadScene(sceneName, currentWorld){
+    forcePreloadScene(sceneName, currentWorld) {
         //this.deleteOtherWorldsExcept(sceneName);
         let meta = currentWorld.sceneMeta;
 
         let currentWorldIndex = currentWorld.frameInfo.frame_index;
-        let startIndex = Math.max(0, currentWorldIndex - this.MaxWorldNumber/2);
+        let startIndex = Math.max(0, currentWorldIndex - this.MaxWorldNumber / 2);
         let endIndex = Math.min(meta.frames.length, startIndex + this.MaxWorldNumber);
 
-        this._doPreload(sceneName, startIndex, endIndex);       
-        
+        this._doPreload(sceneName, startIndex, endIndex);
+
         logger.log(`${endIndex - startIndex} frames created`);
     }
 
-    preloadScene(sceneName, currentWorld){
+    preloadScene(sceneName, currentWorld) {
 
         // clean other scenes.
         this.deleteOtherWorldsExcept(sceneName);
@@ -242,25 +264,24 @@ class Data
 
         if (!this.cfg.enablePreload)
             return;
-        
+
         this.forcePreloadScene(sceneName, currentWorld);
-        
+
     };
 
-    _doPreload(sceneName, startIndex, endIndex)
-    {
+    _doPreload(sceneName, startIndex, endIndex) {
         let meta = this.getMetaBySceneName(sceneName);
 
         let numLoaded = 0;
-        let _need_create = (frame)=>{
-            let world = this.worldList.find((w)=>{
+        let _need_create = (frame) => {
+            let world = this.worldList.find((w) => {
                 return w.frameInfo.scene == sceneName && w.frameInfo.frame == frame;
             })
-            
+
             return !world;
         }
 
-        let _do_create = (frame)=>{
+        let _do_create = (frame) => {
             this._createWorld(sceneName, frame);
             numLoaded++;
         };
@@ -277,69 +298,69 @@ class Data
     }
 
 
-    reloadAllAnnotation=function(done){
-        this.worldList.forEach(w=>w.reloadAnnotation(done));
+    reloadAllAnnotation = function (done) {
+        this.worldList.forEach(w => w.reloadAnnotation(done));
     };
 
-    onAnnotationUpdatedByOthers(scene, frames){
-        frames.forEach(f=>{
-            let world = this.worldList.find(w=>(w.frameInfo.scene==scene && w.frameInfo.frame==f));
+    onAnnotationUpdatedByOthers(scene, frames) {
+        frames.forEach(f => {
+            let world = this.worldList.find(w => (w.frameInfo.scene == scene && w.frameInfo.frame == f));
             if (world)
                 world.annotation.reloadAnnotation();
         })
     };
 
     webglScene = null;
-    set_webglScene=function(scene, mainScene){
-            this.webglScene = scene;
-            this.webglMainScene = mainScene;
-        };
+    set_webglScene = function (scene, mainScene) {
+        this.webglScene = scene;
+        this.webglMainScene = mainScene;
+    };
 
-    scale_point_size(v){
+    scale_point_size(v) {
         this.cfg.point_size *= v;
         // if (this.world){
         //     this.world.lidar.set_point_size(this.cfg.point_size);
         // }
 
-        this.worldList.forEach(w=>{
+        this.worldList.forEach(w => {
             w.lidar.set_point_size(this.cfg.point_size);
         });
     };
 
-    scale_point_brightness(v){
+    scale_point_brightness(v) {
         this.cfg.point_brightness *= v;
 
         // if (this.world){
         //     this.world.lidar.recolor_all_points();
         // }
 
-        this.worldList.forEach(w=>{
+        this.worldList.forEach(w => {
             w.lidar.recolor_all_points();
         })
     };
 
-    set_box_opacity(opacity){
+    set_box_opacity(opacity) {
         this.cfg.box_opacity = opacity;
 
-        this.worldList.forEach(w=>{
+        this.worldList.forEach(w => {
             w.annotation.set_box_opacity(this.cfg.box_opacity);
         });
     };
 
-    toggle_background(){
+    toggle_background() {
         this.cfg.show_background = !this.cfg.show_background;
 
-        if (this.cfg.show_background){
+        if (this.cfg.show_background) {
             this.world.lidar.cancel_highlight();
         }
-        else{
+        else {
             this.world.lidar.hide_background();
         }
     };
 
-    set_obj_color_scheme(scheme){
+    set_obj_color_scheme(scheme) {
 
-        
+
         pointsGlobalConfig.color_obj = scheme;
 
         // if (pointsGlobalConfig.color_obj != "no"){
@@ -357,16 +378,14 @@ class Data
 
 
         // toto: move to world
-        this.worldList.forEach(w=>{
-            if (pointsGlobalConfig.color_obj == "no")
-            {
+        this.worldList.forEach(w => {
+            if (pointsGlobalConfig.color_obj == "no") {
                 w.lidar.color_points();
             }
-            else
-            {
+            else {
                 w.lidar.color_objects();
             }
-            
+
             w.lidar.update_points_color();
 
             w.annotation.color_boxes();
@@ -386,11 +405,11 @@ class Data
     //         this.world.cameras.activate(name);
     //     }
     //     this.worldList.forEach(w=>w.cameras.activate(name));
-        
+
     //     return name;
     // };
 
-    world=null;
+    world = null;
 
     // this.future_world_buffer = [];
     // this.put_world_into_buffer= function(world){
@@ -408,17 +427,17 @@ class Data
     //     this.worldList.push(world);
     // };
 
-    activate_world= function(world, on_finished, dontDestroyOldWorld){
+    activate_world = function (world, on_finished, dontDestroyOldWorld) {
 
-        if (dontDestroyOldWorld){
-            world.activate(this.webglScene, null, on_finished);            
+        if (dontDestroyOldWorld) {
+            world.activate(this.webglScene, null, on_finished);
         }
-        else{
+        else {
             var old_world = this.world;   // current world, should we get current world later?
             this.world = world;  // swich when everything is ready. otherwise data.world is half-baked, causing mysterious problems.
 
-            world.activate(this.webglMainScene, 
-                function(){
+            world.activate(this.webglMainScene,
+                function () {
                     if (old_world)
                         old_world.unload();
                 },
@@ -429,26 +448,31 @@ class Data
 
     meta = {};  //meta data
 
-    getMetaBySceneName = (sceneName)=>{
+    getMetaBySceneName = (sceneName) => {
         return this.meta[sceneName];
     };
 
 
-    get_current_world_scene_meta(){
+    get_current_world_scene_meta() {
         return this.getMetaBySceneName(this.world.frameInfo.scene);
     };
 
+    getWorldByFrame(frame) { // search world in worldList by frame.
+        let world = this.worldList.find((w) => {
+            return w.frameInfo.frame === frame
+        })
+        return world;
+    };
 
-    readSceneMetaData(sceneName)
-    {
-        let self =this;
-        return new Promise(function(resolve, reject){
+    readSceneMetaData(sceneName) {
+        let self = this;
+        return new Promise(function (resolve, reject) {
             let xhr = new XMLHttpRequest();
-            
+
             xhr.onreadystatechange = function () {
-                if (this.readyState != 4) 
+                if (this.readyState != 4)
                     return;
-            
+
                 if (this.status == 200) {
                     let sceneMeta = JSON.parse(this.responseText);
                     self.meta[sceneName] = sceneMeta;
@@ -456,7 +480,7 @@ class Data
                 }
 
             };
-            
+
             xhr.open('GET', `/scenemeta?scene=${sceneName}`, true);
             xhr.send();
         });
@@ -464,5 +488,5 @@ class Data
 };
 
 
-export {Data};
+export { Data };
 

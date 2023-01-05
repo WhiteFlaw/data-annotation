@@ -1,5 +1,3 @@
-
-
 .theme-dark {
 	--font-color: #ffffff;
 	--background-color: #121212;
@@ -26,7 +24,8 @@
 	--highlight-background-transparent-color: #22222244;
 }
 
-html,body {
+html,
+body {
 	margin: 0;
 	height: 100%;
 	width: 100%;
@@ -35,7 +34,7 @@ html,body {
 	/*font-family: Monospace;*/
 	font-family: sans-serif, 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana;
 	font-size: calc(1em * 0.875);
-	line-height: 24px;	
+	line-height: 24px;
 	overflow-x: hidden;
 	overflow-y: hidden;
 }
@@ -46,7 +45,7 @@ html,body {
 	color: red;
 }
 
- 
+
 a {
 	color: var(--font-color);
 	text-decoration: none;
@@ -68,7 +67,7 @@ canvas {
 
 
 
-#main-editor{
+#main-editor {
 	position: absolute;
 	top: 0%;
 	left: 0%;
@@ -76,7 +75,7 @@ canvas {
 	height: 100%;
 }
 
-#batch-editor{
+#batch-editor {
 	display: none;
 	position: absolute;
 	top: 0%;
@@ -85,20 +84,20 @@ canvas {
 	height: 100%;
 }
 
-#main-ui{
+#main-ui {
 	position: relative;
 	width: 100%;
 	height: 100%;
 	/*overflow: hidden;*/
-	
+
 }
 
 #main-ui #content {
-	position:relative;
+	position: relative;
 	/* height: 90%; */
 }
 
-#container{
+#container {
 	position: relative;
 	width: 100%;
 	/* height: 100%; */
@@ -113,13 +112,13 @@ canvas {
 	font-size: inherit;
 	padding: 0px;
 	box-sizing: border-box;
-	text-align: left;	
-	z-index: 3; /* TODO Solve this in HTML */
+	text-align: left;
+	z-index: 3;
+	/* TODO Solve this in HTML */
 	font-size: smaller;
 	display: flex;
 
 }
-
 
 #selectors {
 	background-color: inherit;
@@ -128,19 +127,30 @@ canvas {
 	display: inline-flex;
 }
 
-#object-category-selector, 
-#object-track-id-editor, #attr-input, #scene-selector, 
-#frame-selector, #object-selector, 
-#camera-selector, #obj-ids-of-scene
-{
+#object-category-selector,
+#object-track-id-editor,
+#attr-input,
+#scene-selector,
+#frame-selector,
+#object-selector,
+#camera-selector,
+#obj-ids-of-scene {
 	background-color: inherit;
 	color: inherit;
-	border-width: 0;	
-	display: inline-block;	
+	border-width: 0;
+	display: inline-block;
+}
+
+#category-selector,
+#attribute-selector {
+	border: none;
+	color: inherit;
+	display: inline-flex;
+	background-color: var(--widget-background-color);
 }
 
 #camera-selector {
-	position: relative;	
+	position: relative;
 	padding-right: 5px;
 	padding-left: 5px;
 }
@@ -155,14 +165,18 @@ canvas {
 }
 
 .camera-item {
-	-webkit-user-select: none; /* Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+/Edge */
-	user-select: none; /* Standard */
+	-webkit-user-select: none;
+	/* Safari */
+	-moz-user-select: none;
+	/* Firefox */
+	-ms-user-select: none;
+	/* IE10+/Edge */
+	user-select: none;
+	/* Standard */
 
 	float: left;
-    padding-left: 5px;
-    padding-right: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .camera-selected {
@@ -174,25 +188,40 @@ canvas {
 }
 
 
-#object-track-id-editor, #attr-input
-{
+#object-track-id-editor,
+#attr-input {
 	border-bottom-width: 1px;
 }
 
-#attr-input
-{
+#attr-input {
 	margin-right: 5px;
 	line-height: 24px;
 }
-#object-category-attribute, #obj-ids-of-scene{
+
+#object-category-attribute,
+#obj-ids-of-scene {
 	display: none;
 }
 
 
 .alarm-mark:hover {
-	background-color: lightgray;	
+	background-color: lightgray;
 }
 
+#use-last-frame {
+	background-color: var(--widget-background-color);
+	border-color: var(--widget-background-color);
+	color: var(--font-color);
+	margin-right: 10px;
+}
+
+#use-last-frame:hover {
+	background-color: var(--highlight-background-color);
+}
+
+#if-default-use-label {
+	margin-right: 10px;
+}
 
 #static-buttons {
 	display: flex;
@@ -207,22 +236,22 @@ canvas {
 	display: none;
 }
 
-#log-wrapper #tabs{
+#log-wrapper #tabs {
 	display: flex;
 }
 
-#log-wrapper .tab-button{
-	color: var(--widget-color);    
-    text-align: center;
+#log-wrapper .tab-button {
+	color: var(--widget-color);
+	text-align: center;
 	width: 40px;
-	cursor:default;
+	cursor: default;
 }
 
-#log-wrapper .tab-selected{
+#log-wrapper .tab-selected {
 	color: var(--font-color);
 	border-bottom-color: var(--font-color);
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
 }
 
 #changed-world-list-wrapper {
@@ -242,17 +271,16 @@ canvas {
 	margin: 0;
 }
 
-#header #buttons
-{
-    display: flex;
-    position: absolute;
-    right: 0;
-    top: 0;
+#header #buttons {
+	display: flex;
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 
 #config-button {
-    width: 20px;
-    height: 20px;
+	width: 20px;
+	height: 20px;
 }
 
 /* .header-button {
@@ -267,23 +295,23 @@ canvas {
 	position: absolute;
 	top: 0%;
 	width: 100%;
-	height:100%;
+	height: 100%;
 	border: 0px;
 	padding: 0px;
 }
 
-.image-wrapper #move-handle{
+.image-wrapper #move-handle {
 	position: absolute;
 	top: 0%;
 	left: 0%;
 	width: 100%;
-	height: 90%;	
+	height: 90%;
 }
 
-.image-wrapper #header{
+.image-wrapper #header {
 	position: absolute;
 	top: 0%;
-	left: 0%;	
+	left: 0%;
 	color: red;
 	padding-left: 5px;
 }
@@ -297,34 +325,34 @@ canvas {
 } */
 
 
-.box-svg{
+.box-svg {
 	stroke-width: 3px;
 }
 
-/* 
-this css can be moved to dynamic css in main.js, after obj-type css being set 
+/*
+this css can be moved to dynamic css in main.js, after obj-type css being set
 for now when a box is selected, its objtype class in css is removed so the color is set by selected state.
 dynamic set obj-type css has higher priority than this one.
 */
-.box-svg-selected{
+.box-svg-selected {
 	stroke: #ff00ff88;
 	fill: #ff00ff22;
 	stroke-width: 2px;
 }
 
-.maincanvas-line{
+.maincanvas-line {
 	stroke: #00ff0088;
 	stroke-width: 2px;
 	fill: #00ff0022;
 }
 
-.radar-points{
+.radar-points {
 	stroke: #ff0000aa;
 	stroke-width: 2px;
 	fill: #ff0000aa;
 }
 
-.radar-tracks{
+.radar-tracks {
 	stroke: #00ff00aa;
 	stroke-width: 2px;
 	fill: #00ff00aa;
@@ -333,14 +361,14 @@ dynamic set obj-type css has higher priority than this one.
 
 .image-wrapper {
 	position: absolute;
-	resize:both;
-	overflow:hidden;
-    top: 0%;
+	resize: both;
+	overflow: hidden;
+	top: 0%;
 	left: 20%;
 	width: 30%;
 	height: 30%;
 	padding: 0px;
-    margin: 0px;
+	margin: 0px;
 }
 
 
@@ -351,7 +379,8 @@ dynamic set obj-type css has higher priority than this one.
 	right: 0px;
 	bottom: 0px;
 }
-#resize-handle:hover{
+
+#resize-handle:hover {
 	cursor: se-resize;
 }
 
@@ -366,20 +395,22 @@ dynamic set obj-type css has higher priority than this one.
 	padding: 0px;
 	box-sizing: border-box;
 	text-align: left;
-	align-content: left;	
-	z-index: 1; /* TODO Solve this in HTML */
+	align-content: left;
+	z-index: 1;
+	/* TODO Solve this in HTML */
 }
 
 
-#obj-editor{
+#obj-editor {
 	position: absolute;
 	/*color: #ff00ff; */
-	background-color:var(--widget-background-color); 
+	background-color: var(--widget-background-color);
 	font-size: inherit;
 	padding: 0px;
 	box-sizing: border-box;
 	text-align: left;
-	display: none; /* defult hidden */
+	display: none;
+	/* defult hidden */
 }
 
 #obj-label {
@@ -388,7 +419,7 @@ dynamic set obj-type css has higher priority than this one.
 
 
 #attr-editor {
-	position: relative;	
+	position: relative;
 }
 
 #attr-selector {
@@ -400,14 +431,18 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 .attr-item {
-	-webkit-user-select: none; /* Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+/Edge */
-	user-select: none; /* Standard */
+	-webkit-user-select: none;
+	/* Safari */
+	-moz-user-select: none;
+	/* Firefox */
+	-ms-user-select: none;
+	/* IE10+/Edge */
+	user-select: none;
+	/* Standard */
 
 	float: left;
-    padding-left: 5px;
-    padding-right: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .attr-selected {
@@ -419,8 +454,8 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 #camera {
-	width:100%;
-	height:100%;
+	width: 100%;
+	height: 100%;
 }
 
 #main-view-grid {
@@ -428,7 +463,7 @@ dynamic set obj-type css has higher priority than this one.
 	top: 0%;
 	left: 0%;
 	height: 100%;
-	width: 100%;	
+	width: 100%;
 }
 
 #context-menu-wrapper {
@@ -442,15 +477,24 @@ dynamic set obj-type css has higher priority than this one.
 	line-height: 1.5;
 }
 
-#context-menu, #object-context-menu, #box-editor-context-menu, #box-editor-manager-context-menu, #config-menu {
+#context-menu,
+#object-context-menu,
+#box-editor-context-menu,
+#box-editor-manager-context-menu,
+#config-menu {
 	position: absolute;
-	display: block;	
+	display: block;
 	background-color: var(--widget-background-color);
 }
 
-#new-submenu, #saveall-submenu, #play-submenu, #goto-submenu, #cm-fit-submenu, #cm-this-submenu {
+#new-submenu,
+#saveall-submenu,
+#play-submenu,
+#goto-submenu,
+#cm-fit-submenu,
+#cm-this-submenu {
 	display: none;
-	position: absolute;	
+	position: absolute;
 	/* left:100%;
 	top: 0%; */
 	padding-left: 3px;
@@ -468,27 +512,31 @@ dynamic set obj-type css has higher priority than this one.
 
 .menu-item-arrow {
 	display: inline;
-    position: absolute;
-    right: 0;
+	position: absolute;
+	right: 0;
 }
 
-.menu-item, .menu-nonclickable-item{
+.menu-item,
+.menu-nonclickable-item {
 	padding-left: 10px;
 	padding-right: 10px;
-	position: relative;	
+	position: relative;
 }
 
-#context-menu，#object-context-menu，#box-editor-context-menu, #box-editor-manager-context-menu{
+#context-menu，#object-context-menu，#box-editor-context-menu,
+#box-editor-manager-context-menu {
 	width: 150px;
 }
-#config-menu{
+
+#config-menu {
 	width: 300px;
 }
 
-#cfg-experimental-submenu, #cfg-data-submenu {
+#cfg-experimental-submenu,
+#cfg-data-submenu {
 	display: none;
-	position: absolute;	
-	right:100%;
+	position: absolute;
+	right: 100%;
 	top: 0%;
 	padding-left: 3px;
 	min-width: 400px;
@@ -508,22 +556,22 @@ dynamic set obj-type css has higher priority than this one.
 
 .menu-button {
 	display: inline;
-    padding-left: 5px;
-    padding-right: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .menu-button:hover {
-	background-color: var(--highlight-background-color);	
+	background-color: var(--highlight-background-color);
 }
 
 .menu-item:hover {
-	background-color:  var(--highlight-background-color);	
+	background-color: var(--highlight-background-color);
 }
 
 .menu-item-icon {
-	display: inline;	
+	display: inline;
 	height: 20px;
-	width: 20px;	
+	width: 20px;
 }
 
 
@@ -533,11 +581,11 @@ dynamic set obj-type css has higher priority than this one.
 
 .menu-seperator {
 	padding-top: 1px;
-	background-color:var(--widget-color);
+	background-color: var(--widget-color);
 }
 
 
-#config-wrapper{
+#config-wrapper {
 	display: none;
 	position: absolute;
 	top: 0%;
@@ -551,25 +599,32 @@ dynamic set obj-type css has higher priority than this one.
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	z-index: 2 !important; /* TODO Solve this in HTML */
+	z-index: 2 !important;
+	/* TODO Solve this in HTML */
 }
 
 
 .float-label {
 	color: #0000ff;
 	position: absolute;
-	display:inline-flex;
+	display: inline-flex;
 }
 
 
 .non-selectable {
-	-webkit-user-select: none; /* Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+/Edge */
-	user-select: none; /* Standard */
+	-webkit-user-select: none;
+	/* Safari */
+	-moz-user-select: none;
+	/* Firefox */
+	-ms-user-select: none;
+	/* IE10+/Edge */
+	user-select: none;
+	/* Standard */
 }
 
-.label-obj-id-text, .label-obj-type-text, .label-obj-attr-text {
+.label-obj-id-text,
+.label-obj-type-text,
+.label-obj-attr-text {
 	padding-left: 5px;
 }
 
@@ -582,13 +637,13 @@ dynamic set obj-type css has higher priority than this one.
 
 
 
-#batch-editor-tools-wrapper{
-	width:auto;
+#batch-editor-tools-wrapper {
+	width: auto;
 	display: flex;
-    justify-content: flex-end;
+	justify-content: flex-end;
 }
 
-#batch-editor-tools{
+#batch-editor-tools {
 	background-color: var(--widget-background-color);
 	display: inherit;
 }
@@ -602,10 +657,11 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 #label-more {
-	position:relative;
+	position: relative;
 }
+
 #object-dropdown-menu {
-	position:absolute;
+	position: absolute;
 	/* top: 100%;
 	left: 0%; */
 	background-color: var(--widget-background-color);
@@ -621,51 +677,51 @@ dynamic set obj-type css has higher priority than this one.
 	padding-right: 0;
 	border-width: 1;
 	border-color: var(--widget-background-color);
-	color:var(--font-color);
+	color: var(--font-color);
 	height: 20px;
 	width: 20px;
 	padding: 2px;
 }
 
 .ui-button:hover {
-	background-color: var(--highlight-background-color);	
+	background-color: var(--highlight-background-color);
 }
 
-.svg-menu-icon{
+.svg-menu-icon {
 	/* pointer-events: none;  */
-	display: block; 
-	width: 100%; 
-	height: 100%; 
-	fill:transparent;
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: transparent;
 	stroke: var(--font-color);
 	stroke-width: 1px;
 }
 
-.svg-button{
+.svg-button {
 	/* pointer-events: none;  */
-	display: block; 
-	width: 100%; 
-	height: 100%; 
-	fill:transparent;
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: transparent;
 	stroke: var(--widget-color);
 	stroke-width: 1px;
 }
 
-.alarm-mark .svg-button{
+.alarm-mark .svg-button {
 	/* pointer-events: none;  */
-	display: block; 
-	width: 100%; 
-	height: 100%; 
-	fill:transparent;
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: transparent;
 	stroke: red;
 	stroke-width: 1px;
 }
 
 #main-box-editor-wrapper {
 	position: absolute;
-	top: 0%;    
+	top: 0%;
 	left: 0%;
-    width: 0%;
+	width: 0%;
 	height: 100%;
 }
 
@@ -675,7 +731,8 @@ dynamic set obj-type css has higher priority than this one.
 	position: absolute;
 	bottom: 0%;
 	right: 0%;
-	background-color: var(--widget-background-color);;
+	background-color: var(--widget-background-color);
+	;
 	margin: 1px;
 	display: none;
 }
@@ -683,16 +740,16 @@ dynamic set obj-type css has higher priority than this one.
 
 #main-box-editor-wrapper #sub-views {
 	display: inline-block;
-	position: relative;	
-    width: 320px;
-    height: 100%;
+	position: relative;
+	width: 320px;
+	height: 100%;
 	resize: both;
 	overflow: hidden;
 }
 
-#batch-box-editor{
+#batch-box-editor {
 	position: absolute;
-	top: 0%;    
+	top: 0%;
 	left: 0%;
 	width: 100%;
 	height: 100%;
@@ -701,16 +758,16 @@ dynamic set obj-type css has higher priority than this one.
 
 #batch-box-editor #sub-views {
 	display: inline-block;
-	position: relative;	
-    width: 130px;
-    height: 450px;
+	position: relative;
+	width: 130px;
+	height: 450px;
 	/* resize: none;
 	overflow: hidden; */
 }
 
 #batch-box-editor .selected {
 	background-color: var(--highlight-color-editor);
-	color:var(--highlight-color);
+	color: var(--highlight-color);
 }
 
 #batch-box-editor .v-buttons-wrapper {
@@ -718,30 +775,31 @@ dynamic set obj-type css has higher priority than this one.
 	position: absolute;
 	bottom: 0%;
 	right: 0%;
-	background-color:var(--widget-background-color);
+	background-color: var(--widget-background-color);
 	margin: 0;
 }
 
 #batch-box-editor .ui-button {
 	display: block;
-	background-color:var(--widget-background-color);
+	background-color: var(--widget-background-color);
 	padding-left: 0;
 	padding-right: 0;
 	border-width: 1;
 	border-color: var(--widget-background-color);
 	color: yellow;
 	padding: 0;
-    border: 0;
+	border: 0;
 	margin: 0;
 	height: auto;
 }
 
 #batch-box-editor .ui-button:hover {
-	background-color:  var(--highlight-background-color);;	
+	background-color: var(--highlight-background-color);
+	;
 }
 
 
-#box-info{
+#box-info {
 	position: absolute;
 	top: 0px;
 	/*color: #ffff00; */
@@ -749,17 +807,17 @@ dynamic set obj-type css has higher priority than this one.
 	width: 100%;
 	padding: 0px;
 	box-sizing: border-box;
-	text-align: left;	
+	text-align: left;
 	/*z-index: 3; /* TODO Solve this in HTML */
 	font-size: x-small;
 }
 
-.selected #box-info{
+.selected #box-info {
 	background-color: var(--highlight-background-transparent-color);
 }
 
 .view-manipulator {
-	width: 100%;		
+	width: 100%;
 	/*background-color: #00000000;*/
 	border-width: 1px;
 	position: relative;
@@ -768,10 +826,10 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 #z-view-manipulator {
-	height: 35%;	
+	height: 35%;
 }
 
-#y-view-manipulator {	
+#y-view-manipulator {
 	height: 20%;
 }
 
@@ -788,40 +846,42 @@ dynamic set obj-type css has higher priority than this one.
 	box-sizing: border-box;
 	text-align: left;
 	align-content: left;
-	z-index: 1; /* TODO Solve this in HTML */
+	z-index: 1;
+	/* TODO Solve this in HTML */
 }
 
-#view-manipulator:hover{
+#view-manipulator:hover {
 	/* border-color: yellow; */
-	
+
 }
 
 
-.ew-handle:hover{
+.ew-handle:hover {
 	cursor: ew-resize;
 }
 
-.ns-handle:hover{
+.ns-handle:hover {
 	cursor: ns-resize;
 }
 
 
-.nw-handle:hover{
+.nw-handle:hover {
 	cursor: nw-resize;
 }
-.ne-handle:hover{
+
+.ne-handle:hover {
 	cursor: ne-resize;
 }
 
-.sw-handle:hover{
+.sw-handle:hover {
 	cursor: sw-resize;
 }
 
-.se-handle:hover{
+.se-handle:hover {
 	cursor: se-resize;
 }
 
-.grab-handle:hover{
+.grab-handle:hover {
 	cursor: move;
 }
 
@@ -836,15 +896,16 @@ td {
 
 
 
-.svg-line{
-	stroke-dasharray: 3,3;
+.svg-line {
+	stroke-dasharray: 3, 3;
 	stroke: #00000000;
 	stroke-width: 1px;
 	stroke-opacity: 0.6;
 }
 
 
-.subview-svg, .subview-obj-size{
+.subview-svg,
+.subview-obj-size {
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -859,7 +920,7 @@ td {
 }
 
 
-.origin-point-indicator{
+.origin-point-indicator {
 	position: relative;
 	stroke: #ff0000;
 	stroke-width: 1px;
@@ -872,22 +933,24 @@ td {
 	position: absolute;
 	border: 1px solid #55aaff;
 	background-color: rgba(75, 160, 255, 0.3);
-	
+
 }
 
-#main-view-svg{
+#main-view-svg {
 	position: absolute;
 	top: 0%;
 	left: 0%;
 	height: 100%;
 	width: 100%;
 }
-#grid-lines-wrapper{
+
+#grid-lines-wrapper {
 	position: relative;
 }
+
 .grid-line {
-	
-	stroke-dasharray: 3,3;
+
+	stroke-dasharray: 3, 3;
 	stroke: gray;
 	stroke-width: 1px;
 	stroke-opacity: 0.2;
@@ -901,21 +964,22 @@ td {
 	position: relative;
 	left: 20%;
 	top: 20%;
-	
+
 	height: 60%;
 	width: 60%;
 	background-color: var(--window-background-color);
 	border: 1px;
 	border-color: gray;
 	resize: both;
-    overflow: hidden;
+	overflow: hidden;
 	z-index: 4;
 }
 
 
 .popup-window-wrapper #header {
 	background-color: var(--widget-background-color);
-	min-width: 400px; /*minwidth of dialog*/
+	min-width: 400px;
+	/*minwidth of dialog*/
 }
 
 .popup-window-wrapper #title {
@@ -947,20 +1011,20 @@ td {
 /* trajectory */
 #object-track-svg {
 	width: 100%;
-	height:100%;
+	height: 100%;
 	border: 0px;
 	padding: 0px;
 }
 
 #svg-arrows {
 	stroke: red;
-	fill:none;
+	fill: none;
 }
 
 
 #svg-scaler {
 	stroke: gray;
-	fill:none;
+	fill: none;
 }
 
 
@@ -975,7 +1039,7 @@ td {
 	display: none;
 }
 
-.scaler-label{
+.scaler-label {
 	width: 150px;
 	height: 28px;
 }
@@ -991,13 +1055,13 @@ td {
 	z-index: 10;
 }
 
-.one-track:hover .track-label{
+.one-track:hover .track-label {
 	display: inherit;
 }
 
 .track-wrapper {
 	stroke: #00000000;
-	fill: #00000000;	
+	fill: #00000000;
 }
 
 
@@ -1016,12 +1080,12 @@ td {
 #info-content {
 	padding-left: 5px;
 	height: fit-content;
-    overflow-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
-#info-wrapper #view #info-bottom-buttons{
+#info-wrapper #view #info-bottom-buttons {
 	float: right;
-    padding: 5px;
+	padding: 5px;
 }
 
 
@@ -1035,8 +1099,10 @@ td {
 	left: 200px;
 	top: 200px;
 
-	height: 400px; /*60%;*/
-	width: 600px; /*60%; */
+	height: 400px;
+	/*60%;*/
+	width: 600px;
+	/*60%; */
 }
 
 
@@ -1054,20 +1120,23 @@ td {
 #log-wrapper #view {
 	left: 400px;
 	top: 400px;
-	height: 400px; /*60%;*/
-	width: 600px; /*60%; */
+	height: 400px;
+	/*60%;*/
+	width: 600px;
+	/*60%; */
 }
 
-#log-wrapper #content-logs,#content-errors {
+#log-wrapper #content-logs,
+#content-errors {
 	height: 100%;
 	width: 100%;
 	line-height: 1.5;
-    overflow-y: auto;
+	overflow-y: auto;
 }
 
 
 
-.log-object-frame-id{
+.log-object-frame-id {
 	cursor: pointer;
 }
 
@@ -1079,5 +1148,15 @@ td {
 	left: 0%;
 	height: 100%;
 	width: 100%;
-	z-index: 10;	
+	z-index: 10;
+}
+
+.sub-views-size {
+	display: flex;
+	justify-content: space-between;
+}
+
+/*将标注物体的长宽高高亮显示*/
+span[title="scale"]{
+	color: aqua;
 }

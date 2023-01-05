@@ -1,8 +1,7 @@
 
-import { CubeRefractionMapping } from "./lib/three.module.js";
 import {saveWorldList} from "./save.js"
 
-var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged){
+var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onIfDefaultUseChanged, onUseLastFrameClicked){
 
     this.ui = ui;
     this.data =  data;
@@ -14,11 +13,15 @@ var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelec
     this.objectSelectorUi = ui.querySelector("#object-selector");
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
+    this.ifDefaultUseUi = ui.querySelector('#if-default-use');
+    this.useLastFrameUi = ui.querySelector('#use-last-frame');
 
     this.onSceneChanged = onSceneChanged;
-    this.onFrameChanged = onFrameChanged;
+    this.onFrameChanged = onFrameChanged; // editor.js--this.frame_changed()
     this.onObjectSelected = onObjectSelected;
     this.onCameraChanged = onCameraChanged;
+    this.onIfDefaultUseChanged = onIfDefaultUseChanged;
+    this.onUseLastFrameClicked = onUseLastFrameClicked;
 
 
     if (cfg.disableSceneSelector){
@@ -63,11 +66,12 @@ var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelec
     }
 
     
-
     this.sceneSelectorUi.onchange = (e)=>{this.onSceneChanged(e);};
     this.objectSelectorUi.onchange = (e)=>{this.onObjectSelected(e);};
     this.frameSelectorUi.onchange = (e)=>{this.onFrameChanged(e);};
     this.cameraSelectorUi.onchange = (e)=>{this.onCameraChanged(e);};
+    this.ifDefaultUseUi.onchange = (e)=>{this.onIfDefaultUseChanged(e);}; // enable default attribute and category, Header will be instantiated in editor.js
+    this.useLastFrameUi.onclick = ()=>{this.onUseLastFrameClicked();}; // use previous frame onclick.
 
     this.setObject = function(id)
     {
@@ -94,6 +98,9 @@ var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelec
                                 (rotation.x*180/Math.PI).toFixed(2)+" "+(rotation.y*180/Math.PI).toFixed(2)+" "+(rotation.z*180/Math.PI).toFixed(2)+
                                 "</span> | <span title = 'points'>" +
                                 points_number + "</span> ";
+                                document.getElementById('sub-views-size-top-val').innerHTML = `宽：${scale.y.toFixed(2)} 长：${scale.x.toFixed(2)}`
+                                document.getElementById('sub-views-size-left-val').innerHTML = `长：${scale.x.toFixed(2)} 高：${scale.z.toFixed(2)}`
+                                document.getElementById('sub-views-size-front-val').innerHTML = `宽：${scale.y.toFixed(2)} 高：${scale.z.toFixed(2)}`
         if (box.follows){
             this.boxUi.innerHTML += "| F:"+box.follows.obj_track_id;
         }

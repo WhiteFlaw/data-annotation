@@ -118,7 +118,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
         //scene.add( cameraOrthoHelper );
 
         view.render=function(){
-            console.log("render mainview.");
+            //console.log("render mainview.");
             if (this.active){
                 //this.switch_camera(false);
                 this.renderWithCamera(this.camera);
@@ -130,7 +130,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
         };
 
         view.renderAll = function(){
-            console.log("render mainview.");
+            //console.log("render mainview.");
             if (this.active){
                 //this.switch_camera(false);
                 this.renderWithCamera(this.camera);
