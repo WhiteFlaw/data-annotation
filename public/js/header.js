@@ -1,7 +1,7 @@
 
 import {saveWorldList} from "./save.js"
 
-var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onIfDefaultUseChanged, onUseLastFrameClicked){
+var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onIfDefaultUseChanged, onUsePreviousFrameClicked){
 
     this.ui = ui;
     this.data =  data;
@@ -14,14 +14,14 @@ var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelec
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
     this.ifDefaultUseUi = ui.querySelector('#if-default-use');
-    this.useLastFrameUi = ui.querySelector('#use-last-frame');
+    this.usePreviousFrameUi = ui.querySelector('#use-previous-frame');
 
     this.onSceneChanged = onSceneChanged;
     this.onFrameChanged = onFrameChanged; // editor.js--this.frame_changed()
     this.onObjectSelected = onObjectSelected;
     this.onCameraChanged = onCameraChanged;
     this.onIfDefaultUseChanged = onIfDefaultUseChanged;
-    this.onUseLastFrameClicked = onUseLastFrameClicked;
+    this.onUsePreviousFrameClicked = onUsePreviousFrameClicked;
 
 
     if (cfg.disableSceneSelector){
@@ -71,7 +71,7 @@ var Header=function(ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelec
     this.frameSelectorUi.onchange = (e)=>{this.onFrameChanged(e);};
     this.cameraSelectorUi.onchange = (e)=>{this.onCameraChanged(e);};
     this.ifDefaultUseUi.onchange = (e)=>{this.onIfDefaultUseChanged(e);}; // enable default attribute and category, Header will be instantiated in editor.js
-    this.useLastFrameUi.onclick = ()=>{this.onUseLastFrameClicked();}; // use previous frame onclick.
+    this.usePreviousFrameUi.onclick = ()=>{this.onUsePreviousFrameClicked();}; // use previous frame onclick.
 
     this.setObject = function(id)
     {

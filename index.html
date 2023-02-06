@@ -59,7 +59,7 @@
 				</div>
 
 				<div id="buttons">
-					<div id="use-last-frame">使用上一帧</div>
+					<div id="use-previous-frame">使用上一帧</div>
 					<input type="checkbox" id="if-default-use" name="if-default-use">
 					<label for="if-default-use" id="if-default-use-label" value="y">启用预设</label>
 					<select id="attribute-selector" disabled="true">
@@ -1199,6 +1199,33 @@
 			<div id="move-handle-wrapper">
 			</div>
 
+			<div id="dialog-wrapper" tabindex='-1'>
+				<div id="dialog-main">
+					<div id="dialog-header">
+						<span id="dialog-title">警告</span>
+						<div id="dialog-buttons">
+							<div id="dialog-exit" class="ui-button" title="exit">
+								<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
+									class="svg-button">
+									<g>
+										<path d="M4 4 L 20 20 M 20 4 L 4 20"></path>
+									</g>
+								</svg>
+							</div>
+						</div>
+					</div>
+					<div id="dialog-content">
+						<div id="dialog-text">
+							该行为将 清空当前帧标注 并 强制刷新页面.
+						</div>
+						<div id="dialog-answer">
+							<div id="btn-no" class="dialog-button">取消</div>
+							<div id="btn-yes" class="dialog-button">确定</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</template>
 	<template id="box-editor-ui-template">

@@ -36,6 +36,10 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.sideview_enabled = true;
     this.editorUi = editorUi;
     this.wrapperUi = wrapperUi;
+    this.usePreviousFrameYUi = document.querySelector("#dialog-wrapper #dialog-answer #btn-yes");
+    this.usePreviousFrameNUi = document.querySelector("#dialog-wrapper #dialog-answer #btn-no");
+    this.usePreviousFrameExitUi = document.querySelector("#dialog-wrapper #dialog-header #dialog-buttons #dialog-exit");
+    this.previousFrameUi = null;
     this.container = null;
     this.name = name;
 
@@ -75,7 +79,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
 
 
-
         this.playControl = new PlayControl(this.data);
 
         this.configUi = new ConfigUi(editorUi.querySelector("#config-button"), editorUi.querySelector("#config-wrapper"), this);
@@ -89,7 +92,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             (e) => { this.object_changed(e) },
             (e) => { this.camera_changed(e) },
             () => { this.use_default_changed() }, // enable the default attribute and category.
-            () => { this.use_previous_frame() }, // use previous frame.
+            () => { this.use_previous_frame_click() }, // use previous frame.
         );
 
 
@@ -246,6 +249,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             //if we return nothing here (just calling return;) then there will be no pop-up question at all
             //return;
         };
+
 
         this.onWindowResize();
     };
@@ -2168,10 +2172,41 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         var category_selector = document.querySelector("#category-selector");
         var attribute_selector = document.querySelector("#attribute-selector");
         category_selector.disabled = attribute_selector.disabled = !ifUse;
-        if(ifUse === true) {
+        if (ifUse === true) {
             this.editorUi.querySelector("#floating-things #attr-input").innerHTML = attribute_selector.value;
             this.editorUi.querySelector("#floating-things #attr-selector").innerHTML = attribute_selector.value;
         }
+    }
+
+    this.use_previous_frame_click = async function () {
+        var old_frame = document.querySelector("#frame-selector").value;
+        var sceneName = document.querySelector('#scene-selector').value;
+        let meta = await this.data.readSceneMetaData(sceneName); // frameList of Scene.
+        let old_frame_index = meta.frames.findIndex((w) => { return w === old_frame });
+        var new_frame = meta.frames[Number(old_frame_index) - 1];
+        if (new_frame === undefined) {
+            this.infoBox.show("Notice", `there's no previous frame before.`);
+            return;
+        }
+
+        this.previousFrameUi = document.querySelector("#dialog-wrapper");
+        this.previousFrameUi.style.display = 'block';
+    }
+
+    this.usePreviousFrameExitUi.onclick = () => {
+        this.nonuse_previous_frame();
+    }
+
+    this.usePreviousFrameYUi.onclick = () => {
+        this.use_previous_frame();
+    }
+
+    this.usePreviousFrameNUi.onclick = () => {
+        this.nonuse_previous_frame();
+    }
+
+    this.nonuse_previous_frame = function () {
+        this.previousFrameUi.style.display = 'none';
     }
 
     this.use_previous_frame = async function () {
@@ -2180,17 +2215,10 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         let meta = await this.data.readSceneMetaData(sceneName); // frameList of Scene.
         let old_frame_index = meta.frames.findIndex((w) => { return w === old_frame });
         var new_frame = meta.frames[Number(old_frame_index) - 1];
-
-        if (new_frame === undefined) {
-            this.infoBox.show("Notice", `there's no previous frame before.`);
-            return;
-        }
-        var new_world = this.data.getWorldByFrame(new_frame); // world in previous frame.
-        this.change_world(old_frame, new_world, () => {
-            console.log("change_world finished");
-        }, true);
+        var new_world = await this.data.getWorld(sceneName, new_frame); // world in previous frame.
+        this.change_webglGroup(old_frame, new_world, () => { location.reload(true) }, true);
+        this.nonuse_previous_frame()
     }
-
 
     this.previous_frame = function () {
 
@@ -2338,7 +2366,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     };
 
-    this.change_world = async function (oldFrame, newWorld, onFinished, updateFrameInfo = true) {
+    this.change_webglGroup = async function (oldFrame, newWorld, onFinished, updateFrameInfo = true) {
 
         this.data.dbg.dump();
 
@@ -2360,9 +2388,9 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             this.viewManager.mainView.transform_control.detach();
         }
 
-        var world = await this.data.changeWorld(oldFrame, newWorld); // find nowWorld in worldList and replace it.
-        saveWorldList([world]) // save
+        var world = await this.data.changeWebglGroup(oldFrame, newWorld); // find nowWorld in worldList and replace it.
 
+        saveWorldList([world]) // save
         if (world) {
             this.data.activate_world(
                 world,

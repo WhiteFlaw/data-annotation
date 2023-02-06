@@ -15,8 +15,8 @@ class ObjectCategory {
 
 
         BicycleRider: { color: '#88ff00', size: [1.6, 0.6, 1.7], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
-        // Bicycle: { color: '#ff8800', size: [1.6, 0.6, 1.2], attr: ["laying down"] },
-// 
+        Bicycle: { color: '#ff8800', size: [1.8, 0.7, 1] },
+        Cyclist: { color: '#ff8800', size: [1.5, 0.6, 1] },
 // 
         // Motorcycle: { color: '#aaaa00', size: [1.6, 0.6, 1.2], attr: ["umbrella"] },
         // MotorcyleRider: { color: '#ff8800', size: [1.6, 0.6, 1.6], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
@@ -56,6 +56,7 @@ class ObjectCategory {
 // 
         // ForkLift: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // Trimotorcycle: { color: '#00aaff', size: [2.6, 1.0, 1.6] },
+        Tricycle: { color: '#00aaff', size: [2.8, 1.3, 1.5] },
         // FreightTricycle: { color: '#00aaff', size: [2.6, 1.0, 1.6] },
         // Crane: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // RoadRoller: { color: '#00aaff', size: [2.7, 1.5, 2.0] },
@@ -64,6 +65,7 @@ class ObjectCategory {
         // DontCare: { color: '#00ff88', size: [4, 4, 3] },
         // Misc: { color: '#008888', size: [4.5, 1.8, 1.5] },
         Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] },
+        Others: { color: '#008888', size: [4.5, 1.8, 1.5] },
         // Unknown1: { color: '#008888', size: [4.5, 1.8, 1.5] },
         // Unknown2: { color: '#008888', size: [4.5, 1.8, 1.5] },
         // Unknown3: { color: '#008888', size: [4.5, 1.8, 1.5] },
@@ -85,7 +87,7 @@ class ObjectCategory {
         "Truck", 
         // "Scooter", 
         // "ScooterRider", 
-        // "Bicycle", 
+        "Bicycle", 
         "BicycleRider"
     ];
 

@@ -208,14 +208,14 @@ canvas {
 	background-color: lightgray;
 }
 
-#use-last-frame {
+#use-previous-frame {
 	background-color: var(--widget-background-color);
 	border-color: var(--widget-background-color);
 	color: var(--font-color);
 	margin-right: 10px;
 }
 
-#use-last-frame:hover {
+#use-previous-frame:hover {
 	background-color: var(--highlight-background-color);
 }
 
@@ -850,11 +850,6 @@ dynamic set obj-type css has higher priority than this one.
 	/* TODO Solve this in HTML */
 }
 
-#view-manipulator:hover {
-	/* border-color: yellow; */
-
-}
-
 
 .ew-handle:hover {
 	cursor: ew-resize;
@@ -1157,6 +1152,51 @@ td {
 }
 
 /*将标注物体的长宽高高亮显示*/
-span[title="scale"]{
+span[title="scale"] {
 	color: aqua;
+}
+
+#dialog-wrapper {
+	position: relative;
+	top: calc(-50% - 80px);
+	left: calc(50% - 200px);
+	height: 100px;
+	width: 400px;
+	display: none;
+}
+
+#dialog-wrapper #dialog-main {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	background-color: var(--window-background-color);
+}
+
+#dialog-wrapper #dialog-header {
+	display: flex;
+	justify-content: space-between;
+	padding-left: 5px;
+	background-color: var(--widget-background-color);
+}
+
+#dialog-wrapper #dialog-content {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+#dialog-wrapper #dialog-answer {
+	display: flex;
+	justify-content: space-between;
+	padding: 5px;
+}
+#dialog-wrapper #dialog-answer .dialog-button {
+	flex: 1;
+	text-align: center;
+}
+
+#dialog-wrapper #dialog-answer .dialog-button:hover {
+	background-color: var(--highlight-background-color);
 }

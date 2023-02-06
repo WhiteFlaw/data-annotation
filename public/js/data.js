@@ -73,41 +73,17 @@ class Data {
         return world;
     };
 
-    async changeWorld(oldFrame, newWorld) { // change the world in Scene.
-        let oldWorldIndex = this.worldList.findIndex((w) => {
-            return w.frameInfo.frame === oldFrame
-        })
-        this.worldList[oldWorldIndex] = newWorld;
-        this.worldList[oldWorldIndex].frameInfo.frame = oldFrame;
-
-        // const nowScene = document.querySelector("#scene-selector").value; // just call saveWorldList() in editor.js--change_world()
-        // const params = []
-        // for (let i = 0; i < this.worldList.length; i++) {
-        //     params.push({
-        //         scene: nowScene,
-        //         frame: this.worldList[i].frameInfo.frame,
-        //         annotation: []
-        //     })
-        //     for (let j = 0; j < this.worldList[i].annotation.boxes.length; j++) {
-        //         const psrRotation = {};
-        //         for (let key in this.worldList[i].annotation.boxes[j].rotation) {
-        //             psrRotation.x = this.worldList[i].annotation.boxes[j].rotation._x;
-        //             psrRotation.y = this.worldList[i].annotation.boxes[j].rotation._y;
-        //             psrRotation.z = this.worldList[i].annotation.boxes[j].rotation._z;
-        //         }
-        //         params[i].annotation.push({
-        //             obj_id: this.worldList[i].annotation.boxes[j].obj_track_id,
-        //             obj_type: this.worldList[i].annotation.boxes[j].obj_type,
-        //             psr: {
-        //                 position: this.worldList[i].annotation.boxes[j].position,
-        //                 rotation: psrRotation,
-        //                 scale: this.worldList[i].annotation.boxes[j].scale
-        //             }
-        //         })
-        //     }
-        // }
-        // console.log(params)
-        return newWorld
+    async changeWebglGroup(oldFrame, newWorld) { // pcd不变, 替换标注
+        let oldWorld = this.worldList.find((w) => w.frameInfo.frame === oldFrame);
+        for (const key in newWorld) {
+            if (key === 'webglGroup') { // 旧世界的所有的Group全部去除再加入所有新世界Group, 可以实现box视图更新
+                oldWorld[key]['children'] = oldWorld[key]['children'].filter((ele) => { return ele.type !== 'Group' });
+                oldWorld[key]['children'].push(...newWorld[key]['children'].filter((ele) => { return ele.type === 'Group' }));
+                // 替换webglGroup其他所有
+                for (const pro in newWorld[key]) pro !== 'children' && pro !== 'position' && pro !== 'rotation' && pro !== 'quaternion' && pro !== 'scale' && (oldWorld[key][pro] = newWorld[key][pro]);
+            } else if (key !== 'frameInfo') oldWorld[key] = newWorld[key];
+        }
+        return oldWorld;
     }
 
     _createWorld(sceneName, frame, on_preload_finished) {

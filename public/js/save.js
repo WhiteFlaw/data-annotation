@@ -139,7 +139,6 @@ function doSaveWorldList(worldList, done) {
     };
 
     var b = JSON.stringify(ann);
-    console.log(b);
     xhr.send(b);
 }
 
