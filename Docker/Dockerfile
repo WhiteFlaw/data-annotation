@@ -14,6 +14,6 @@ RUN cd data-annotate && \
         wget https://github.com/naurril/SUSTechPOINTS/releases/download/0.1/deep_annotation_inference.h5 -P algos/models && \
         python3 -m pip install -r ./requirement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-ENTRYPOINT ["/root/run.sh"]
+ENTRYPOINT ["sh", "/root/run.sh"]
 
 EXPOSE 8081
