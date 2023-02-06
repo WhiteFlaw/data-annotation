@@ -510,17 +510,7 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
                 this.unload();
                 return;
             }
-            const sceneLength = this.scene.children.map((ele) => ele.name === 'world').length;
-            if(sceneLength === 2) { // view.js--this.scene.children内出现多个Group会导致世界重叠
-                // 但是新增的webglGroup应该去替换旧的而不是阻止加入
-                for (let i = 0; i < this.scene.children.length; i++) {
-                    if(this.scene.children[i].name === 'world') {
-                        this.scene.children.splice(i, 1);
-                    }
-                }
-            }
             this.scene.add(this.webglGroup);
-            
             this.lidar.go(this.scene);
             this.annotation.go(this.scene);
             this.radars.go(this.scene);            
