@@ -10,3 +10,4 @@ tools/pypcd
 temp*/
 .idea
 .idea/*
+nohup.log

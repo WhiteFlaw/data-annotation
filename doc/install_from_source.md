@@ -7,7 +7,7 @@
    ```
 1. Install packages
      ```
-     pip install -r requirement.txt
+     pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirement.txt
      ```
 2. Download model
 
@@ -19,7 +19,9 @@
 ### Start
 Run the following command in shell, then go to http://127.0.0.1:8081
 ```
-python main.py
+python3 main.py
+# 【部署】后台运行
+nohup python3 -u main.py >> nohup.log 2>&1 &
 ```
 
 ## Object type configuration

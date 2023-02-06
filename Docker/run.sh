@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-cd /root/SUSTechPOINTS && python3 ./main.py
+cd /root/data-annotate && python3 ./main.py
