@@ -3,16 +3,15 @@ import { PopupDialog } from "./popup_dialog.js";
 
 
 
-class LogWindow extends PopupDialog{
-    
+class LogWindow extends PopupDialog {
+
     mouseDown = false;
     mouseDwwnPos = {};
 
 
-    constructor(ui, btn)
-    {
+    constructor(ui, btn) {
         super(ui);
-        
+
         this.btn = btn;
         this.svg = btn.querySelector("#log-svg");
 
@@ -20,13 +19,13 @@ class LogWindow extends PopupDialog{
         this.errorsContentUi = this.ui.querySelector("#content-errors");
         this.clearBtn = this.ui.querySelector("#btn-clear");
 
-        this.clearBtn.onclick = ()=>{ this.logsContentUi.innerHTML = ""; };
+        this.clearBtn.onclick = () => { this.logsContentUi.innerHTML = ""; };
         this.log("Welcome!");
 
         this.logBtn = this.ui.querySelector("#tab-log");
         this.errorBtn = this.ui.querySelector("#tab-error");
 
-        this.logBtn.onclick= ()=>{
+        this.logBtn.onclick = () => {
             this.logBtn.className = "tab-button tab-selected";
             this.errorBtn.className = "tab-button";
 
@@ -34,7 +33,7 @@ class LogWindow extends PopupDialog{
             this.errorsContentUi.style.display = 'none';
         }
 
-        this.errorBtn.onclick= ()=>{
+        this.errorBtn.onclick = () => {
             this.errorBtn.className = "tab-button tab-selected";
             this.logBtn.className = "tab-button";
 
@@ -43,14 +42,13 @@ class LogWindow extends PopupDialog{
         }
     }
 
-    setErrorsContent(errors)
-    {
+    setErrorsContent(errors) {
         let summary = `${errors.length} warnings.<br>`;
-        let text = errors.map(r=>`<a class='log-object-frame-id'>${r.frame_id},${r.obj_id}</a>, ${r.desc}<br>`).reduce((a,b)=>a+b, summary);
+        let text = errors.map(r => `<a class='log-object-frame-id'>${r.frame_id},${r.obj_id}</a>, ${r.desc}<br>`).reduce((a, b) => a + b, summary);
         this.errorsContentUi.innerHTML = text;
 
-        this.errorsContentUi.querySelectorAll(".log-object-frame-id").forEach(ele=>{
-            ele.onclick = (event)=>{
+        this.errorsContentUi.querySelectorAll(".log-object-frame-id").forEach(ele => {
+            ele.onclick = (event) => {
                 let obj = event.currentTarget.innerHTML.split(",");
                 console.log("click", obj);
                 window.editor.currentMainEditor.gotoObjectFrame(...obj); //frameid, objid
@@ -59,13 +57,11 @@ class LogWindow extends PopupDialog{
     }
 
 
-    setUi(ui)
-    {
+    setUi(ui) {
 
     }
 
-    show()
-    {
+    show() {
         super.show();
     }
 
@@ -75,13 +71,12 @@ class LogWindow extends PopupDialog{
     }
 
     autoScroll = true;
-    updateAutoScrollFlag()
-    {
+    updateAutoScrollFlag() {
         let div = this.logsContentUi;
-        this.autoScroll = (div.scrollHeight-10 < div.scrollTop + div.clientHeight);
+        this.autoScroll = (div.scrollHeight - 10 < div.scrollTop + div.clientHeight);
     }
 
-    autoScrollOutput(){
+    autoScrollOutput() {
         let div = this.logsContentUi;
         if (this.autoScroll)
             div.scrollTop = div.scrollHeight;
@@ -117,7 +112,7 @@ class LogWindow extends PopupDialog{
 
         this.logid++;
 
-        
+
         this.logsContentUi.innerHTML = old_content + "<div id='log-" + this.logid + "'  class='" + color + "'>" + thisstr + "</div>";
 
         this.autoScrollOutput();
@@ -126,12 +121,14 @@ class LogWindow extends PopupDialog{
 
     logid = 0;
     maxLogLength = 10000; // stringLength;
-    log() {
+    log() { // logger到处都是, 仅在此不做操作
+    }
 
-        this.svg.style.fill= this.logid %2 ? "red" : "green";
+    log_bak() {
+        this.svg.style.fill = this.logid % 2 ? "red" : "green";
 
         this.updateAutoScrollFlag();
-        
+
         console.log(...arguments);
         let old_content = this.logsContentUi.innerHTML;
 
@@ -140,15 +137,14 @@ class LogWindow extends PopupDialog{
         thisstr += this.buildLogStr(arguments);
 
         this.logid++;
-        
-        if (old_content.length > this.maxLogLength)
-        {
-            old_content = old_content.slice(old_content.length-this.maxLogLength);
+
+        if (old_content.length > this.maxLogLength) {
+            old_content = old_content.slice(old_content.length - this.maxLogLength);
             let firstLogPos = old_content.search("<div id=");
             old_content = old_content.slice(firstLogPos);
         }
 
-        this.logsContentUi.innerHTML =  old_content + "<div id='log-" + this.logid + "'>" + thisstr + "</div>";
+        this.logsContentUi.innerHTML = old_content + "<div id='log-" + this.logid + "'>" + thisstr + "</div>";
         this.autoScrollOutput();
     }
 
@@ -171,15 +167,15 @@ class LogWindow extends PopupDialog{
     }
 
     logonce() {
-        this.updateAutoScrollFlag(); 
+        this.updateAutoScrollFlag();
         let old_content = this.logsContentUi.innerHTML;
 
         let thisstr = this.gettime() + " ";
-        
+
         thisstr += this.buildLogStr(arguments);
 
         let laststr = this.logsContentUi.querySelector("#log-" + this.logid);
-        if (laststr && laststr.innerHTML && thisstr == laststr.innerHTML) 
+        if (laststr && laststr.innerHTML && thisstr == laststr.innerHTML)
             return;
 
         this.logid++;
@@ -195,8 +191,8 @@ class LogWindow extends PopupDialog{
 
 let logger = null;
 
-function create_logger(ui, btn){
+function create_logger(ui, btn) {
     logger = new LogWindow(ui, btn);
 }
 
-export{logger, create_logger};
+export { logger, create_logger };

@@ -1111,10 +1111,10 @@ td {
 }
 
 
-#log-wrapper {
+#log-wrapper { /* 控制logger显示 原inherit*/
 	width: 0%;
 	height: 0%;
-	display: inherit;
+	display: none;
 }
 
 #log-wrapper #view {
