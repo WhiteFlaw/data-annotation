@@ -25,6 +25,7 @@ import { MovableView } from './popup_dialog.js';
 import { globalKeyDownManager } from './keydown_manager.js';
 import { vector_range } from "./util.js"
 import { checkScene } from './error_check.js';
+import { manager } from "./backup/manager.js";
 
 function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
@@ -2055,7 +2056,16 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 break;
             */
             case 'z': // X
-                this.viewManager.mainView.transform_control.showX = !this.viewManager.mainView.transform_control.showX;
+                if (ev.ctrlKey) { // undo
+                    manager.undo();
+                } else {
+                    this.viewManager.mainView.transform_control.showX = !this.viewManager.mainView.transform_control.showX;
+                }
+                break;
+            case 'y': // X
+                if (ev.ctrlKey) { // redo
+                    manager.redo();
+                }
                 break;
             case 'x': // Y
                 this.viewManager.mainView.transform_control.showY = !this.viewManager.mainView.transform_control.showY;
@@ -2216,7 +2226,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         let old_frame_index = meta.frames.findIndex((w) => { return w === old_frame });
         var new_frame = meta.frames[Number(old_frame_index) - 1];
         var new_world = await this.data.getWorld(sceneName, new_frame); // world in previous frame.
-        this.change_webglGroup(old_frame, new_world, () => { location.reload(true) }, true);
+        this.change_world(old_frame, new_world, () => { }, true);
         this.nonuse_previous_frame()
     }
 
@@ -2366,11 +2376,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     };
 
-    this.change_webglGroup = async function (oldFrame, newWorld, onFinished, updateFrameInfo = true) {
+    this.change_world = async function (oldFrame, newWorld, onFinished, updateFrameInfo = true) {
 
         this.data.dbg.dump();
 
-        logger.log(`oldFrame '${oldFrame}' changed.`);
+        logger.log(`Replace annotation in ${oldFrame} by annotation in ${newWorld.frameInfo.frame}.`);
 
         var self = this;
         //stop if current world is not ready!
@@ -2388,9 +2398,10 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             this.viewManager.mainView.transform_control.detach();
         }
 
-        var world = await this.data.changeWebglGroup(oldFrame, newWorld); // find nowWorld in worldList and replace it.
+        var world = this.data.changeWorld(oldFrame, newWorld); // find nowWorld in worldList and replace it.
 
         saveWorldList([world]) // save
+
         if (world) {
             this.data.activate_world(
                 world,
@@ -2403,8 +2414,41 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             );
         }
 
-
     };
+
+    this.change_anno = async function (oldFrame, newWorldData, updateFrameInfo = true) {
+        this.data.dbg.dump();
+
+        var self = this;
+        //stop if current world is not ready!
+        if (this.data.world && !this.data.world.preloaded()) {
+            console.error("current world is still loading.");
+            return;
+        }
+
+        if (this.selected_box && this.selected_box.in_highlight) {
+            this.cancelFocus(this.selected_box);
+        }
+
+        if (this.viewManager.mainView && this.viewManager.mainView.transform_control.visible) {
+            //unselect first time
+            this.viewManager.mainView.transform_control.detach();
+        }
+
+        const world = await this.data.changeAnno(oldFrame, newWorldData);
+        // deepCopy保存下来的world不能直接用于渲染, 会出现视图更新的问题, 但是可以用来更新本地文件
+        saveWorldList([world]);
+
+        if (world) {
+            this.data.activate_world(
+                world,
+                function () {
+                    self.on_load_world_finished(world, updateFrameInfo);
+                }
+            );
+        }
+    };
+
     this.load_world = async function (sceneName, frame, onFinished, noUpdateFrameInfo = true) {
 
         this.data.dbg.dump();

@@ -29,7 +29,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
             this.mainView.onWindowResize();
     };
     
-    this.render = function(){
+    this.render = function(){ // 受boxEditor.render()调用
         console.log("render verything");
         if (this.mainView)
            this.mainView.renderAll();
@@ -66,7 +66,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
     //this.setColorScheme();
 
     // no public funcs below
-    function create_main_view(scene, renderer, globalRenderFunc, container, on_box_changed){
+    function create_main_view(scene, renderer, globalRenderFunc, container, on_box_changed){ // editor.js-->run()->render()->mainView
         var view ={};
         
         view.backgroundColor=　(document.documentElement.className == "theme-dark") ? new THREE.Color( 0.0, 0.0, 0.0 ) : new THREE.Color( 1.0, 1.0, 1.0 );
@@ -117,7 +117,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
         //cameraOrthoHelper.visible=true;
         //scene.add( cameraOrthoHelper );
 
-        view.render=function(){
+        view.render=function(){ // editor.js--run()->render()->mainView--render()
             //console.log("render mainview.");
             if (this.active){
                 //this.switch_camera(false);
@@ -145,7 +145,7 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
             this.renderWithCamera(this.blind_camera);
         };
 
-        view.renderWithCamera = function(camera){
+        view.renderWithCamera = function(camera){ // editor.js--run()->render()->mainView--render()->renderWithCamera()
             var left = 0;
             var bottom = 0;
             var width = this.container.scrollWidth;
@@ -161,8 +161,8 @@ function ViewManager(mainViewContainer, webglScene, webglMainScene, renderer, gl
             this.renderer.setScissor( left, bottom, width, height );
             this.renderer.setClearColor(view.backgroundColor );
             this.renderer.setScissorTest( true );
-
-            this.renderer.render( this.scene, camera );
+            
+            this.renderer.render( this.scene, camera ); // view.scene->create_main_view()--scene->webglMainScene->editor.js--this.mainScene->this.scene->new THREE.Scene();
         };
 
 

@@ -3,6 +3,8 @@
 import { World } from "./world.js";
 import { Debug } from "./debug.js";
 import { logger } from "./log.js"
+import { manager } from "./backup/manager.js";
+import { copyWorld, setWorld, replaceWorld } from "./util.js";
 
 class Data {
 
@@ -73,16 +75,15 @@ class Data {
         return world;
     };
 
-    async changeWebglGroup(oldFrame, newWorld) { // pcd不变, 替换标注
+    changeWorld(oldFrame, newWorld) { // pcd不变, 替换标注
         let oldWorld = this.worldList.find((w) => w.frameInfo.frame === oldFrame);
-        for (const key in newWorld) {
-            if (key === 'webglGroup') { // 旧世界的所有的Group全部去除再加入所有新世界Group, 可以实现box视图更新
-                oldWorld[key]['children'] = oldWorld[key]['children'].filter((ele) => { return ele.type !== 'Group' });
-                oldWorld[key]['children'].push(...newWorld[key]['children'].filter((ele) => { return ele.type === 'Group' }));
-                // 替换webglGroup其他所有
-                for (const pro in newWorld[key]) pro !== 'children' && pro !== 'position' && pro !== 'rotation' && pro !== 'quaternion' && pro !== 'scale' && (oldWorld[key][pro] = newWorld[key][pro]);
-            } else if (key !== 'frameInfo') oldWorld[key] = newWorld[key];
-        }
+        const world = replaceWorld(newWorld, oldWorld);
+        return world;
+    }
+
+    changeAnno(oldFrame, newWorldData) { // webglGroup会随着_preload自动更新, 数据正确就不用担心
+        let oldWorld = this.worldList.find((w) => w.frameInfo.frame === oldFrame);
+        setWorld(oldWorld, newWorldData);
         return oldWorld;
     }
 
@@ -271,6 +272,12 @@ class Data {
         // }
 
         pendingFrames.forEach(_do_create);
+
+        const initialAction = {
+            name: 'initialWorld',
+            params: copyWorld(this.world)
+        }
+        manager.initManager(initialAction);
     }
 
 

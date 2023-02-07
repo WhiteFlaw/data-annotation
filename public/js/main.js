@@ -1,7 +1,7 @@
-import{Config} from "./config.js"
-import{Editor} from "./editor.js"
-import {Data} from './data.js'
-
+import { Config } from "./config.js"
+import { Editor } from "./editor.js"
+import { Data } from './data.js'
+import { manager } from './backup/manager.js';
 
 let pointsGlobalConfig = new Config();
 window.pointsGlobalConfig = pointsGlobalConfig;
@@ -10,38 +10,41 @@ window.pointsGlobalConfig = pointsGlobalConfig;
 pointsGlobalConfig.load();
 
 
-document.documentElement.className="theme-"+pointsGlobalConfig.theme;
+document.documentElement.className = "theme-" + pointsGlobalConfig.theme;
 
 
 document.body.addEventListener('keydown', event => {
-    if (event.ctrlKey && 'asdv'.indexOf(event.key) !== -1) {
-      event.preventDefault()
-    }
+  if (event.ctrlKey && 'asdv'.indexOf(event.key) !== -1) {
+    event.preventDefault()
+  }
 });
 
-async function createMainEditor(){
+async function createMainEditor() {
 
   let template = document.querySelector('#editor-template');
-  let maindiv  = document.querySelector("#main-editor");
+  let maindiv = document.querySelector("#main-editor");
   let main_ui = template.content.cloneNode(true); // 对editor-template节点进行深拷贝
   maindiv.appendChild(main_ui); // input parameter is changed after `append`
 
   let editorCfg = pointsGlobalConfig;
 
   let dataCfg = pointsGlobalConfig;
-  
+
   let data = new Data(dataCfg);
   await data.init();
 
   let editor = new Editor(maindiv.lastElementChild, maindiv, editorCfg, data, "main-editor")
   window.editor = editor;
   editor.run();
+
+  manager.initEditor(editor);
+
   return editor;
-} 
+}
 
-async function start(){
+async function start() {
 
- 
+
   let mainEditor = await createMainEditor();
 
 
@@ -51,8 +54,7 @@ async function start(){
   let scene = url.searchParams.get("scene");
   let frame = url.searchParams.get("frame");
 
-  if (scene && frame)
-  {
+  if (scene && frame) {
     mainEditor.load_world(scene, frame);
   }
 }

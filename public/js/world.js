@@ -31,7 +31,7 @@ function FrameInfo(data, sceneMeta, sceneName, frame){
     //         this.annotation_format = annotation_format;
     // };
 
-        
+    // 读取本地数据
     this.get_pcd_path = function(){
             return 'data/'+ this.scene + "/lidar/" + this.frame + this.sceneMeta.lidar_ext;
         };
@@ -210,7 +210,7 @@ function Images(sceneMeta, sceneName, frame){
 
 
 
-function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
+function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){ // world初始实例化不包括webglGroup, 所以会直接执行preload以生成webglGroup
     this.data = data;
     this.sceneMeta = this.data.getMetaBySceneName(sceneName);
     this.frameInfo = new FrameInfo(this.data, this.sceneMeta, sceneName, frame);
@@ -224,7 +224,7 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
     }
     //points_backup: null, //for restore from highlight
         
-    this.cameras = new Images(this.sceneMeta, sceneName, frame);
+    this.cameras = new Images(this.sceneMeta, sceneName, frame); // new World会进行一些实例化以准备preload
     this.radars = new RadarManager(this.sceneMeta, this, this.frameInfo);
     this.lidar = new Lidar(this.sceneMeta, this, this.frameInfo);
     this.annotation = new Annotation(this.sceneMeta, this, this.frameInfo);
@@ -451,12 +451,13 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
     }
 
 
-    this.preload=function(on_preload_finished){
+    this.preload=function(on_preload_finished){ // on_preload_finished没传
         this.create_time = new Date().getTime();
         console.log(this.create_time, sceneName, frame, "start");
 
         this.webglGroup = new THREE.Group();
         this.webglGroup.name = "world";
+        console.log("重建webglGroup");
         
         
         let _preload_cb = ()=>this.on_subitem_preload_finished(on_preload_finished);
@@ -472,7 +473,7 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
     this.scene = null,
     this.destroy_old_world = null, //todo, this can be a boolean
     this.on_finished = null,
-    this.activate=function(scene, destroy_old_world, on_finished){
+    this.activate=function(scene, destroy_old_world, on_finished){ // data.js--word_active--world.active, data从editor--set_webglScene拿到mainscene,即该处scene, 完成回调即on_load_world_finished 
         this.scene = scene;
         this.active = true;
         this.destroy_old_world = destroy_old_world;
@@ -492,7 +493,7 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
 
             //however we still call on_finished
             if (this.on_finished){
-                this.on_finished();
+                this.on_finished(); // on_load_world_finished
             }
             return;
         }
@@ -510,10 +511,12 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){
                 this.unload();
                 return;
             }
-            this.scene.add(this.webglGroup);
+
+            this.scene.add(this.webglGroup); // this.scene->this.activate()--editor.js->this.mainScene->THREE.new Group()
+
             this.lidar.go(this.scene);
             this.annotation.go(this.scene);
-            this.radars.go(this.scene);            
+            this.radars.go(this.scene);
             this.aux_lidars.go(this.scene);
 
 

@@ -1,48 +1,44 @@
-
-
-
-import { Editor } from "./editor.js";
 import { checkScene } from "./error_check.js";
-import {logger} from "./log.js"
+import { logger } from "./log.js"
+import { manager } from "./backup/manager.js";
+import { copyWorld } from './util.js'
 
 
-
-
-function reloadWorldList(worldList, done){
+function reloadWorldList(worldList, done) {
     var xhr = new XMLHttpRequest();
-        // we defined the xhr
+    // we defined the xhr
     xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
-    
+
         if (this.status == 200) {
             let anns = JSON.parse(this.responseText);
-        
+
             // load annotations
-            anns.forEach(a=>{
-                let world = worldList.find(w=>{
-                    return (w.frameInfo.scene == a.scene && 
-                            w.frameInfo.frame == a.frame);
-                    });
-                if (world){
+            anns.forEach(a => {
+                let world = worldList.find(w => {
+                    return (w.frameInfo.scene == a.scene &&
+                        w.frameInfo.frame == a.frame);
+                });
+                if (world) {
                     world.annotation.reapplyAnnotation(a.annotation);
                 }
-                else{
+                else {
                     console.error("bug?");
                 }
-                
+
             });
 
             if (done)
                 done();
         }
     };
-    
+
     xhr.open('POST', "/loadworldlist", true);
 
-    let para = worldList.map(w=>{
+    let para = worldList.map(w => {
         return {
             //todo: we could add an id, so as to associate world easily
-            scene: w.frameInfo.scene, 
+            scene: w.frameInfo.scene,
             frame: w.frameInfo.frame,
         };
     });
@@ -54,30 +50,35 @@ function reloadWorldList(worldList, done){
 var saveDelayTimer = null;
 var pendingSaveList = [];
 
-function saveWorldList(worldList){
-    //pendingSaveList = pendingSaveList.concat(worldList);
+function saveToBackup(world) {
+    const action = {
+        name: 'saveWorld',
+        params: copyWorld(world)
+    }
 
-    worldList.forEach(w=>{
+    manager.do(action);
+}
+
+function saveWorldList(worldList) {
+    worldList.forEach(w => {
         if (!pendingSaveList.includes(w))
             pendingSaveList.push(w); // offline save
     });
 
-    if (saveDelayTimer)
-    {
+    if (saveDelayTimer) {
         clearTimeout(saveDelayTimer);
     }
-    
-    saveDelayTimer = setTimeout(()=>{
-            
+
+    saveDelayTimer = setTimeout(() => { // 节流?
+        saveToBackup(worldList[0]);
+
         logger.log("save delay expired.");
 
         //pandingSaveList will be cleared soon.
         let scene = pendingSaveList[0].frameInfo.scene;
-        
 
-        console.log("pendingSaveList", pendingSaveList);
-        doSaveWorldList(pendingSaveList, ()=>{
-            editor.header.updateModifiedStatus();
+        doSaveWorldList(pendingSaveList, () => {
+            window.editor.header.updateModifiedStatus(); // 更新保存按钮状态
 
             checkScene(scene);
         });
@@ -85,25 +86,23 @@ function saveWorldList(worldList){
         //reset
 
         saveDelayTimer = null;
-        pendingSaveList = [];
+        // pendingSaveList = [];
+    },
 
-        
-    }, 
-
-    500);
+        500);
 }
 
 
 function doSaveWorldList(worldList, done) {
-    if (worldList.length>0){
-        if (worldList[0].data.cfg.disableLabels){
+    if (worldList.length > 0) {
+        if (worldList[0].data.cfg.disableLabels) {
             console.log("labels not loaded, save action is prohibitted.")
             return;
         }
     }
 
     console.log(worldList.length, "frames");
-    let ann = worldList.map(w=>{
+    let ann = worldList.map(w => {
         return {
             scene: w.frameInfo.scene,
             frame: w.frameInfo.frame,
@@ -117,24 +116,25 @@ function doSaveWorldList(worldList, done) {
 
     xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
-    
+
         if (this.status == 200) {
             
-            worldList.forEach(w=>{
+
+            worldList.forEach(w => {
                 w.annotation.resetModified();
             })
 
-            logger.log(`saved: ${worldList[0].frameInfo.scene}: ${worldList.reduce((a,b)=>a+" "+b.frameInfo.frame, "")}`);
+            logger.log(`saved: ${worldList[0].frameInfo.scene}: ${worldList.reduce((a, b) => a + " " + b.frameInfo.frame, "")}`);
 
-            if(done){
+            if (done) {
                 done();
             }
         }
-        else{
+        else {
             window.editor.infoBox.show("Error", `save failed, status : ${this.status}`);
         }
-        
-    
+
+
         // end of state change: it can be after some time (async)
     };
 
@@ -157,7 +157,7 @@ function doSaveWorldList(worldList, done) {
 
 //     xhr.onreadystatechange = function () {
 //         if (this.readyState != 4) return;
-    
+
 //         if (this.status == 200) {
 //             logger.log(`saved: ${world}`);
 //             world.annotation.resetModified();
@@ -170,10 +170,10 @@ function doSaveWorldList(worldList, done) {
 //                 done();
 //             }
 
-            
-            
+
+
 //         }
-    
+
 //         // end of state change: it can be after some time (async)
 //     };
 
@@ -183,4 +183,4 @@ function doSaveWorldList(worldList, done) {
 // }
 
 
-export {saveWorldList, reloadWorldList}
+export { saveWorldList, reloadWorldList }
