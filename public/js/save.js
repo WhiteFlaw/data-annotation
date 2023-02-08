@@ -59,7 +59,7 @@ function saveToBackup(world) {
     manager.do(action);
 }
 
-function saveWorldList(worldList) {
+function saveWorldList(worldList, isManual = false) {
     worldList.forEach(w => {
         if (!pendingSaveList.includes(w))
             pendingSaveList.push(w); // offline save
@@ -78,6 +78,12 @@ function saveWorldList(worldList) {
         let scene = pendingSaveList[0].frameInfo.scene;
 
         doSaveWorldList(pendingSaveList, () => {
+            if (isManual) {
+                const feedback = document.querySelector("#save-feedback");
+                feedback.style.display = 'block';
+                const reHide = () => feedback.style.display = 'none';
+                setTimeout(reHide, 2000);
+            }
             window.editor.header.updateModifiedStatus(); // 更新保存按钮状态
 
             checkScene(scene);
@@ -118,7 +124,7 @@ function doSaveWorldList(worldList, done) {
         if (this.readyState != 4) return;
 
         if (this.status == 200) {
-            
+
 
             worldList.forEach(w => {
                 w.annotation.resetModified();
