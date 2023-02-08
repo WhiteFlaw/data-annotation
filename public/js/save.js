@@ -79,10 +79,7 @@ function saveWorldList(worldList, isManual = false) {
 
         doSaveWorldList(pendingSaveList, () => {
             if (isManual) {
-                const feedback = document.querySelector("#save-feedback");
-                feedback.style.display = 'block';
-                const reHide = () => feedback.style.display = 'none';
-                setTimeout(reHide, 2000);
+                window.editor.header.updateSaveFeedback();
             }
             window.editor.header.updateModifiedStatus(); // 更新保存按钮状态
 
