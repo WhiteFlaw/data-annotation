@@ -23,7 +23,7 @@ async function createMainEditor() {
 
   let template = document.querySelector('#editor-template');
   let maindiv = document.querySelector("#main-editor");
-  let main_ui = template.content.cloneNode(true); // 对editor-template节点进行深拷贝
+  let main_ui = template.content.cloneNode(true);
   maindiv.appendChild(main_ui); // input parameter is changed after `append`
 
   let editorCfg = pointsGlobalConfig;
@@ -58,7 +58,6 @@ async function start() {
     mainEditor.load_world(scene, frame);
   }
 }
-
 
 
 

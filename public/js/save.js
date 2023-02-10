@@ -79,7 +79,7 @@ function saveWorldList(worldList, isManual = false) {
 
         doSaveWorldList(pendingSaveList, () => {
             if (isManual) {
-                window.editor.header.updateSaveFeedback();
+                window.editor.header.updateSaveFeedback(true);
             }
             window.editor.header.updateModifiedStatus(); // 更新保存按钮状态
 
@@ -89,7 +89,7 @@ function saveWorldList(worldList, isManual = false) {
         //reset
 
         saveDelayTimer = null;
-        // pendingSaveList = [];
+        pendingSaveList = [];
     },
 
         500);
@@ -109,7 +109,7 @@ function doSaveWorldList(worldList, done) {
         return {
             scene: w.frameInfo.scene,
             frame: w.frameInfo.frame,
-            annotation: w.annotation.toBoxAnnotations(),
+            annotation: w.annotation.toBoxAnnotations()
         };
     })
 
@@ -132,8 +132,7 @@ function doSaveWorldList(worldList, done) {
             if (done) {
                 done();
             }
-        }
-        else {
+        } else {
             window.editor.infoBox.show("Error", `save failed, status : ${this.status}`);
         }
 

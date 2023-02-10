@@ -132,12 +132,12 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
             }
         }
 
-        this.updateSaveFeedback = function () {
-            const feedback = document.querySelector("#save-feedback");
-            feedback.style.display = 'block';
-            reHide = () => feedback.style.display = 'none';
-            setTimeout(reHide, 2000);
-        }
+    this.updateSaveFeedback = function () {
+        const feedback = document.querySelector("#save-feedback");
+        feedback.style.display = 'block';
+        const reHide = () => feedback.style.display = 'none';
+        setTimeout(reHide, 2000);
+    }
 
     this.ui.querySelector("#changed-mark").onmouseenter = () => {
 

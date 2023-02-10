@@ -83,7 +83,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.playControl = new PlayControl(this.data);
 
         this.configUi = new ConfigUi(editorUi.querySelector("#config-button"), editorUi.querySelector("#config-wrapper"), this);
-
+        
         this.header = new Header(editorUi.querySelector("#header"), this.data, this.editorCfg,
             (e) => {
                 this.scene_changed(e.currentTarget.value);
@@ -2399,7 +2399,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
 
         var world = this.data.changeWorld(oldFrame, newWorld); // find nowWorld in worldList and replace it.
-
         saveWorldList([world]) // save
 
         if (world) {

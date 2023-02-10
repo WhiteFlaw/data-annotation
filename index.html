@@ -17,9 +17,9 @@
 <body>
 
 	<div id="main-editor"></div>
-	<!-- div id="batch-editor"-->
-	</div>
-	<template id="editor-template">
+	<!-- div id="batch-editor"
+	</div> -->
+	<template id="editor-template"> <!-- mainEditor有一个, 最先进行 -->
 		<div id="main-ui" class="editor-ui">
 			<div id="header">
 				<div id="global-info">
@@ -1232,7 +1232,7 @@
 		</div>
 
 	</template>
-	<template id="box-editor-ui-template">
+	<template id="box-editor-ui-template"> <!-- batch-box-editor-group, main-box-editor-wrapper, batch-box-editor里各有一个 -->
 		<div id="sub-views">
 			<div class="box-info non-selectable" id="box-info"></div>
 			<div class="view-manipulator" id="z-view-manipulator" tabindex="-1">
@@ -1474,7 +1474,7 @@
 			<canvas id="focuscanvas" class="non-selectable" width="320" height="240">cavas</canvas>
 		</div>
 	</template>
-	<template id="batch-editor-tools-template">
+	<template id="batch-editor-tools-template"> <!-- dynamic-buttons-placeholder有一个 -->
 		<div id="batch-editor-tools-wrapper" class="non-selectable">
 			<div id="batch-editor-tools">
 				<!-- <select title="category"  id="object-category-selector"></select>
