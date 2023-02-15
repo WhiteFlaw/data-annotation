@@ -15,7 +15,7 @@ class ObjectCategory {
 
 
         BicycleRider: { color: '#88ff00', size: [1.6, 0.6, 1.7], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
-        Bicycle: { color: '#ff8800', size: [1.8, 0.7, 1] },
+        Bicycle: { color: '#fcaafc', size: [1.8, 0.7, 1] },
         Cyclist: { color: '#ff8800', size: [1.5, 0.6, 1] },
 // 
         // Motorcycle: { color: '#aaaa00', size: [1.6, 0.6, 1.2], attr: ["umbrella"] },
