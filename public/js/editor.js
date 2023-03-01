@@ -301,8 +301,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             var x2 = Math.cos(theta2);
             var y2 = Math.sin(theta2);
 
-            body.push(0.6 * x1, 0.6 * y1, h, 0.6 * x2, 0.6 * y2, h); // 75, 只保留一个半径75的单圆环
-            // body.push(x1,y1,h,x2,y2,h); // 125
+            body.push(0.6 * x1, 0.6 * y1, h, 0.6 * x2, 0.6 * y2, h); // 75
+            body.push(x1 * (120 / 125), y1 * (120 / 125), h, x2 * (120 / 125), y2 * (120 / 125), h); // 120
             // body.push(2.0*x1,2.0*y1,h,2.0*x2,2.0*y2,h); // 250
         }
 
