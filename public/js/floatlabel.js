@@ -86,11 +86,13 @@ class FastToolBox {
     }
 
     show() { // it be called when floating-things needs to show.
-        if(document.querySelector("#if-default-use").checked === true) {
-            let default_category = document.querySelector("#category-selector").value;
+        if(document.querySelector("#if-default-attribute-use").checked) {
             let default_attribute = document.querySelector("#attribute-selector").value;
-            document.querySelector('#floating-things #object-category-selector').value = default_category;
             this.ui.querySelector('#attr-input').value = default_attribute;
+        }
+        if(document.querySelector("#if-default-category-use").checked) {
+            let default_category = document.querySelector("#category-selector").value;
+            document.querySelector('#floating-things #object-category-selector').value = default_category;
         }
         this.ui.style.display = "inline-block";
         this.ui.querySelector("#attr-selector").style.display = "none";
@@ -99,7 +101,7 @@ class FastToolBox {
     setValue(obj_type, obj_track_id, obj_attr) {
         this.ui.querySelector("#object-category-selector").value = obj_type;
 
-        if(document.querySelector("#if-default-use").checked === false) { // can use default attr, value of object-att should be set in show()
+        if(document.querySelector("#if-default-attribute-use").checked === false) { // object-attr should be set in show()
             this.setAttrOptions(obj_type, obj_attr);
         }
 

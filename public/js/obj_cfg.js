@@ -93,7 +93,7 @@ class ObjectCategory {
 
     guess_obj_type_by_dimension(scale) {
         let max_name = 0;
-        if (document.querySelector("#if-default-use").checked === true) {
+        if (document.querySelector("#if-default-category-use").checked) {
             max_name = document.querySelector("#category-selector").value;
         } else {
             var max_score = 0;

@@ -92,7 +92,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             (e) => { this.frame_changed(e) },
             (e) => { this.object_changed(e) },
             (e) => { this.camera_changed(e) },
-            () => { this.use_default_changed() }, // enable the default attribute and category.
+            () => { this.use_attribute_changed() }, // enable the default attribute.
+            () => { this.use_category_changed() }, // enable the default category.
             () => { this.use_previous_frame_click() }, // use previous frame.
         );
 
@@ -1245,7 +1246,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     this.object_attribute_changed = function (value) {
         if (this.selected_box) {
-            if (document.querySelector("#if-default-use").checked === true) {
+            if (document.querySelector("#if-default-attribute-use").checked) {
                 let currAttr = document.querySelector('#attribute-selector').value;
                 this.selected_box.obj_attr = currAttr;
                 this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, currAttr);
@@ -2177,14 +2178,27 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
     };
 
-    this.use_default_changed = function () {
-        var ifUse = document.querySelector('#if-default-use').checked;
-        var category_selector = document.querySelector("#category-selector");
+    this.use_attribute_changed = function () {
+        var ifuse = document.querySelector('#if-default-attribute-use').checked;
         var attribute_selector = document.querySelector("#attribute-selector");
-        category_selector.disabled = attribute_selector.disabled = !ifUse;
-        if (ifUse === true) {
-            this.editorUi.querySelector("#floating-things #attr-input").innerHTML = attribute_selector.value;
-            this.editorUi.querySelector("#floating-things #attr-selector").innerHTML = attribute_selector.value;
+        var attribute_label = document.querySelector('#if-default-attribute-label');
+        attribute_selector.disabled = !ifuse;
+        if(ifuse) {
+            attribute_label.style.color = '#fff';
+        } else {
+            attribute_label.style.color = 'rgb(173, 173, 173)';
+        }
+    }
+    
+    this.use_category_changed = function () {
+        var ifuse = document.querySelector('#if-default-category-use').checked;
+        var category_selector = document.querySelector("#category-selector");
+        var category_label = document.querySelector("#if-default-category-label");
+        category_selector.disabled = !ifuse;
+        if(ifuse) {
+            category_label.style.color = '#fff';
+        } else {
+            category_label.style.color = 'rgb(173, 173, 173)';
         }
     }
 
@@ -2704,26 +2718,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             sheet.insertRule(rule, sheet.cssRules.length);
         }
 
-        let obj_type_keys = Object.keys(obj_type_map)
-
-        // obj type selector
-        sessionStorage.setItem('default_category', obj_type_keys[0]);
-        sessionStorage.setItem('default_attribute', 0);
-
         let options = ''
         for (var o in obj_type_map) {
             options += '<option value="' + o + '" class="' + o + '">' + o + '</option>';
         }
         document.querySelector('#category-selector').innerHTML = options;
-
-        // document.querySelector('#category-selector').onchange = (event) => {
-        //     this.object_category_changed(event) // 修改物体标注
-        //     this.category_selector_changed()
-        // }
-        // document.querySelector("#attribute-selector").onchange = (event) => {
-        //     this.object_attribute_changed()
-        //     this.attribute_selector_changed()
-        // }
 
         this.editorUi.querySelector("#floating-things #object-category-selector").innerHTML = options;
         // this.editorUi.querySelector("#batch-editor-tools-wrapper #object-category-selector").innerHTML = options;
@@ -2778,21 +2777,13 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     };
 
     this.category_selector_changed = function () {
-        let now_obj_category = this.editorUi.querySelector("#floating-things #object-category-selector").value;
         let default_category = document.getElementById('category-selector').value;
         this.editorUi.querySelector("#floating-things #object-category-selector").value = default_category;
-        if (now_obj_category !== default_category) { // 判定是否需要更新缓存
-            sessionStorage.setItem('default_category', default_category);
-        }
     }
 
     this.attribute_selector_changed = function () {
-        let now_attr = document.querySelector("#attr-input").value;
         let default_attr = document.querySelector('#attribute-selector').value;
         document.querySelector("#attr-input").value = default_attr
-        if (now_attr != default_attr) {
-            sessionStorage.setItem('default_attribute', default_attr);
-        }
     }
 
     this.setDefaultObjType = function (currVal) {

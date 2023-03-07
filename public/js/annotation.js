@@ -319,7 +319,7 @@ function Annotation(sceneMeta, world, frameInfo) {
 
     this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
         let objAttr
-        if(document.querySelector("#if-default-use").checked === true) {
+        if(document.querySelector("#if-default-attribute-use").checked) {
             objAttr = document.querySelector("#attribute-selector").value
         } else {
             objAttr = obj_attr;

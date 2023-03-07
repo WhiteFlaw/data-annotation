@@ -1,7 +1,7 @@
 
 import { saveWorldList } from "./save.js"
 
-var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onIfDefaultUseChanged, onUsePreviousFrameClicked) {
+var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onAttributeUseChanged, onCategoryUseChanged, onUsePreviousFrameClicked) {
 
     this.ui = ui;
     this.data = data;
@@ -13,14 +13,16 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.objectSelectorUi = ui.querySelector("#object-selector");
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
-    this.ifDefaultUseUi = ui.querySelector('#if-default-use');
+    this.categoryUseUi = ui.querySelector('#if-default-category-use');
+    this.attributeUseUi = ui.querySelector('#if-default-attribute-use');
     this.usePreviousFrameUi = ui.querySelector('#use-previous-frame');
 
     this.onSceneChanged = onSceneChanged;
     this.onFrameChanged = onFrameChanged; // editor.js--this.frame_changed()
     this.onObjectSelected = onObjectSelected;
     this.onCameraChanged = onCameraChanged;
-    this.onIfDefaultUseChanged = onIfDefaultUseChanged;
+    this.onCategoryUseChanged = onCategoryUseChanged;
+    this.onAttributeUseChanged = onAttributeUseChanged;
     this.onUsePreviousFrameClicked = onUsePreviousFrameClicked;
 
 
@@ -69,8 +71,9 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
     this.frameSelectorUi.onchange = (e) => { this.onFrameChanged(e); };
     this.cameraSelectorUi.onchange = (e) => { this.onCameraChanged(e); };
-    this.ifDefaultUseUi.onchange = (e) => { this.onIfDefaultUseChanged(e); }; // enable default attribute and category, Header will be instantiated in editor.js
-    this.usePreviousFrameUi.onclick = () => { this.onUsePreviousFrameClicked(); }; // use previous frame onclick.
+    this.attributeUseUi.onchange = () => { this.onAttributeUseChanged(); }; // enable default attribute
+    this.categoryUseUi.onchange = () => { this.onCategoryUseChanged(); }; // enable default category
+    this.usePreviousFrameUi.onclick = () => { this.onUsePreviousFrameClicked(); }; // use previous frame.
 
     this.setObject = function (id) {
         this.objectSelectorUi.value = id;
