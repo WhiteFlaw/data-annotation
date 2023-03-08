@@ -149,6 +149,11 @@ canvas {
 	background-color: var(--widget-background-color);
 }
 
+#if-default-attribute-label,
+#if-default-category-label {
+	color: rgb(173, 173, 173);
+}
+
 #camera-selector {
 	position: relative;
 	padding-right: 5px;
