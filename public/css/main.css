@@ -129,7 +129,7 @@ canvas {
 
 #object-category-selector,
 #object-track-id-editor,
-#attr-input,
+#object-attribute-selector,
 #scene-selector,
 #frame-selector,
 #object-selector,
@@ -194,13 +194,8 @@ canvas {
 
 
 #object-track-id-editor,
-#attr-input {
+#object-attribute-selector {
 	border-bottom-width: 1px;
-}
-
-#attr-input {
-	margin-right: 5px;
-	line-height: 24px;
 }
 
 #object-category-attribute,
@@ -425,14 +420,14 @@ dynamic set obj-type css has higher priority than this one.
 
 #attr-editor {
 	position: relative;
+	width: 100%;
+	height: 20px;
 }
 
-#attr-selector {
+#object-attribute-selector {
 	position: absolute;
-	top: 100%;
-	left: 0%;
 	background-color: var(--widget-background-color);
-	width: 250px;
+	width: 30%;
 }
 
 .attr-item {

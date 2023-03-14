@@ -469,8 +469,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             case "object-track-id-editor":
                 this.object_track_id_changed(event);
                 break;
-            case "attr-input":
-                this.object_attribute_changed(event.currentTarget.value);
+            case "object-attribute-selector":
+                this.object_attribute_changed(event);
                 break;
             default:
                 this.handleContextMenuEvent(event);
@@ -1244,17 +1244,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
     };
 
-    this.object_attribute_changed = function (value) {
+    this.object_attribute_changed = function (event) {
+        let currAttr = event.currentTarget.value;
         if (this.selected_box) {
-            if (document.querySelector("#if-default-attribute-use").checked) {
-                let currAttr = document.querySelector('#attribute-selector').value;
-                this.selected_box.obj_attr = currAttr;
-                this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, currAttr);
-            } else {
-                this.selected_box.obj_attr = value;
-                this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, value);
-
-            }
+            this.selected_box.obj_attr = currAttr;
+            this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, currAttr);
             this.data.world.annotation.setModified();
             this.header.updateModifiedStatus();
         }
@@ -2775,16 +2769,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         // }
 
     };
-
-    this.category_selector_changed = function () {
-        let default_category = document.getElementById('category-selector').value;
-        this.editorUi.querySelector("#floating-things #object-category-selector").value = default_category;
-    }
-
-    this.attribute_selector_changed = function () {
-        let default_attr = document.querySelector('#attribute-selector').value;
-        document.querySelector("#attr-input").value = default_attr
-    }
 
     this.setDefaultObjType = function (currVal) {
         if (this.selected_box) {

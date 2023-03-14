@@ -1,8 +1,8 @@
-
+import * as THREE from './lib/three.module.js';
 
 import { psr_to_xyz } from "./util.js"
-import * as THREE from './lib/three.module.js';
 import { globalObjectCategory } from "./obj_cfg.js";
+
 class FastToolBox {
     constructor(ui, eventHandler) {
         let self = this;
@@ -10,28 +10,6 @@ class FastToolBox {
         this.eventHandler = eventHandler;
 
         this.installEventHandler();
-
-        this.ui.querySelector("#attr-editor").onmouseenter = function (event) {
-            if (this.timerId) {
-                clearTimeout(this.timerId);
-                this.timerId = null;
-            }
-
-            event.target.querySelector("#attr-selector").style.display = "";
-
-        };
-
-
-        this.ui.querySelector("#attr-editor").onmouseleave = function (event) {
-            let ui = event.target.querySelector("#attr-selector");
-
-            this.timerId = setTimeout(() => {
-                ui.style.display = "none";
-                this.timerId = null;
-            },
-                200);
-
-        };
 
         this.ui.querySelector("#label-more").onmouseenter = function (event) {
             if (this.timerId) {
@@ -85,17 +63,16 @@ class FastToolBox {
         this.ui.style.display = "none";
     }
 
-    show() { // it be called when floating-things needs to show.
-        if(document.querySelector("#if-default-attribute-use").checked) {
-            let default_attribute = document.querySelector("#attribute-selector").value;
-            this.ui.querySelector('#attr-input').value = default_attribute;
-        }
-        if(document.querySelector("#if-default-category-use").checked) {
+    show() { // if floating-things needs to show.
+        /* if(document.querySelector("#if-default-category-use").checked) {
             let default_category = document.querySelector("#category-selector").value;
-            document.querySelector('#floating-things #object-category-selector').value = default_category;
-        }
+            this.ui.querySelector('#floating-things #object-category-selector').value = default_category;
+        } */
+/*         if(document.querySelector("#if-default-attribute-use").checked) {
+            let default_attribute = document.querySelector("#attribute-selector").value;
+            this.ui.querySelector('#floating-things #object-attribute-selector').value = default_attribute;
+        } */
         this.ui.style.display = "inline-block";
-        this.ui.querySelector("#attr-selector").style.display = "none";
     }
 
     setValue(obj_type, obj_track_id, obj_attr) {
@@ -108,9 +85,9 @@ class FastToolBox {
         this.ui.querySelector("#object-track-id-editor").value = obj_track_id;
 
         if (obj_attr)
-            this.ui.querySelector("#attr-input").value = obj_attr;
+            this.ui.querySelector("#object-attribute-selector").value = obj_attr;
         else
-            this.ui.querySelector("#attr-input").value = "";
+            this.ui.querySelector("#object-attribute-selector").value = "";
 
     }
 
@@ -123,76 +100,17 @@ class FastToolBox {
 
     setAttrOptions(obj_type, obj_attr) {
 
-        let attrs = ["static"];
-
-
-        if (globalObjectCategory.obj_type_map[obj_type] && globalObjectCategory.obj_type_map[obj_type].attr)
-            attrs = attrs.concat(globalObjectCategory.obj_type_map[obj_type].attr);
-
-
-        // merge attrs
-        let objAttrs = [];
-
-        if (obj_attr) {
-            objAttrs = obj_attr.split(",").map(a => a.trim());
-            objAttrs.forEach(a => {
-                if (!attrs.find(x => x == a)) {
-                    attrs.push(a);
-                }
-            })
-        }
-
+        let attrs = ['', 0, 1]; // object-attribute-selector
 
         let items = ``;
 
-
         attrs.forEach(a => {
-            if (objAttrs.find(x => x == a)) {
-                items += `<div class='attr-item attr-selected'>${a}</div>`
-            }
-            else {
-                items += `<div class='attr-item'>${a}</div>`
-            }
+            items += `<option class='attr-item'>${a}</option>`
         });
 
 
-        this.ui.querySelector("#attr-selector").innerHTML = items; // also set options for header attr-selector
-
-        this.ui.querySelector("#attr-selector").onclick = (event) => {
-
-            let attrs = this.ui.querySelector("#attr-input").value;
-
-            let objCurrentAttrs = [];
-            if (attrs)
-                objCurrentAttrs = attrs.split(",").map(a => a.trim());
-
-
-            let clickedAttr = event.target.innerText;
-
-            if (objCurrentAttrs.find(x => x == clickedAttr)) {
-                objCurrentAttrs = objCurrentAttrs.filter(x => x != clickedAttr);
-                event.target.className = 'attr-item';
-            }
-            else {
-                objCurrentAttrs.push(clickedAttr);
-                event.target.className = 'attr-item attr-selected';
-            }
-
-            attrs = "";
-            if (objCurrentAttrs.length > 0) {
-                attrs = objCurrentAttrs.reduce((a, b) => a + (a ? "," : "") + b);
-            }
-            
-            this.ui.querySelector("#attr-input").value = attrs;
-
-            this.eventHandler({
-                currentTarget: {
-                    id: "attr-input",
-                    value: attrs
-                }
-            });
-
-        }
+        this.ui.querySelector("#object-attribute-selector").innerHTML = items;
+        document.querySelector("#attribute-selector").innerHTML = items; // also set options for header attribute-selector
 
     }
 
@@ -216,11 +134,7 @@ class FastToolBox {
             };
         });
 
-        this.ui.querySelector("#object-category-selector").onchange = event => { // floating-category change
-            // this.ui.querySelector("#attr-input").value="";
-            // this.setAttrOptions(event.currentTarget.value, this.ui.querySelector("#attr-input").value);
-            this.eventHandler(event);
-        };
+        this.ui.querySelector("#object-category-selector").onchange = event => this.eventHandler(event);
 
         this.ui.querySelector("#object-track-id-editor").onchange = event => this.eventHandler(event);
         this.ui.querySelector("#object-track-id-editor").addEventListener("keydown", e => e.stopPropagation());
@@ -229,12 +143,7 @@ class FastToolBox {
             this.eventHandler(event);
         });
 
-        this.ui.querySelector("#attr-input").onchange = event => this.eventHandler(event);
-        this.ui.querySelector("#attr-input").addEventListener("keydown", e => e.stopPropagation());
-        this.ui.querySelector("#attr-input").addEventListener("keyup", event => {
-            event.stopPropagation();
-            this.eventHandler(event);
-        });
+        this.ui.querySelector("#object-attribute-selector").onchange = event => this.eventHandler(event);
     }
 }
 
