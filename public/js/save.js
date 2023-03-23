@@ -1,6 +1,6 @@
 import { checkScene } from "./error_check.js";
 import { logger } from "./log.js"
-import { manager } from "./backup/manager.js";
+import { backupManager } from "./backup/manager.js";
 import { copyWorld } from './util.js'
 
 
@@ -21,6 +21,7 @@ function reloadWorldList(worldList, done) {
                 });
                 if (world) {
                     world.annotation.reapplyAnnotation(a.annotation);
+                    // 在此处调用image的reapply
                 }
                 else {
                     console.error("bug?");
@@ -56,7 +57,7 @@ function saveToBackup(world) {
         params: copyWorld(world)
     }
 
-    manager.do(action);
+    backupManager.do(action);
 }
 
 function saveWorldList(worldList, isManual = false) {

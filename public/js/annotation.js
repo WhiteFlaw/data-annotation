@@ -144,10 +144,18 @@ function Annotation(sceneMeta, world, frameInfo) {
 
         anns.sort((a, b) => a.obj_id - b.obj_id);
 
+        const sd = () => {
+            for (let i = 0; i < anns.length; i++) {
+                for (let j = 0; j < this.world.annotation_2d.psr.length; j++) {
+                    if (anns[i].obj_id === this.world.annotation_2d.psr[j].obj_id) anns[i]['annotation_2d'] = this.world.annotation_2d.psr[j];
+                }
+            }
+        }
+        if (this.world.annotation_2d.psr) {
+            sd();
+        }
         return anns;
     };
-
-
 
     // to real-world position (no offset)
     this.ann_to_vector_global = function (box) {
@@ -319,7 +327,7 @@ function Annotation(sceneMeta, world, frameInfo) {
 
     this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
         let objAttr
-        if(document.querySelector("#if-default-attribute-use").checked) {
+        if (document.querySelector("#if-default-attribute-use").checked) {
             objAttr = document.querySelector("#attribute-selector").value
         } else {
             objAttr = obj_attr;
@@ -405,14 +413,16 @@ function Annotation(sceneMeta, world, frameInfo) {
     },
 
 
-        this.proc_annotation = function (boxes) {
+        this.proc_annotation = function (boxList) {
 
             // boxes = this.transformBoxesByEgoPose(boxes);
             // boxes = this.transformBoxesByOffset(boxes);
 
             // //var boxes = JSON.parse(this.responseText);
             //console.log(ret);
-            this.boxes = this.createBoxes(boxes);  //create in future world
+            this.create_annotation_2d(boxList);
+            this.boxes = boxList;
+            this.boxes = this.createBoxes(this.boxes);  //create in future world
 
             this.webglGroup = new THREE.Group();
             this.webglGroup.name = "annotations";
@@ -428,7 +438,25 @@ function Annotation(sceneMeta, world, frameInfo) {
             this._afterPreload();
         };
 
+    this.create_annotation_2d = (boxList) => {
+        const scene = document.querySelector('#scene-selector').value;
+        const frame = document.querySelector('#frame-selector').value;
+        const data = {
+            scene: scene,
+            frame: frame,
+            obj_type: 'annotation_2d',
+            psr: []
+        }
+        for (let i = 0; i < boxList.length; i++) {
+            if (boxList[i].annotation_2d) {
+                data.psr.push(boxList[i].annotation_2d)
+            }
+        }
+        this.world['annotation_2d'] = data;
+    }
+
     this.load_annotation = function (on_load) {
+        const that = this;
         if (this.data.cfg.disableLabels) {
             on_load([]);
         } else {
@@ -440,7 +468,7 @@ function Annotation(sceneMeta, world, frameInfo) {
 
                 if (this.status == 200) {
                     let ann = _self.frameInfo.anno_to_boxes(this.responseText);
-                    on_load(ann);
+                    on_load(ann); // on_load最后不能处理2d标注数据
                 }
 
                 // end of state change: it can be after some time (async)
@@ -458,7 +486,7 @@ function Annotation(sceneMeta, world, frameInfo) {
     };
 
 
-    this.reapplyAnnotation = function (boxes, done) {
+    this.reapplyAnnotation = function (boxes, done) { // 数据转模型
         // these boxes haven't attached a world
         //boxes = this.transformBoxesByOffset(boxes);
 
@@ -468,6 +496,7 @@ function Annotation(sceneMeta, world, frameInfo) {
         let pendingBoxList = [];
 
         boxes.forEach(nb => {  // nb is annotation format, not a true box
+            console.log(nb)
             let old_box = this.boxes.find(function (x) {
                 return x.obj_track_id == nb.obj_id && x.obj_track_id != "" && nb.obj_id != "" && x.obj_type == nb.obj_type;;
             });

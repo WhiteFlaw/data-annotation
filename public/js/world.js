@@ -1,6 +1,5 @@
 import * as THREE from './lib/three.module.js';
 
-
 import {RadarManager} from "./radar.js"
 import {AuxLidarManager} from "./aux_lidar.js"
 import {Lidar} from "./lidar.js"
@@ -457,8 +456,6 @@ function World(data, sceneName, frame, coordinatesOffset, on_preload_finished){ 
 
         this.webglGroup = new THREE.Group();
         this.webglGroup.name = "world";
-        console.log("重建webglGroup");
-        
         
         let _preload_cb = ()=>this.on_subitem_preload_finished(on_preload_finished);
 

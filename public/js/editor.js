@@ -25,7 +25,7 @@ import { MovableView } from './popup_dialog.js';
 import { globalKeyDownManager } from './keydown_manager.js';
 import { vector_range } from "./util.js"
 import { checkScene } from './error_check.js';
-import { manager } from "./backup/manager.js";
+import { backupManager } from "./backup/manager.js";
 
 function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
@@ -965,15 +965,16 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.frame_changed = function (event) {
         console.log("frame_changed", event);
         var sceneName = this.editorUi.querySelector("#scene-selector").value;
-
+        
         if (sceneName.length == 0 && this.data.world) {
             sceneName = this.data.world.frameInfo.scene;
         }
         if (sceneName.length == 0) {
             return;
         }
-
+        
         var frame = event.currentTarget.value;
+        this.imageContextManager.images[0].annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
     };
@@ -2052,14 +2053,14 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             */
             case 'z': // X
                 if (ev.ctrlKey) { // undo
-                    manager.undo();
+                    backupManager.undo();
                 } else {
                     this.viewManager.mainView.transform_control.showX = !this.viewManager.mainView.transform_control.showX;
                 }
                 break;
             case 'y': // X
                 if (ev.ctrlKey) { // redo
-                    manager.redo();
+                    backupManager.redo();
                 }
                 break;
             case 'x': // Y

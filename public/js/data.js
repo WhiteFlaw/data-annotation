@@ -3,7 +3,7 @@
 import { World } from "./world.js";
 import { Debug } from "./debug.js";
 import { logger } from "./log.js"
-import { manager } from "./backup/manager.js";
+import { backupManager } from "./backup/manager.js";
 import { copyWorld, setWorld, replaceWorld } from "./util.js";
 
 class Data {
@@ -277,7 +277,7 @@ class Data {
             name: 'initialWorld',
             params: copyWorld(this.world)
         }
-        manager.initManager(initialAction);
+        backupManager.initManager(initialAction);
     }
 
 

@@ -14,6 +14,8 @@ class MovableView
         let movableUi = document.getElementById("move-handle-wrapper");
 
         dragableUi.addEventListener("mousedown", (event)=>{
+            // if(event.ctrlKey === false) return;
+
             if (event.which == 1 && event.currentTarget == event.target)
             {
                 
@@ -25,6 +27,7 @@ class MovableView
         });
 
         movableUi.addEventListener("mouseup", (event)=>{
+            // if(event.ctrlKey === false) return;
             if (this.mouseDown){
                 dragableUi.style.cursor = "";
                 event.stopPropagation();
@@ -36,6 +39,7 @@ class MovableView
         });
 
         movableUi.addEventListener("mousemove", (event)=>{
+            // if(event.ctrlKey === false) return;
 
             if (this.mouseDown){
                 let posDelta = {
