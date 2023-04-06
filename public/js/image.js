@@ -230,8 +230,10 @@ class ImageContext extends MovableView {
     start = false; // 当前是否正在拖放添加矩形
     startDom = null; // 当前正在添加(鼠标未弹起)的矩形id
     rectData = null; // 鼠标坐标, 数组[x, y]
-    nowSel = null; // 当前选中的矩形
+    nowSel = 'nowSel_default'; // 当前选中的矩形
     topDot = null; // 拖拽模式下鼠标拖拽顶点的斜对顶点
+    trackId = null;
+    headerIdList = document.querySelector('#header-id-list');
 
     getRate() {
         const boardData = getDomInfo(document.querySelector('#image-board'));
@@ -242,18 +244,23 @@ class ImageContext extends MovableView {
         return rates;
     }
 
-    annotate_pic_init() { // 图片标注相关
+    annotate_pic_init() { // 初始化图片标注
         const svg = d3.select('#maincanvas-svg');
         const act = d3.select('#header-modify');
+        const list = d3.select('#header-id-list');
+
         act.text('调整');
 
-        this.createDrag(); // 注册drag模式
+        this.createDrag();
         svg.on('mousemove', (e) => { this.annotate_pic_mouse_move(e) });
         svg.on('mousedown', (e) => { this.annotate_pic_mouse_down(e) });
         svg.on('mouseup', (e) => { this.annotate_pic_mouse_up(e) });
-        act.on('click', () => { this.annotate_pic_finish() });
 
-        // 初始化星标
+        act.on('click', () => { this.annotate_pic_finish() });
+        list.on('click', () => { this.annotate_pic_id_list() }); // 及时更新可用id列表
+
+
+        // 星标
         const positionXY = svg.append('g').attr('class', 'line-g');
         svg.append('g').attr('id', 'rect-g'); // 标注组
         positionXY.append('line').attr('id', 'line-x').attr('x1', 0).attr('y1', 0).attr('x2', 2048).attr('y2', 0).attr('stroke', 'white').attr('stroke-width', 0);
@@ -261,42 +268,42 @@ class ImageContext extends MovableView {
         positionXY.append('circle').attr('id', 'line-circle').attr('cx', -10).attr('cy', -10).attr('r', 5).attr('fill', 'red');
 
         d3.select('#header-save').on('click', () => { this.annotate_pic_save() });
-        // this.annotate_pic_reapply(); // 这个时刻没有world, 不能在此重应用, 必须在world生成并且annotation挂载到world之后
+        // 这个时刻没有world, 不能在此重应用
     }
 
-    annotate_pic_id() {
-        const id = document.querySelector('#header-id-list').value;
+    annotate_pic_set_id() {
+        const id = this.headerIdList.value;
         d3.select(`#${this.nowSel}-rect`).attr(`obj_id`, id);
     }
 
-    annotate_pic_clear() { // 切帧清除全部标注
-        // 但是不能在这保存
+    annotate_pic_clear() { // 清除全部标注 // 清不掉？留到下一张一起保存起来所有svg的vector会相同
         d3.selectAll('#rect-g > g').remove();
     }
 
     annotate_pic_reapply() {
         const data = this.world.annotation_2d;
         const container = d3.select('#rect-g');
-        for (let i = 0; i < data.psr.length; i++) {
-            container.append('g')
-                .attr('id', data.psr[i].id.substring(0, data.psr[i].id.length - 5))
-                .append('rect')
-                .attr('id', data.psr[i].id)
-                .attr('width', data.psr[i].width)
-                .attr('height', data.psr[i].height)
-                .attr('x', data.psr[i].x)
-                .attr('y', data.psr[i].y)
+        const draw_needed = data.psr.filter((item) => { // this.world存在时必有this.name;
+            return item.vector === this.name; // 单等？？？？？？？
+        })
+        for (let i = 0; i < draw_needed.length; i++) {
+            const rect = container.append('g').attr('id', draw_needed[i].id.substring(0, draw_needed[i].id.length - 5)).append('rect')
+                .attr('id', draw_needed[i].id)
+                .attr('width', draw_needed[i].width)
+                .attr('height', draw_needed[i].height)
+                .attr('x', draw_needed[i].x)
+                .attr('y', draw_needed[i].y)
                 .attr('stroke', 'yellow')
                 .attr('fill', 'yellow')
                 .attr('fill-opacity', '0.1')
-                .attr('obj_id', data.psr[i].obj_id)
+                .attr('obj_id', draw_needed[i].obj_id)
+            this.annotate_pic_mouse_enter(rect);
+            this.annotate_pic_anno_click(rect);
         }
     }
 
-    // 给新建的dom对象加obj_id属性, reapply也加
-    // 存的时候得对ann做额外的处理, 加入2d数据
     annotate_pic_id_list() {
-        const id_list = this.world.annotation.boxes.map((item) => item.obj_track_id).sort((a, b) => a - b)// .concat([]);
+        const id_list = this.world.annotation.boxes.map((item) => item.obj_track_id).sort((a, b) => a - b);
         let obj_list_str = id_list.reduce((prev, curr) => {
             return `${prev}<option>${curr}</option>`;
         }, '<option>unknown</option>');
@@ -310,107 +317,210 @@ class ImageContext extends MovableView {
         const sta = d3.select('#header-state');
         const del = d3.select('#header-delete');
         const idList = d3.select('#header-id-list');
+        const show = d3.select('#header-show');
+        const hide = d3.select('#header-hide');
         if (!this.isDrag) {
             act.text('完成');
             sta.text('调整中...').style('color', '#ffffff');
+
             del.style('display', 'block').on('click', () => { this.annotate_pic_delete() });
-            idList.style('display', 'block').on('change', () => { this.annotate_pic_id() });
-        } else { // 进入完成
+            idList.style('display', 'block').on('change', () => { this.annotate_pic_set_id() });
+            hide.style('display', 'block').on('click', () => { this.annotate_pic_hide() });
+            show.style('display', 'block').on('click', () => { this.annotate_pic_show_all() });
+        } else {
             act.text('调整');
             sta.text('');
-            del.style('display', 'none')
-            idList.style('display', 'none')
+
+            del.style('display', 'none');
+            idList.style('display', 'none');
+            show.style('display', 'none');
+            hide.style('display', 'none');
+
             d3.selectAll('#rect-g > g > circle').remove();
-            d3.select(`#${this.nowSel}-rect`).attr('stroke', 'yellow');
+            d3.select(`#${this.nowSel}-rect`).style('stroke', 'yellow').style('fill', 'yellow');
         }
         this.isDrag = !this.isDrag;
     }
 
+    annotate_pic_hide() { // 隐藏受选box
+        const svg = d3.select(`#${this.nowSel}`);
+        if (svg.style('visibility') === 'visible') {
+            svg.style('visibility', 'hidden');
+        }
+    }
+
+    annotate_pic_show_all() { // 显示所有不可见box
+        d3.selectAll('#svg-boxes > g').style('visibility', 'visible');
+        d3.selectAll('#rect-g > g').style('visibility', 'visible');
+    }
+
     annotate_pic_delete() {
+        this.world.annotation.boxes.forEach((item) => { // 如果受删标注为scene中存在标注
+            if (item.obj_track_id === this.trackId) {
+                item['draw'] = false;
+                return;
+            }
+        })
+
         d3.select(`#${this.nowSel}`).remove();
     }
 
+    annotation_2d = {
+        obj_type: 'annotation_2d',
+        psr: []
+    }
+
     annotate_pic_save() {
-        const scene = document.querySelector('#scene-selector').value;
-        const frame = document.querySelector('#frame-selector').value;
+        // data在类中维护(annotation_2d), 每次保存要根据当前相机方向去改变data中的一部分, 不能全部重组
         const allRect = d3.selectAll("#rect-g > g > rect")._groups[0];
         const sta = d3.select('#header-state');
-        const data = {
-            scene: scene,
-            frame: frame,
-            obj_type: 'annotation_2d',
-            psr: []
-        }
+
+        this.annotate_pic_filter(allRect);
+
+        this.world['annotation_2d'] = this.annotation_2d; // annotation.js - toBoxAnnotations()
+        saveWorldList([this.world]);
+
+        sta.text('保存成功.').style('color', '#ffffff');
+        this.annotate_pic_after_switch();
+    }
+
+
+    annotate_pic_filter(allRect) {
         for (let i = 0; i < allRect.length; i++) {
-            const obj_id = d3.select(allRect[i]).attr('obj_id');
-            if (obj_id === null) {
+            const obj_track_id = d3.select(allRect[i]).attr('obj_id')
+            if (obj_track_id === null) {
+                const sta = d3.select('#header-state');
                 sta.text('驳回: 未知项.').style('color', 'red');
                 return;
-            } else {
-                d3.selectAll('#rect-g > g > rect').attr('stroke', 'yellow');
-                sta.text('保存成功.').style('color', '#ffffff');
-            };
+            }
             const temObj = {
+                vector: this.name,
                 id: allRect[i].id,
+                obj_id: obj_track_id,
                 y: allRect[i].y.animVal.value,
                 x: allRect[i].x.animVal.value,
                 width: allRect[i].width.animVal.value,
-                height: allRect[i].height.animVal.value,
-                obj_id: obj_id
+                height: allRect[i].height.animVal.value
             }
-            data.psr.push(temObj);
+            // 对比当前psr, add/update
+            const target = this.annotation_2d.psr.find(item => item.obj_id === allRect[i].obj_id && item.vector === this.name);
+            if (target) { // update
+                target = temObj;
+            } else { // add
+                this.annotation_2d.psr.push(temObj);
+            }
         };
-        // 先加入world, 然后在boxtoAnnotation取到之后加入ann
-        this.world['annotation_2d'] = data; // annotation.js - toBoxAnnotations()
-        saveWorldList([this.world]); // 调用boxtoAnnotation
-        return data;
+        // 为了防止删除svg后ann_2d无察觉, 最后必须根据this.name找ann_2d, this.name下ruo不存在该obj_id, 那么需要从anno_2d删除
+        // 筛选ann_2d内所有vector = this.name的元素, 如果这些元素在rectAll中找不到, 那么该删除
+        for (let i = 0; i < this.annotation_2d.length; i++) {
+            if(this.annotation_2d[i].vector === this.name && allRect.find(item => item.obj_id === this.annotation_2d[i].obj_id) === undefined) {
+                this.annotation_2d.splice(i, 1);
+            }
+        }
     }
 
-    annotate_pic_mouse_down(e) {
-        if (!this.isDrag) { // 不是在拖拽模式
-            const that = this;
-            const id = new Date().getTime() + ''; // 获取一个不重复的id,给矩形分配一个id
+    annotate_pic_mouse_enter(dom) { // 注册rect的mouseenter
+        const that = this;
+        dom.on('mouseenter', function () {
+            if (that.isDrag) {
+                d3.select(this).attr('cursor', 'pointer');
+                const ver = [(+d3.select(this).attr('x')), (+d3.select(this).attr('y'))];
+                const wh = [(+d3.select(this).attr('width')), (+d3.select(this).attr('height'))];
+                const dots = [ver, [ver[0] + wh[0], ver[1]], [ver[0] + wh[0], ver[1] + wh[1]], [ver[0], ver[1] + wh[1]]];
+                const id = d3.select(this)._groups[0][0].parentNode.id;
 
-            const xy = [(+e.offsetX) * this.getRate().rateX, (+e.offsetY) * this.getRate().rateY]; // 获取鼠标按下的坐标
+                d3.select(`#${id}`).selectAll('circle').data(dots).enter().append('circle')
+                    .attr('cx', d => d[0]).attr('cy', d => d[1]).attr('r', 8).attr('fill', 'yellow').attr('parent', id)
+                    .on('mouseenter', function () {
+                        that.Drag(d3.select(this)); // 圆点事件
+                    })
+            }
+        })
+    }
 
-            d3.select('#rect-g').append('g').attr('id', `rect-g-${id}`).append('rect').attr('id', `rect-g-${id}-rect`).attr('x', xy[0]).attr('y', xy[1]).attr('stroke', 'yellow').attr('fill', 'yellow').attr('fill-opacity', 0.1)
-                .on('mouseenter', function () {
-                    if (that.isDrag) {
-                        d3.select(this).attr('cursor', 'pointer'); // 改变鼠标指针样式
-                        const ver = [(+d3.select(this).attr('x')), (+d3.select(this).attr('y'))]; // 顶点坐标
-                        const wh = [(+d3.select(this).attr('width')), (+d3.select(this).attr('height'))]; // 矩形宽高
-                        const dots = [ver, [ver[0] + wh[0], ver[1]], [ver[0] + wh[0], ver[1] + wh[1]], [ver[0], ver[1] + wh[1]]]; // 得到四个圆点
-                        const id = d3.select(this)._groups[0][0].parentNode.id; // 矩形父容器的id
+    annotate_pic_after_switch() { // 受选标注切换后
+        if (this.nowSel.substring(0, 4) === 'rect') {
+            d3.select(`#${this.nowSel}-rect`)
+                .style('stroke', 'yellow')
+                .style('fill', 'yellow');
+            d3.selectAll(`#${this.nowSel} > circle`).style('fill', 'yellow');
+        } else {
+            d3.select(`#${this.nowSel}`).style('fill', '');
+        }
+    }
 
-                        d3.select(`#${id}`).selectAll('circle').data(dots).enter().append('circle')
-                            .attr('cx', d => d[0]).attr('cy', d => d[1]).attr('r', 8).attr('fill', 'yellow').attr('parent', id)
-                            .on('mouseenter', function () {
-                                that.Drag(d3.select(this));
-                            })
-                    }
-                })
-                .on('click', function () {
-                    if (that.isDrag) {
-                        d3.select(this).attr('stroke', 'red');
-                        d3.select(`#${that.nowSel}-rect`).attr('stroke', 'yellow');
-                        that.nowSel = d3.select(this).attr('id').substring(0, d3.select(this).attr('id').length - 5);
-                        const obj_id = d3.select(this).attr('obj_id') === null ? `unknown` : d3.select(this).attr('obj_id')
-                        document.querySelector('#header-id-list').value = obj_id;
-                    }
-                })
-            /* d3.select(`#rect-g-${id}-rect`).on('mouseleave', function () { // 直接在退出模式时全部去除即可, 此为单个去除
-                if (!that.isDrag) {
-                    const ver = [(+d3.select(this).attr('x')), (+d3.select(this).attr('y'))];
-                    const wh = [(+d3.select(this).attr('width')), (+d3.select(this).attr('height'))];
-                    const dots = [ver, [ver[0] + wh[0], ver[1]], [ver[0] + wh[0], ver[1] + wh[1]], [ver[0], ver[1] + wh[1]]];
-                    const id = d3.select(this)._groups[0][0].parentNode.id; // 矩形父容器的id
-                    console.log(d3.select(`#${id}`).selectAll('circle').data(dots).enter());
-                    d3.select(`#${id}`).selectAll('circle').remove();
+    annotate_pic_select_box(obj_local_id) {
+        this.world.annotation.boxes.forEach((item) => {
+            if (item.obj_local_id === Number(obj_local_id)) {
+                this.trackId = item.obj_track_id;
+                this.headerIdList.value = item.obj_track_id;
+                return;
+            }
+        })
+    }
+
+    annotate_pic_anno_click(dom) { // 注册rect/g的click
+        const that = this;
+        if (typeof dom === 'string') { // 3D转2D标注受击
+            d3.select(`#${dom}`).on('click', function () {
+                if (that.isDrag === false) return;
+
+                const fillColor = d3.select(this).style('stroke');
+                d3.select(this).style('fill', fillColor);
+
+                if (d3.select(this).attr('id') !== that.nowSel) {
+                    that.annotate_pic_after_switch();
                 }
-            }) */
-            this.rectData = xy; // 鼠标按下坐标
-            this.start = true; // 开始添加绘制矩形
-            this.startDom = `rect-g-${id}-rect`; // 当前矩形id
+
+                that.nowSel = d3.select(this).attr('id');
+                let local_id = that.nowSel.substring(14, that.nowSel.length);
+                (() => that.annotate_pic_select_box(local_id))();
+            });
+            return;
+        }
+        dom.on('click', function () { // 2D标注受击
+            if (that.isDrag === false) return;
+
+            d3.select(this).style('stroke', 'red').style('fill', 'red');
+            if (d3.select(this).attr('id') !== `${that.nowSel}-rect`) {
+                that.annotate_pic_after_switch();
+            }
+
+            that.nowSel = d3.select(this).attr('id').substring(0, d3.select(this).attr('id').length - 5);
+            d3.selectAll(`#${that.nowSel} > circle`).style('fill', 'red');
+
+            let obj_id =
+                d3.select(this).attr('obj_id') === null ?
+                    `unknown` :
+                    d3.select(this).attr('obj_id');
+            that.headerIdList.value = obj_id;
+        })
+    }
+
+    annotate_pic_mouse_down(e) { // 注册矩形事件
+        if (!this.isDrag) {
+            const that = this;
+            const id = new Date().getTime() + '';
+
+            const xy = [(+e.offsetX) * this.getRate().rateX, (+e.offsetY) * this.getRate().rateY];
+
+            const rect = d3.select('#rect-g')
+                .append('g')
+                .attr('id', `rect-g-${id}`)
+                .append('rect')
+                .attr('id', `rect-g-${id}-rect`)
+                .attr('x', xy[0])
+                .attr('y', xy[1])
+                .attr('stroke', 'yellow')
+                .attr('fill', 'yellow')
+                .attr('fill-opacity', 0.1);
+
+            this.annotate_pic_mouse_enter(rect);
+            this.annotate_pic_anno_click(rect);
+
+            this.rectData = xy;
+            this.start = true;
+            this.startDom = `rect-g-${id}-rect`;
         }
     }
 
@@ -421,26 +531,44 @@ class ImageContext extends MovableView {
             const xy1 = xy[1] * this.getRate().rateY;
 
             // 更新星标
-            d3.select('#line-x').attr('x1', 0).attr('y1', xy1).attr('x2', 2048).attr('y2', xy1).attr('stroke', 'white').attr('stroke-width', 2);
-            d3.select('#line-y').attr('x1', xy0).attr('y1', 0).attr('x2', xy0).attr('y2', 1536).attr('stroke', 'white').attr('stroke-width', 2);
-            d3.select('#line-circle').attr('cx', xy0).attr('r', 10).attr('cy', xy1).attr('fill', 'red');
+            d3.select('#line-x')
+                .attr('x1', 0)
+                .attr('y1', xy1)
+                .attr('x2', 2048)
+                .attr('y2', xy1)
+                .attr('stroke', 'white')
+                .attr('stroke-width', 2);
+
+            d3.select('#line-y')
+                .attr('x1', xy0)
+                .attr('y1', 0)
+                .attr('x2', xy0)
+                .attr('y2', 1536)
+                .attr('stroke', 'white')
+                .attr('stroke-width', 2);
+
+            d3.select('#line-circle')
+                .attr('cx', xy0)
+                .attr('r', 10)
+                .attr('cy', xy1)
+                .attr('fill', 'red');
 
             if (this.start) {
                 let top
-                if (xy0 >= this.rectData[0]) { // 判断当前矩形顶点坐标
+                if (xy0 >= this.rectData[0]) {
                     if (xy1 >= this.rectData[1]) {
-                        top = this.rectData; // 右下
+                        top = this.rectData;
                     } else {
-                        top = [this.rectData[0], xy1]; // 右上
+                        top = [this.rectData[0], xy1];
                     }
                 } else {
                     if (xy1 >= this.rectData[1]) {
-                        top = [xy0, this.rectData[1]]; // 左下
+                        top = [xy0, this.rectData[1]];
                     } else {
-                        top = xy; // 左上
+                        top = xy;
                     }
                 }
-                // 动态修改矩形的属性值startDom是在mousedown中记录的矩形的id
+
                 d3.select(`#${this.startDom}`)
                     .attr('x', top[0])
                     .attr('y', top[1])
@@ -452,7 +580,7 @@ class ImageContext extends MovableView {
 
     annotate_pic_mouse_up() {
         if (!this.isDrag) {
-            this.start = false; // 添加矩形动作取消
+            this.start = false;
             this.startDom = '';
             this.rectData = [];
         }
@@ -465,9 +593,8 @@ class ImageContext extends MovableView {
             .on('start', function () {
                 color = d3.select(this).attr('fill');
                 widget = d3.select(this).attr('fill', 'lime');
-                const id = widget._groups[0][0].parentNode.id; // 获取父元素id
+                const id = widget._groups[0][0].parentNode.id;
                 if (widget._groups[0][0].localName === 'circle') {
-                    // 获取矩形信息
                     const cxy = [
                         (+d3.select(`#${id}-rect`).attr('x')),
                         (+d3.select(`#${id}-rect`).attr('y')),
@@ -814,7 +941,10 @@ class ImageContext extends MovableView {
 
         this.img = img;
 
-
+        if (this.world !== null) {
+            this.annotate_pic_clear();
+            this.annotate_pic_reapply();
+        }
     }
 
 
@@ -914,12 +1044,14 @@ class ImageContext extends MovableView {
 
         // draw boxes
         this.world.annotation.boxes.forEach((box) => {
-            var imgfinal = box_to_2d_points(box, calib);
-            if (imgfinal) {
-                var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
-                svg.appendChild(box_svg);
+            if (box.draw) {
+                var imgfinal = box_to_2d_points(box, calib);
+                if (imgfinal) {
+                    var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
+                    svg.appendChild(box_svg);
+                    this.annotate_pic_anno_click(box_svg.getAttribute('id'));
+                }
             }
-
         });
 
         svg = this.ui.querySelector("#svg-points");

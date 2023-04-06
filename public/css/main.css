@@ -344,25 +344,21 @@ canvas {
 	background-color: var(--widget-background-color);
 }
 
-.image-wrapper #header #header-save,
-.image-wrapper #header #header-modify,
-.image-wrapper #header #header-delete {
+#header-action div {
 	min-width: 50px;
 }
 
-.image-wrapper #header #header-save:hover,
-.image-wrapper #header #header-modify:hover,
-.image-wrapper #header #header-delete:hover {
+#header-action div:hover {
 	background-color: var(--highlight-background-color);
 }
 
-.image-wrapper #header #header-id-list {
+.image-wrapper #header #header-id-list,
+.image-wrapper #header #header-delete,
+.image-wrapper #header #header-show,
+.image-wrapper #header #header-hide {
 	display: none;
 }
 
-.image-wrapper #header #header-delete {
-	display: none;
-}
 /* line {
 	stroke-width: 2;
 } */

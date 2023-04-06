@@ -977,6 +977,10 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.imageContextManager.images[0].annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
+
+        const frame_index = this.data.getFrameIndex();
+        const frame_length = this.data.getFrameList().length;
+        this.editorUi.querySelector('#page-now').innerText = `当前第 ${ frame_index } 页 共 ${ frame_length } 页 | `;
     };
 
 
@@ -2712,6 +2716,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 '}';
             sheet.insertRule(rule, sheet.cssRules.length);
         }
+
+        let obj_type_keys = Object.keys(obj_type_map)
 
         let options = ''
         for (var o in obj_type_map) {

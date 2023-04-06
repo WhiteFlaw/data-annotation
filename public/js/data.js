@@ -110,6 +110,14 @@ class Data {
             return null;
     };
 
+    getFrameIndex() {
+        return this.worldList[0].frameInfo.frame_index + 1;
+    };
+    
+    getFrameList() {
+        return this.worldList[0].frameInfo.sceneMeta.frames;
+    };
+
     offsetList = [[0, 0, 0]];
     lastSeedOffset = [0, 0, 0];
     offsetsAliveCount = 0;

@@ -49,6 +49,7 @@
 				</div>
 
 				<div id="buttons">
+					<div id="page-now"></div>
 					<div id="use-previous-frame">使用上一帧</div>
 					<input type="checkbox" id="if-default-attribute-use" name="if-default-attribute-use">
 					<label for="if-default-attribute-use" id="if-default-attribute-label" value="y">属性预设</label>
@@ -1461,7 +1462,7 @@
 			<canvas id="focuscanvas" class="non-selectable" width="320" height="240">cavas</canvas>
 		</div>
 	</template>
-	<template id="batch-editor-tools-template"> <!-- dynamic-buttons-placeholder有一个 -->
+	<template id="batch-editor-tools-template">
 		<div id="batch-editor-tools-wrapper" class="non-selectable">
 			<div id="batch-editor-tools">
 				<!-- <select title="category"  id="object-category-selector"></select>
@@ -1499,7 +1500,6 @@
 		<div class="image-wrapper" id="image-board">
 			<!-- <div id="custom-svg"></div> -->
 			<svg id="maincanvas-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
-				<!-- 图片加在svg里, 推测是svg能和图片同步变动的原因之一, 如果需要新增svg并同步变动需要在新增svg内导入图片作为子元素. -->
 				<image id="svg-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none" xlink:href="" />
 				<g id="svg-boxes"></g>
 				<g id="svg-points"></g>
@@ -1511,6 +1511,8 @@
 				<div id="header-state"></div>
 				<div id="header-action">
 					<select name="obj_id_list" id="header-id-list"></select>
+					<div id="header-show">显示全部</div>
+					<div id="header-hide">隐藏</div>
 					<div id="header-save">保存</div>
 					<div id="header-delete">删除</div>
 					<div id="header-modify"></div>

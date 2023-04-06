@@ -139,6 +139,8 @@ function Annotation(sceneMeta, world, frameInfo) {
 
             if (b.follows)
                 ann.follows = b.follows;
+
+            ann.draw = b.draw;
             return ann;
         });
 
@@ -332,7 +334,8 @@ function Annotation(sceneMeta, world, frameInfo) {
         } else {
             objAttr = obj_attr;
         }
-        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr)
+        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr);
+        mesh.draw = true;
 
         this.boxes.push(mesh);
         this.sort_boxes();
@@ -415,12 +418,7 @@ function Annotation(sceneMeta, world, frameInfo) {
 
         this.proc_annotation = function (boxList) {
 
-            // boxes = this.transformBoxesByEgoPose(boxes);
-            // boxes = this.transformBoxesByOffset(boxes);
-
-            // //var boxes = JSON.parse(this.responseText);
-            //console.log(ret);
-            this.create_annotation_2d(boxList);
+            const boxes_draw_no = this.create_annotation_2d(boxList);
             this.boxes = boxList;
             this.boxes = this.createBoxes(this.boxes);  //create in future world
 
@@ -434,11 +432,13 @@ function Annotation(sceneMeta, world, frameInfo) {
             console.log(this.boxes_load_time, this.frameInfo.scene, this.frameInfo.frame, "loaded boxes ", this.boxes_load_time - this.create_time, "ms");
 
             this.sort_boxes();
+            this.if_draw_box(boxes_draw_no);
 
             this._afterPreload();
         };
 
     this.create_annotation_2d = (boxList) => {
+        const boxes_draw_no = [];
         const scene = document.querySelector('#scene-selector').value;
         const frame = document.querySelector('#frame-selector').value;
         const data = {
@@ -448,11 +448,23 @@ function Annotation(sceneMeta, world, frameInfo) {
             psr: []
         }
         for (let i = 0; i < boxList.length; i++) {
-            if (boxList[i].annotation_2d) {
-                data.psr.push(boxList[i].annotation_2d)
-            }
+            boxList[i].draw === false && boxes_draw_no.push(boxList[i].obj_id);
+            boxList[i].annotation_2d && data.psr.push(boxList[i].annotation_2d);
         }
         this.world['annotation_2d'] = data;
+        return boxes_draw_no;
+    }
+
+    this.if_draw_box = (boxes_draw_no) => {
+        const boxes = this.world.annotation.boxes;
+        for (let i = 0; i < boxes.length; i++) {
+            boxes[i]['draw'] = true;
+            for (let j = 0; j < boxes_draw_no.length; j++) { // 需要设置fraw = false的放这, 但是也在这里面设置true就设置不上了, 应该放这个循环外
+                if (boxes[i].obj_track_id === boxes_draw_no[j]) {
+                    boxes[i]['draw'] = false;
+                }
+            }
+        }
     }
 
     this.load_annotation = function (on_load) {
