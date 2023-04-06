@@ -123,9 +123,11 @@ function Annotation(sceneMeta, world, frameInfo) {
             },
             obj_type: box.obj_type,
             obj_id: String(box.obj_track_id),
-            obj_attr: box.obj_attr,
+            obj_trunk: box.obj_trunk,
+            obj_occlu: box.obj_occlu
             //vertices: vertices,
         };
+        console.log(ann);
         return ann;
     };
 
@@ -300,7 +302,7 @@ function Annotation(sceneMeta, world, frameInfo) {
         return box;
     };
 
-    this.createCuboid = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
+    this.createCuboid = function (pos, scale, rotation, obj_type, track_id, obj_trunk, obj_occlu) {
         let mesh = this.new_bbox_cube(parseInt("0x" + globalObjectCategory.get_obj_cfg_by_type(obj_type).color.slice(1)));
         mesh.position.x = pos.x;
         mesh.position.y = pos.y;
@@ -316,7 +318,8 @@ function Annotation(sceneMeta, world, frameInfo) {
 
         mesh.obj_track_id = track_id;  //tracking id
         mesh.obj_type = obj_type;
-        mesh.obj_attr = obj_attr;
+        mesh.obj_trunk = obj_trunk;
+        mesh.obj_occlu = obj_occlu;
         mesh.obj_local_id = this.get_new_box_local_id();
 
         mesh.world = this.world;
@@ -327,15 +330,14 @@ function Annotation(sceneMeta, world, frameInfo) {
      pos:  offset position, after transformed
     */
 
-    this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
+    this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_trunk, obj_occlu) {
         let objAttr
         if (document.querySelector("#if-default-attribute-use").checked) {
             objAttr = document.querySelector("#attribute-selector").value
         } else {
-            objAttr = obj_attr;
+            objAttr = obj_trunk;
         }
-        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr);
-        mesh.draw = true;
+        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr, obj_occlu)
 
         this.boxes.push(mesh);
         this.sort_boxes();
@@ -520,7 +522,7 @@ function Annotation(sceneMeta, world, frameInfo) {
                 old_box.position.set(nb.psr.position.x, nb.psr.position.y, nb.psr.position.z);
                 old_box.scale.set(nb.psr.scale.x, nb.psr.scale.y, nb.psr.scale.z);
                 old_box.rotation.set(nb.psr.rotation.x, nb.psr.rotation.y, nb.psr.rotation.z);
-                old_box.obj_attr = nb.obj_attr;
+                old_box.obj_trunk = nb.obj_trunk;
                 old_box.annotator = nb.annotator;
                 old_box.changed = false; // clear changed flag.
 
@@ -578,7 +580,8 @@ function Annotation(sceneMeta, world, frameInfo) {
             b.psr.rotation,
             b.obj_type,
             b.obj_id,
-            b.obj_attr);
+            b.obj_trunk,
+            b.obj_occlu);
 
         if (b.annotator) {
             mesh.annotator = b.annotator;

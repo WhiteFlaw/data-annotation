@@ -130,6 +130,7 @@ canvas {
 #object-category-selector,
 #object-track-id-editor,
 #object-attribute-selector,
+#object-occlusion-selector,
 #scene-selector,
 #frame-selector,
 #object-selector,
@@ -194,7 +195,8 @@ canvas {
 
 
 #object-track-id-editor,
-#object-attribute-selector {
+#object-attribute-selector,
+#object-occlusion-selector {
 	border-bottom-width: 1px;
 }
 
@@ -463,14 +465,21 @@ dynamic set obj-type css has higher priority than this one.
 
 #attr-editor {
 	position: relative;
-	width: 100%;
+	width: 47%;
 	height: 20px;
 }
 
-#object-attribute-selector {
+#occl-editor {
+	position: relative;
+	width: 33%;
+	height: 20px;
+}
+
+#object-attribute-selector,
+#object-occlusion-selector {
 	position: absolute;
+	width: 100%;
 	background-color: var(--widget-background-color);
-	width: 30%;
 }
 
 .attr-item {
@@ -667,7 +676,8 @@ dynamic set obj-type css has higher priority than this one.
 
 .label-obj-id-text,
 .label-obj-type-text,
-.label-obj-attr-text {
+.label-obj-attr-text,
+.label-obj-occl-text {
 	padding-left: 5px;
 }
 

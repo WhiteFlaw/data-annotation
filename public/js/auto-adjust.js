@@ -28,7 +28,7 @@ function AutoAdjust(boxOp, mouse, header){
     this.followStaticObjects = function(box) {
         let world = box.world;
         let staticObjects = world.annotation.boxes.
-            filter(b=>b!=box && b.obj_attr && b.obj_attr.search('static')>=0).
+            filter(b=>b!=box && b.obj_trunk && b.obj_trunk.search('static')>=0).
             map(refObj=>{
                 let coord = euler_angle_to_rotate_matrix_3by3(refObj.rotation);
                 let trans = transpose(coord, 3);
@@ -174,7 +174,8 @@ function AutoAdjust(boxOp, mouse, header){
                     newObjRot, 
                     box.obj_type, 
                     box.obj_track_id,
-                    box.obj_attr);
+                    box.obj_trunk,
+                    box.obj_occlu);
                 newBox.annotator="S";
                 
                 w.annotation.load_box(newBox);
@@ -282,7 +283,8 @@ function AutoAdjust(boxOp, mouse, header){
                         newObjRot, 
                         box.obj_type, 
                         box.obj_track_id,
-                        box.obj_attr);
+                        box.obj_trunk,
+                        obj_occlu);
                     newBox.annotator="F";
                     newBox.follows = {
                         obj_track_id: refObj.obj_track_id,
@@ -346,7 +348,7 @@ function AutoAdjust(boxOp, mouse, header){
            pos.z = this.marked_object.ann.psr.position.z;
     
         return  add_box(pos, this.marked_object.ann.psr.scale, this.marked_object.ann.psr.rotation,
-            this.marked_object.ann.obj_type, this.marked_object.ann.obj_id, this.marked_object.ann.obj_attr);    
+            this.marked_object.ann.obj_type, this.marked_object.ann.obj_id, this.marked_object.ann.obj_trunk, this.marked_object.ann.obj_occlu);    
     };
     
     
