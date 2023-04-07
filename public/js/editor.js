@@ -983,7 +983,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
         
         var frame = event.currentTarget.value;
-        this.imageContextManager.images[0].annotate_pic_clear();
+        this.imageContextManager.images[0].imageEditor.annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
 

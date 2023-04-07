@@ -127,7 +127,6 @@ function Annotation(sceneMeta, world, frameInfo) {
             obj_occlu: box.obj_occlu
             //vertices: vertices,
         };
-        console.log(ann);
         return ann;
     };
 
@@ -337,7 +336,8 @@ function Annotation(sceneMeta, world, frameInfo) {
         } else {
             objAttr = obj_trunk;
         }
-        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr, obj_occlu)
+        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr, obj_occlu);
+        mesh.draw =  true; // 解决新增的box不会及时更新到照片
 
         this.boxes.push(mesh);
         this.sort_boxes();

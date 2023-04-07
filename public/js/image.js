@@ -5,46 +5,46 @@ import { MovableView } from "./popup_dialog.js";
 import { saveWorldList } from "./save.js";
 
 function BoxImageContext(ui) {
-
+    
     this.ui = ui;
-
+    
     // draw highlighted box
     this.updateFocusedImageContext = function (box) {
         var scene_meta = box.world.frameInfo.sceneMeta;
-
-
+        
+        
         let bestImage = choose_best_camera_for_point(
             scene_meta,
             box.position);
-
-        if (!bestImage) {
-            return;
-        }
-
-        if (!scene_meta.calib.camera) {
-            return;
-        }
-
-        var calib = scene_meta.calib.camera[bestImage]
-        if (!calib) {
-            return;
-        }
-
-        if (calib) {
-            var img = box.world.cameras.getImageByName(bestImage);
-            if (img && (img.naturalWidth > 0)) {
-
-                this.clear_canvas();
-
-                var imgfinal = box_to_2d_points(box, calib)
-
-                if (imgfinal != null) {  // if projection is out of range of the image, stop drawing.
-                    var ctx = this.ui.getContext("2d");
-                    ctx.lineWidth = 0.5;
-
-                    // note: 320*240 should be adjustable
-                    var crop_area = crop_image(img.naturalWidth, img.naturalHeight, ctx.canvas.width, ctx.canvas.height, imgfinal);
-
+            
+            if (!bestImage) {
+                return;
+            }
+            
+            if (!scene_meta.calib.camera) {
+                return;
+            }
+            
+            var calib = scene_meta.calib.camera[bestImage]
+            if (!calib) {
+                return;
+            }
+            
+            if (calib) {
+                var img = box.world.cameras.getImageByName(bestImage);
+                if (img && (img.naturalWidth > 0)) {
+                    
+                    this.clear_canvas();
+                    
+                    var imgfinal = box_to_2d_points(box, calib)
+                    
+                    if (imgfinal != null) {  // if projection is out of range of the image, stop drawing.
+                        var ctx = this.ui.getContext("2d");
+                        ctx.lineWidth = 0.5;
+                        
+                        // note: 320*240 should be adjustable
+                        var crop_area = crop_image(img.naturalWidth, img.naturalHeight, ctx.canvas.width, ctx.canvas.height, imgfinal);
+                        
                     ctx.drawImage(img, crop_area[0], crop_area[1], crop_area[2], crop_area[3], 0, 0, ctx.canvas.width, ctx.canvas.height);// ctx.canvas.clientHeight);
                     //ctx.drawImage(img, 0,0,img.naturalWidth, img.naturalHeight, 0, 0, 320, 180);// ctx.canvas.clientHeight);
                     var imgfinal = vectorsub(imgfinal, [crop_area[0], crop_area[1]]);
@@ -52,50 +52,50 @@ function BoxImageContext(ui) {
                         x: ctx.canvas.height / crop_area[3],
                         y: ctx.canvas.height / crop_area[3],
                     }
-
+                    
                     draw_box_on_image(ctx, box, imgfinal, trans_ratio, true);
                 }
             }
         }
     }
-
+    
     this.clear_canvas = function () {
         var c = this.ui;
         var ctx = c.getContext("2d");
         ctx.clearRect(0, 0, c.width, c.height);
     }
-
-
+    
+    
     function vectorsub(vs, v) {
         var ret = [];
         var vl = v.length;
-
+        
         for (var i = 0; i < vs.length / vl; i++) {
             for (var j = 0; j < vl; j++)
-                ret[i * vl + j] = vs[i * vl + j] - v[j];
+            ret[i * vl + j] = vs[i * vl + j] - v[j];
         }
-
+        
         return ret;
     }
-
-
+    
+    
     function crop_image(imgWidth, imgHeight, clientWidth, clientHeight, corners) {
         var maxx = 0, maxy = 0, minx = imgWidth, miny = imgHeight;
-
+        
         for (var i = 0; i < corners.length / 2; i++) {
             var x = corners[i * 2];
             var y = corners[i * 2 + 1];
-
+            
             if (x > maxx) maxx = x;
             else if (x < minx) minx = x;
-
+            
             if (y > maxy) maxy = y;
             else if (y < miny) miny = y;
         }
-
+        
         var targetWidth = (maxx - minx) * 1.5;
         var targetHeight = (maxy - miny) * 1.5;
-
+        
         if (targetWidth / targetHeight > clientWidth / clientHeight) {
             //increate height
             targetHeight = targetWidth * clientHeight / clientWidth;
@@ -103,10 +103,10 @@ function BoxImageContext(ui) {
         else {
             targetWidth = targetHeight * clientWidth / clientHeight;
         }
-
+        
         var centerx = (maxx + minx) / 2;
         var centery = (maxy + miny) / 2;
-
+        
         return [
             centerx - targetWidth / 2,
             centery - targetHeight / 2,
@@ -114,10 +114,10 @@ function BoxImageContext(ui) {
             targetHeight
         ];
     }
-
+    
     function draw_box_on_image(ctx, box, box_corners, trans_ratio, selected) {
         var imgfinal = box_corners;
-
+        
         if (!selected) {
             let target_color = null;
             if (box.world.data.cfg.color_obj == "category") {
@@ -128,52 +128,52 @@ function BoxImageContext(ui) {
                 let idx = (box.obj_track_id) ? parseInt(box.obj_track_id) : box.obj_local_id;
                 target_color = globalObjectCategory.get_color_by_id(idx);
             }
-
+            
             //ctx.strokeStyle = get_obj_cfg_by_type(box.obj_type).color;
-
+            
             //var c = get_obj_cfg_by_type(box.obj_type).color;
             var r = "0x" + (target_color.x * 256).toString(16);
             var g = "0x" + (target_color.y * 256).toString(16);;
             var b = "0x" + (target_color.z * 256).toString(16);;
-
+            
             ctx.fillStyle = "rgba(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ",0.2)";
         }
         else {
             ctx.strokeStyle = "#ff00ff";
             ctx.fillStyle = "rgba(255,0,255,0.2)";
         }
-
+        
         // front panel
         ctx.beginPath();
         ctx.moveTo(imgfinal[3 * 2] * trans_ratio.x, imgfinal[3 * 2 + 1] * trans_ratio.y);
-
+        
         for (var i = 0; i < imgfinal.length / 2 / 2; i++) {
             ctx.lineTo(imgfinal[i * 2 + 0] * trans_ratio.x, imgfinal[i * 2 + 1] * trans_ratio.y);
         }
-
+        
         ctx.closePath();
         ctx.fill();
-
+        
         // frame
         ctx.beginPath();
-
+        
         ctx.moveTo(imgfinal[3 * 2] * trans_ratio.x, imgfinal[3 * 2 + 1] * trans_ratio.y);
-
+        
         for (var i = 0; i < imgfinal.length / 2 / 2; i++) {
             ctx.lineTo(imgfinal[i * 2 + 0] * trans_ratio.x, imgfinal[i * 2 + 1] * trans_ratio.y);
         }
         //ctx.stroke();
-
-
+        
+        
         //ctx.strokeStyle="#ff00ff";
         //ctx.beginPath();
-
+        
         ctx.moveTo(imgfinal[7 * 2] * trans_ratio.x, imgfinal[7 * 2 + 1] * trans_ratio.y);
-
+        
         for (var i = 4; i < imgfinal.length / 2; i++) {
             ctx.lineTo(imgfinal[i * 2 + 0] * trans_ratio.x, imgfinal[i * 2 + 1] * trans_ratio.y);
         }
-
+        
         ctx.moveTo(imgfinal[0 * 2] * trans_ratio.x, imgfinal[0 * 2 + 1] * trans_ratio.y);
         ctx.lineTo(imgfinal[4 * 2 + 0] * trans_ratio.x, imgfinal[4 * 2 + 1] * trans_ratio.y);
         ctx.moveTo(imgfinal[1 * 2] * trans_ratio.x, imgfinal[1 * 2 + 1] * trans_ratio.y);
@@ -182,8 +182,8 @@ function BoxImageContext(ui) {
         ctx.lineTo(imgfinal[6 * 2 + 0] * trans_ratio.x, imgfinal[6 * 2 + 1] * trans_ratio.y);
         ctx.moveTo(imgfinal[3 * 2] * trans_ratio.x, imgfinal[3 * 2 + 1] * trans_ratio.y);
         ctx.lineTo(imgfinal[7 * 2 + 0] * trans_ratio.x, imgfinal[7 * 2 + 1] * trans_ratio.y);
-
-
+        
+        
         ctx.stroke();
     }
 }
@@ -191,41 +191,482 @@ function BoxImageContext(ui) {
 
 
 class ImageContext extends MovableView {
-
+    
     constructor(parentUi, name, autoSwitch, cfg, on_img_click) {
-
+        
         // create ui
         let template = document.getElementById("image-wrapper-template");
         let tool = template.content.cloneNode(true);
         // this.boxEditorHeaderUi.appendChild(tool);
         // return this.boxEditorHeaderUi.lastElementChild;
-
+        
         parentUi.appendChild(tool);
         let ui = parentUi.lastElementChild;
         let handle = ui.querySelector("#move-handle");
         super(handle, ui);
-
+        
         this.ui = ui;
         this.cfg = cfg;
         this.on_img_click = on_img_click;
         this.autoSwitch = autoSwitch;
         this.setImageName(name);
-
+        
     }
+    img_lidar_point_map = {};
+    get_selected_box = null;
+    imageEditor = null
+    drawing = false;
+    points = [];
+    polyline;
 
+    all_lines = [];
+
+    world = null;
+    img = null;
+    
     remove() {
         this.ui.remove();
     }
-
-
+    
     setImageName(name) {
         this.name = name;
         this.ui.querySelector("#header-title").innerText = (this.autoSwitch ? "auto-" : "") + name;
     }
 
+    init_image_op(func_get_selected_box) {
+        this.imageEditor = new ImageEditor();
+        this.imageEditor.annotate_pic_init()
+        this.get_selected_box = func_get_selected_box;
+    }
 
-    get_selected_box = null;
+    clear_main_canvas() {
 
+        var boxes = this.ui.querySelector("#svg-boxes").children;
+
+        if (boxes.length > 0) {
+            for (var c = boxes.length - 1; c >= 0; c--) {
+                boxes[c].remove();
+            }
+        }
+
+        var points = this.ui.querySelector("#svg-points").children;
+
+        if (points.length > 0) {
+            for (var c = points.length - 1; c >= 0; c--) {
+                points[c].remove();
+            }
+        }
+    }
+
+
+    attachWorld(world) {
+        this.world = world;
+        this.imageEditor.attachWorld(world);
+    };
+
+    hide() {
+        this.ui.style.display = "none";
+    };
+
+    hidden() {
+        this.ui.style.display == "none";
+    };
+
+    show() {
+        this.ui.style.display = "";
+    };
+
+    point_color_by_distance(x, y) {
+        // x,y are image coordinates
+        let p = this.img_lidar_point_map[y * this.img.width + x];
+
+        let distance = Math.sqrt(p[1] * p[1] + p[2] * p[2] + p[3] * p[3]);
+
+        if (distance > 60.0)
+            distance = 60.0;
+        else if (distance < 10.0)
+            distance = 10.0;
+
+        return [(distance - 10) / 50.0, 1 - (distance - 10) / 50.0, 0].map(c => {
+            let hex = Math.floor(c * 255).toString(16);
+            if (hex.length == 1)
+                hex = "0" + hex;
+            return hex;
+        }).reduce((a, b) => a + b, "#");
+    }
+
+    to_polyline_attr(points) {
+        return points.reduce(function (x, y) {
+            return String(x) + "," + y;
+        }
+        )
+    }
+
+    to_viewbox_coord(x, y) {
+        var div = this.ui.querySelector("#maincanvas-svg");
+
+        x = Math.round(x * 2048 / div.clientWidth);
+        y = Math.round(y * 1536 / div.clientHeight);
+        return [x, y];
+
+    }
+
+    getCalib() {
+        var scene_meta = this.world.sceneMeta;
+
+        if (!scene_meta.calib.camera) {
+            return null;
+        }
+
+        //var active_camera_name = this.world.cameras.active_name;
+        var calib = scene_meta.calib.camera[this.name];
+
+        return calib;
+    }
+
+    get_trans_ratio() {
+        var img = this.world.cameras.getImageByName(this.name);
+
+        if (!img || img.width == 0) {
+            return null;
+        }
+
+        var clientWidth, clientHeight;
+
+        clientWidth = 2048;
+        clientHeight = 1536;
+
+        var trans_ratio = {
+            x: clientWidth / img.naturalWidth,
+            y: clientHeight / img.naturalHeight,
+        };
+
+        return trans_ratio;
+    }
+
+    show_image() {
+        var svgimage = this.ui.querySelector("#svg-image");
+
+        // active img is set by global, it's not set sometimes.
+        var img = this.world.cameras.getImageByName(this.name);
+        if (img) {
+            svgimage.setAttribute("xlink:href", img.src);
+        }
+
+        this.img = img;
+
+        if (this.world !== null) {
+            this.imageEditor.annotate_pic_clear();
+            this.imageEditor.annotate_pic_reapply();
+        }
+    }
+
+    points_to_svg(points, trans_ratio, cssclass, radius = 2) {
+        var ptsFinal = points.map(function (x, i) {
+            if (i % 2 == 0) {
+                return Math.round(x * trans_ratio.x);
+            } else {
+                return Math.round(x * trans_ratio.y);
+            }
+        });
+
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+
+        if (cssclass) {
+            svg.setAttribute("class", cssclass);
+        }
+
+        for (let i = 0; i < ptsFinal.length; i += 2) {
+
+
+            let x = ptsFinal[i];
+            let y = ptsFinal[i + 1];
+
+            let p = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            p.setAttribute("cx", x);
+            p.setAttribute("cy", y);
+            p.setAttribute("r", 2);
+            p.setAttribute("stroke-width", "1");
+
+            if (!cssclass) {
+                let image_x = points[i];
+                let image_y = points[i + 1];
+                let color = point_color_by_distance(image_x, image_y);
+                color += "24"; //transparency
+                p.setAttribute("stroke", color);
+                p.setAttribute("fill", color);
+            }
+
+            svg.appendChild(p);
+        }
+
+        return svg;
+    }
+
+    draw_point(x, y) {
+        let trans_ratio = this.get_trans_ratio();
+        let svg = this.ui.querySelector("#svg-points");
+        let pts_svg = this.points_to_svg([x, y], trans_ratio, "radar-points");
+        svg.appendChild(pts_svg);
+    };
+
+    render_2d_image() {
+
+
+        if (this.cfg.disableMainImageContext)
+            return;
+        this.clear_main_canvas();
+
+        this.show_image();
+        this.draw_svg();
+    }
+
+    hide_canvas() {
+        //document.getElementsByClassName("ui-wrapper")[0].style.display="none";
+        this.ui.style.display = "none";
+    }
+
+    show_canvas() {
+        this.ui.style.display = "inline";
+    }
+
+    draw_svg() {
+        // draw picture
+        var img = this.world.cameras.getImageByName(this.name);
+
+        if (!img || img.width == 0) {
+            this.hide_canvas();
+            return;
+        }
+
+        this.show_canvas();
+
+        var trans_ratio = this.get_trans_ratio();
+
+        var calib = this.getCalib();
+        if (!calib) {
+            return;
+        }
+
+        let svg = this.ui.querySelector("#svg-boxes");
+
+        // draw boxes
+        this.world.annotation.boxes.forEach((box) => {
+            if (box.draw) {
+                var imgfinal = box_to_2d_points(box, calib);
+                if (imgfinal) {
+                    var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
+                    svg.appendChild(box_svg);
+                    this.imageEditor.annotate_pic_anno_click(box_svg.getAttribute('id'));
+                }
+            }
+        });
+
+        svg = this.ui.querySelector("#svg-points");
+
+        // draw radar points
+        if (this.cfg.projectRadarToImage) {
+            this.world.radars.radarList.forEach(radar => {
+                let pts = radar.get_unoffset_radar_points();
+                let ptsOnImg = points3d_to_image2d(pts, calib);
+
+                // there may be none after projecting
+                if (ptsOnImg && ptsOnImg.length > 0) {
+                    let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio, radar.cssStyleSelector);
+                    svg.appendChild(pts_svg);
+                }
+            });
+        }
+
+        // project lidar points onto camera image   
+        if (this.cfg.projectLidarToImage) {
+            let pts = this.world.lidar.get_all_points();
+            let ptsOnImg = points3d_to_image2d(pts, calib, true, this.img_lidar_point_map, img.width, img.height);
+
+            // there may be none after projecting
+            if (ptsOnImg && ptsOnImg.length > 0) {
+                let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio);
+                svg.appendChild(pts_svg);
+            }
+        }
+
+    }
+
+    box_to_svg(box, box_corners, trans_ratio, selected) {
+
+
+        var imgfinal = box_corners.map(function (x, i) {
+            if (i % 2 == 0) {
+                return Math.round(x * trans_ratio.x);
+            } else {
+                return Math.round(x * trans_ratio.y);
+            }
+        })
+
+
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+        svg.setAttribute("id", "svg-box-local-" + box.obj_local_id);
+
+        if (selected) {
+            svg.setAttribute("class", box.obj_type + " box-svg box-svg-selected");
+        } else {
+            if (box.world.data.cfg.color_obj == "id") {
+                svg.setAttribute("class", "color-" + box.obj_track_id % 33);
+            }
+            else // by id
+            {
+                svg.setAttribute("class", box.obj_type + " box-svg");
+            }
+        }
+
+
+        var front_panel = document.createElementNS("http://www.w3.org/2000/svg", 'polygon');
+        svg.appendChild(front_panel);
+        front_panel.setAttribute("points",
+            imgfinal.slice(0, 4 * 2).reduce(function (x, y) {
+                return String(x) + "," + y;
+            })
+        )
+
+        for (var i = 0; i < 4; ++i) {
+            var line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+            svg.appendChild(line);
+            line.setAttribute("x1", imgfinal[(4 + i) * 2]);
+            line.setAttribute("y1", imgfinal[(4 + i) * 2 + 1]);
+            line.setAttribute("x2", imgfinal[(4 + (i + 1) % 4) * 2]);
+            line.setAttribute("y2", imgfinal[(4 + (i + 1) % 4) * 2 + 1]);
+        }
+
+        for (var i = 0; i < 4; ++i) {
+            var line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+            svg.appendChild(line);
+            line.setAttribute("x1", imgfinal[i * 2]);
+            line.setAttribute("y1", imgfinal[i * 2 + 1]);
+            line.setAttribute("x2", imgfinal[(i + 4) * 2]);
+            line.setAttribute("y2", imgfinal[(i + 4) * 2 + 1]);
+        }
+
+        return svg;
+    }
+
+    boxes_manager = {
+        display_image: () => {
+            if (!this.cfg.disableMainImageContext)
+                this.render_2d_image();
+        },
+
+        add_box: (box) => {
+            var calib = this.getCalib();
+            if (!calib) {
+                return;
+            }
+            var trans_ratio = this.get_trans_ratio();
+            if (trans_ratio) {
+                var imgfinal = box_to_2d_points(box, calib);
+                if (imgfinal) {
+                    var imgfinal = imgfinal.map(function (x, i) {
+                        if (i % 2 == 0) {
+                            return Math.round(x * trans_ratio.x);
+                        } else {
+                            return Math.round(x * trans_ratio.y);
+                        }
+                    })
+
+                    var svg_box = this.box_to_svg(box, imgfinal, trans_ratio);
+                    var svg = this.ui.querySelector("#svg-boxes");
+                    svg.appendChild(svg_box);
+                }
+            }
+        },
+
+        onBoxSelected: (box_obj_local_id, obj_type) => {
+            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
+            if (b) {
+                b.setAttribute("class", "box-svg-selected");
+            }
+        },
+
+        onBoxUnselected: (box_obj_local_id, obj_type) => {
+            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
+
+            if (b)
+                b.setAttribute("class", obj_type);
+        },
+
+        remove_box: (box_obj_local_id) => {
+            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
+
+            if (b)
+                b.remove();
+        },
+
+        update_obj_type: (box_obj_local_id, obj_type) => {
+            this.onBoxSelected(box_obj_local_id, obj_type);
+        },
+
+        update_box: (box) => {
+            var b = this.ui.querySelector("#svg-box-local-" + box.obj_local_id);
+            if (!b) {
+                return;
+            }
+
+            var children = b.childNodes;
+
+            var calib = this.getCalib();
+            if (!calib) {
+                return;
+            }
+
+            var trans_ratio = this.get_trans_ratio();
+            var imgfinal = box_to_2d_points(box, calib);
+
+            if (!imgfinal) {
+                //box may go out of image
+                return;
+            }
+            var imgfinal = imgfinal.map(function (x, i) {
+                if (i % 2 == 0) {
+                    return Math.round(x * trans_ratio.x);
+                } else {
+                    return Math.round(x * trans_ratio.y);
+                }
+            })
+
+            if (imgfinal) {
+                var front_panel = children[0];
+                front_panel.setAttribute("points",
+                    imgfinal.slice(0, 4 * 2).reduce(function (x, y) {
+                        return String(x) + "," + y;
+                    })
+                )
+
+
+
+                for (var i = 0; i < 4; ++i) {
+                    var line = children[1 + i];
+                    line.setAttribute("x1", imgfinal[(4 + i) * 2]);
+                    line.setAttribute("y1", imgfinal[(4 + i) * 2 + 1]);
+                    line.setAttribute("x2", imgfinal[(4 + (i + 1) % 4) * 2]);
+                    line.setAttribute("y2", imgfinal[(4 + (i + 1) % 4) * 2 + 1]);
+                }
+
+
+                for (var i = 0; i < 4; ++i) {
+                    var line = children[5 + i];
+                    line.setAttribute("x1", imgfinal[i * 2]);
+                    line.setAttribute("y1", imgfinal[i * 2 + 1]);
+                    line.setAttribute("x2", imgfinal[(i + 4) * 2]);
+                    line.setAttribute("y2", imgfinal[(i + 4) * 2 + 1]);
+                }
+            }
+
+        }
+    }
+}
+
+class ImageEditor {
+
+    world = null;
     isDrag = false; // 当前是否为拖拽(移动)模式
     start = false; // 当前是否正在拖放添加矩形
     startDom = null; // 当前正在添加(鼠标未弹起)的矩形id
@@ -234,6 +675,10 @@ class ImageContext extends MovableView {
     topDot = null; // 拖拽模式下鼠标拖拽顶点的斜对顶点
     trackId = null;
     headerIdList = document.querySelector('#header-id-list');
+    annotation_2d = { // 维护annotation_2d
+        obj_type: 'annotation_2d',
+        psr: []
+    }
 
     getRate() {
         const boardData = getDomInfo(document.querySelector('#image-board'));
@@ -242,6 +687,12 @@ class ImageContext extends MovableView {
             rateY: 1536 / boardData.height
         }
         return rates;
+    }
+
+    attachWorld(world) {
+        this.world = world;
+        this.annotate_pic_reapply();
+        this.annotate_pic_id_list();
     }
 
     annotate_pic_init() { // 初始化图片标注
@@ -276,7 +727,7 @@ class ImageContext extends MovableView {
         d3.select(`#${this.nowSel}-rect`).attr(`obj_id`, id);
     }
 
-    annotate_pic_clear() { // 清除全部标注 // 清不掉？留到下一张一起保存起来所有svg的vector会相同
+    annotate_pic_clear() { // 清除全部标注
         d3.selectAll('#rect-g > g').remove();
     }
 
@@ -284,7 +735,7 @@ class ImageContext extends MovableView {
         const data = this.world.annotation_2d;
         const container = d3.select('#rect-g');
         const draw_needed = data.psr.filter((item) => { // this.world存在时必有this.name;
-            return item.vector === this.name; // 单等？？？？？？？
+            return item.vector === this.name;
         })
         for (let i = 0; i < draw_needed.length; i++) {
             const rect = container.append('g').attr('id', draw_needed[i].id.substring(0, draw_needed[i].id.length - 5)).append('rect')
@@ -342,20 +793,20 @@ class ImageContext extends MovableView {
         this.isDrag = !this.isDrag;
     }
 
-    annotate_pic_hide() { // 隐藏受选box
+    annotate_pic_hide() { // 隐藏
         const svg = d3.select(`#${this.nowSel}`);
         if (svg.style('visibility') === 'visible') {
             svg.style('visibility', 'hidden');
         }
     }
 
-    annotate_pic_show_all() { // 显示所有不可见box
+    annotate_pic_show_all() { // 显示所有
         d3.selectAll('#svg-boxes > g').style('visibility', 'visible');
         d3.selectAll('#rect-g > g').style('visibility', 'visible');
     }
 
-    annotate_pic_delete() {
-        this.world.annotation.boxes.forEach((item) => { // 如果受删标注为scene中存在标注
+    annotate_pic_delete() { // 删除
+        this.world.annotation.boxes.forEach((item) => { // 如果受删标注为3d转
             if (item.obj_track_id === this.trackId) {
                 item['draw'] = false;
                 return;
@@ -365,17 +816,12 @@ class ImageContext extends MovableView {
         d3.select(`#${this.nowSel}`).remove();
     }
 
-    annotation_2d = {
-        obj_type: 'annotation_2d',
-        psr: []
-    }
 
     annotate_pic_save() {
-        // data在类中维护(annotation_2d), 每次保存要根据当前相机方向去改变data中的一部分, 不能全部重组
         const allRect = d3.selectAll("#rect-g > g > rect")._groups[0];
         const sta = d3.select('#header-state');
 
-        this.annotate_pic_filter(allRect);
+        if (this.annotate_pic_filter(allRect) === false) return;
 
         this.world['annotation_2d'] = this.annotation_2d; // annotation.js - toBoxAnnotations()
         saveWorldList([this.world]);
@@ -384,14 +830,13 @@ class ImageContext extends MovableView {
         this.annotate_pic_after_switch();
     }
 
-
     annotate_pic_filter(allRect) {
         for (let i = 0; i < allRect.length; i++) {
-            const obj_track_id = d3.select(allRect[i]).attr('obj_id')
+            const obj_track_id = d3.select(allRect[i]).attr('obj_id');
             if (obj_track_id === null) {
                 const sta = d3.select('#header-state');
                 sta.text('驳回: 未知项.').style('color', 'red');
-                return;
+                return false;
             }
             const temObj = {
                 vector: this.name,
@@ -413,13 +858,34 @@ class ImageContext extends MovableView {
         // 为了防止删除svg后ann_2d无察觉, 最后必须根据this.name找ann_2d, this.name下ruo不存在该obj_id, 那么需要从anno_2d删除
         // 筛选ann_2d内所有vector = this.name的元素, 如果这些元素在rectAll中找不到, 那么该删除
         for (let i = 0; i < this.annotation_2d.length; i++) {
-            if(this.annotation_2d[i].vector === this.name && allRect.find(item => item.obj_id === this.annotation_2d[i].obj_id) === undefined) {
+            if (this.annotation_2d[i].vector === this.name && allRect.find(item => item.obj_id === this.annotation_2d[i].obj_id) === undefined) {
                 this.annotation_2d.splice(i, 1);
             }
         }
     }
 
-    annotate_pic_mouse_enter(dom) { // 注册rect的mouseenter
+    annotate_pic_after_switch() { // 受选标注切换后
+        if (this.nowSel.substring(0, 4) === 'rect') {
+            d3.select(`#${this.nowSel}-rect`)
+            .style('stroke', 'yellow')
+            .style('fill', 'yellow');
+            d3.selectAll(`#${this.nowSel} > circle`).style('fill', 'yellow');
+        } else {
+            d3.select(`#${this.nowSel}`).style('fill', '');
+        }
+    }
+    
+    annotate_pic_select_box(obj_local_id) { // 选中
+        this.world.annotation.boxes.forEach((item) => {
+            if (item.obj_local_id === Number(obj_local_id)) {
+                this.trackId = item.obj_track_id;
+                this.headerIdList.value = item.obj_track_id;
+                return;
+            }
+        })
+    }
+    
+    annotate_pic_mouse_enter(dom) {
         const that = this;
         dom.on('mouseenter', function () {
             if (that.isDrag) {
@@ -438,30 +904,9 @@ class ImageContext extends MovableView {
         })
     }
 
-    annotate_pic_after_switch() { // 受选标注切换后
-        if (this.nowSel.substring(0, 4) === 'rect') {
-            d3.select(`#${this.nowSel}-rect`)
-                .style('stroke', 'yellow')
-                .style('fill', 'yellow');
-            d3.selectAll(`#${this.nowSel} > circle`).style('fill', 'yellow');
-        } else {
-            d3.select(`#${this.nowSel}`).style('fill', '');
-        }
-    }
-
-    annotate_pic_select_box(obj_local_id) {
-        this.world.annotation.boxes.forEach((item) => {
-            if (item.obj_local_id === Number(obj_local_id)) {
-                this.trackId = item.obj_track_id;
-                this.headerIdList.value = item.obj_track_id;
-                return;
-            }
-        })
-    }
-
-    annotate_pic_anno_click(dom) { // 注册rect/g的click
+    annotate_pic_anno_click(dom) {
         const that = this;
-        if (typeof dom === 'string') { // 3D转2D标注受击
+        if (typeof dom === 'string') { // 3D转标注受击
             d3.select(`#${dom}`).on('click', function () {
                 if (that.isDrag === false) return;
 
@@ -497,7 +942,7 @@ class ImageContext extends MovableView {
         })
     }
 
-    annotate_pic_mouse_down(e) { // 注册矩形事件
+    annotate_pic_mouse_down(e) {
         if (!this.isDrag) {
             const that = this;
             const id = new Date().getTime() + '';
@@ -586,7 +1031,7 @@ class ImageContext extends MovableView {
         }
     }
 
-    createDrag() {
+    createDrag() { // 拖拽
         let color, widget;
         const that = this;
         this.Drag = d3.drag()
@@ -667,612 +1112,7 @@ class ImageContext extends MovableView {
                 widget = null;
             })
     }
-
-    init_image_op(func_get_selected_box) {
-        this.annotate_pic_init(); // 初始化绘制
-        this.get_selected_box = func_get_selected_box;
-    }
-
-    clear_main_canvas() {
-
-        var boxes = this.ui.querySelector("#svg-boxes").children;
-
-        if (boxes.length > 0) {
-            for (var c = boxes.length - 1; c >= 0; c--) {
-                boxes[c].remove();
-            }
-        }
-
-        var points = this.ui.querySelector("#svg-points").children;
-
-        if (points.length > 0) {
-            for (var c = points.length - 1; c >= 0; c--) {
-                points[c].remove();
-            }
-        }
-    }
-
-    world = null;
-    img = null;
-
-    attachWorld(world) {
-        this.world = world;
-        this.annotate_pic_reapply();
-        this.annotate_pic_id_list();
-    };
-
-    hide() {
-        this.ui.style.display = "none";
-    };
-
-    hidden() {
-        this.ui.style.display == "none";
-    };
-
-    show() {
-        this.ui.style.display = "";
-    };
-
-
-
-    drawing = false;
-    points = [];
-    polyline;
-
-    all_lines = [];
-
-    img_lidar_point_map = {};
-
-    point_color_by_distance(x, y) {
-        // x,y are image coordinates
-        let p = this.img_lidar_point_map[y * this.img.width + x];
-
-        let distance = Math.sqrt(p[1] * p[1] + p[2] * p[2] + p[3] * p[3]);
-
-        if (distance > 60.0)
-            distance = 60.0;
-        else if (distance < 10.0)
-            distance = 10.0;
-
-        return [(distance - 10) / 50.0, 1 - (distance - 10) / 50.0, 0].map(c => {
-            let hex = Math.floor(c * 255).toString(16);
-            if (hex.length == 1)
-                hex = "0" + hex;
-            return hex;
-        }).reduce((a, b) => a + b, "#");
-
-    }
-
-    to_polyline_attr(points) {
-        return points.reduce(function (x, y) {
-            return String(x) + "," + y;
-        }
-        )
-    }
-
-    to_viewbox_coord(x, y) {
-        var div = this.ui.querySelector("#maincanvas-svg");
-
-        x = Math.round(x * 2048 / div.clientWidth);
-        y = Math.round(y * 1536 / div.clientHeight);
-        return [x, y];
-
-    }
-
-    /* on_click(e){
-        var p= this.to_viewbox_coord(e.layerX, e.layerY);
-        var x=p[0];
-        var y=p[1];
-        
-        console.log("clicked",x,y);
-
-        
-        if (!this.drawing){
-
-            if (e.ctrlKey){
-                this.drawing = true;
-                var svg = this.ui.querySelector("#maincanvas-svg");
-                //svg.style.position = "absolute";
-                
-                this.polyline = document.createElementNS("http://www.w3.org/2000/svg", 'polyline');
-                svg.appendChild(this.polyline);
-                this.points.push(x);
-                this.points.push(y);
-
-                
-                this.polyline.setAttribute("class", "maincanvas-line")
-                this.polyline.setAttribute("points", this.to_polyline_attr(this.points));
-
-                var c = this.ui;
-                c.onmousemove = on_move;
-                c.ondblclick = on_dblclick;   
-                c.onkeydown = on_key;    
-            
-            }
-            else{
-                // not drawing
-                //this is a test
-                if (false){
-                    let nearest_x = 100000;
-                    let nearest_y = 100000;
-                    let selected_pts = [];
-                    
-                    for (let i =x-100; i<x+100; i++){
-                        if (i < 0 || i >= this.img.width)
-                            continue;
-
-                        for (let j = y-100; j<y+100; j++){
-                            if (j < 0 || j >= this.img.height)
-                                continue;
-
-                            let lidarpoint = this.img_lidar_point_map[j*this.img.width+i];
-                            if (lidarpoint){
-                                //console.log(i,j, lidarpoint);
-                                selected_pts.push(lidarpoint); //index of lidar point
-
-                                if (((i-x) * (i-x) + (j-y)*(j-y)) < ((nearest_x-x)*(nearest_x-x) + (nearest_y-y)*(nearest_y-y))){
-                                    nearest_x = i;
-                                    nearest_y = j;                                
-                                }
-                            }
-                                
-                        }
-                    }
-                    console.log("nearest", nearest_x, nearest_y);
-                    this.draw_point(nearest_x, nearest_y);
-                    if (nearest_x < 100000)
-                    {
-                        this.on_img_click([this.img_lidar_point_map[nearest_y*this.img.width+nearest_x][0]]);
-                    }
-                }
-                
-            }
-
-        } else {
-            if (this.points[this.points.length-2]!=x || this.points[this.points.length-1]!=y){
-                this.points.push(x);
-                this.points.push(y);
-                this.polyline.setAttribute("points", this.to_polyline_attr(this.points));
-            }
-            
-        }
-
-        function on_move(e){
-
-            var p = to_viewbox_coord(e.layerX, e.layerY);
-            var x = p[0];
-            var y = p[1];
-
-            console.log(x,y);
-            this.polyline.setAttribute("points", this.to_polyline_attr(this.points) + ',' + x + ',' + y);
-        }
-
-        function on_dblclick(e){
-            
-            this.points.push(this.points[0]);
-            this.points.push(this.points[1]);
-            
-            this.polyline.setAttribute("points", this.to_polyline_attr(this.points));
-            console.log(this.points)
-            
-            all_lines.push(this.points);
-
-            this.drawing = false;
-            this.points = [];
-
-            var c = this.ui;
-            c.onmousemove = null;
-            c.ondblclick = null;
-            c.onkeypress = null;
-            c.blur();
-        }
-
-        function cancel(){
-                
-                polyline.remove();
-
-                this.drawing = false;
-                this.points = [];
-                var c = this.ui;
-                c.onmousemove = null;
-                c.ondblclick = null;
-                c.onkeypress = null;
-
-                c.blur();
-        }
-
-        function on_key(e){
-            if (e.key == "Escape"){
-                cancel();
-                
-            }
-        }
-    } */
-
-
-    // all boxes
-
-
-
-    getCalib() {
-        var scene_meta = this.world.sceneMeta;
-
-        if (!scene_meta.calib.camera) {
-            return null;
-        }
-
-        //var active_camera_name = this.world.cameras.active_name;
-        var calib = scene_meta.calib.camera[this.name];
-
-        return calib;
-    }
-
-
-
-
-    get_trans_ratio() {
-        var img = this.world.cameras.getImageByName(this.name);
-
-        if (!img || img.width == 0) {
-            return null;
-        }
-
-        var clientWidth, clientHeight;
-
-        clientWidth = 2048;
-        clientHeight = 1536;
-
-        var trans_ratio = {
-            x: clientWidth / img.naturalWidth,
-            y: clientHeight / img.naturalHeight,
-        };
-
-        return trans_ratio;
-    }
-
-    show_image() {
-        var svgimage = this.ui.querySelector("#svg-image");
-
-        // active img is set by global, it's not set sometimes.
-        var img = this.world.cameras.getImageByName(this.name);
-        if (img) {
-            svgimage.setAttribute("xlink:href", img.src);
-        }
-
-        this.img = img;
-
-        if (this.world !== null) {
-            this.annotate_pic_clear();
-            this.annotate_pic_reapply();
-        }
-    }
-
-
-    points_to_svg(points, trans_ratio, cssclass, radius = 2) {
-        var ptsFinal = points.map(function (x, i) {
-            if (i % 2 == 0) {
-                return Math.round(x * trans_ratio.x);
-            } else {
-                return Math.round(x * trans_ratio.y);
-            }
-        });
-
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", 'g');
-
-        if (cssclass) {
-            svg.setAttribute("class", cssclass);
-        }
-
-        for (let i = 0; i < ptsFinal.length; i += 2) {
-
-
-            let x = ptsFinal[i];
-            let y = ptsFinal[i + 1];
-
-            let p = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-            p.setAttribute("cx", x);
-            p.setAttribute("cy", y);
-            p.setAttribute("r", 2);
-            p.setAttribute("stroke-width", "1");
-
-            if (!cssclass) {
-                let image_x = points[i];
-                let image_y = points[i + 1];
-                let color = point_color_by_distance(image_x, image_y);
-                color += "24"; //transparency
-                p.setAttribute("stroke", color);
-                p.setAttribute("fill", color);
-            }
-
-            svg.appendChild(p);
-        }
-
-        return svg;
-    }
-
-    draw_point(x, y) {
-        let trans_ratio = this.get_trans_ratio();
-        let svg = this.ui.querySelector("#svg-points");
-        let pts_svg = this.points_to_svg([x, y], trans_ratio, "radar-points");
-        svg.appendChild(pts_svg);
-    };
-
-
-
-
-    render_2d_image() {
-
-
-        if (this.cfg.disableMainImageContext)
-            return;
-        this.clear_main_canvas();
-
-        this.show_image();
-        this.draw_svg();
-    }
-
-
-    hide_canvas() {
-        //document.getElementsByClassName("ui-wrapper")[0].style.display="none";
-        this.ui.style.display = "none";
-    }
-
-    show_canvas() {
-        this.ui.style.display = "inline";
-    }
-
-
-    draw_svg() {
-        // draw picture
-        var img = this.world.cameras.getImageByName(this.name);
-
-        if (!img || img.width == 0) {
-            this.hide_canvas();
-            return;
-        }
-
-        this.show_canvas();
-
-        var trans_ratio = this.get_trans_ratio();
-
-        var calib = this.getCalib();
-        if (!calib) {
-            return;
-        }
-
-        let svg = this.ui.querySelector("#svg-boxes");
-
-        // draw boxes
-        this.world.annotation.boxes.forEach((box) => {
-            if (box.draw) {
-                var imgfinal = box_to_2d_points(box, calib);
-                if (imgfinal) {
-                    var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
-                    svg.appendChild(box_svg);
-                    this.annotate_pic_anno_click(box_svg.getAttribute('id'));
-                }
-            }
-        });
-
-        svg = this.ui.querySelector("#svg-points");
-
-        // draw radar points
-        if (this.cfg.projectRadarToImage) {
-            this.world.radars.radarList.forEach(radar => {
-                let pts = radar.get_unoffset_radar_points();
-                let ptsOnImg = points3d_to_image2d(pts, calib);
-
-                // there may be none after projecting
-                if (ptsOnImg && ptsOnImg.length > 0) {
-                    let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio, radar.cssStyleSelector);
-                    svg.appendChild(pts_svg);
-                }
-            });
-        }
-
-
-
-        // project lidar points onto camera image   
-        if (this.cfg.projectLidarToImage) {
-            let pts = this.world.lidar.get_all_points();
-            let ptsOnImg = points3d_to_image2d(pts, calib, true, this.img_lidar_point_map, img.width, img.height);
-
-            // there may be none after projecting
-            if (ptsOnImg && ptsOnImg.length > 0) {
-                let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio);
-                svg.appendChild(pts_svg);
-            }
-        }
-
-    }
-
-    box_to_svg(box, box_corners, trans_ratio, selected) {
-
-
-        var imgfinal = box_corners.map(function (x, i) {
-            if (i % 2 == 0) {
-                return Math.round(x * trans_ratio.x);
-            } else {
-                return Math.round(x * trans_ratio.y);
-            }
-        })
-
-
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", 'g');
-        svg.setAttribute("id", "svg-box-local-" + box.obj_local_id);
-
-        if (selected) {
-            svg.setAttribute("class", box.obj_type + " box-svg box-svg-selected");
-        } else {
-            if (box.world.data.cfg.color_obj == "id") {
-                svg.setAttribute("class", "color-" + box.obj_track_id % 33);
-            }
-            else // by id
-            {
-                svg.setAttribute("class", box.obj_type + " box-svg");
-            }
-        }
-
-
-        var front_panel = document.createElementNS("http://www.w3.org/2000/svg", 'polygon');
-        svg.appendChild(front_panel);
-        front_panel.setAttribute("points",
-            imgfinal.slice(0, 4 * 2).reduce(function (x, y) {
-                return String(x) + "," + y;
-            })
-        )
-
-        /*
-        var back_panel =  document.createElementNS("http://www.w3.org/2000/svg", 'polygon');
-        svg.appendChild(back_panel);
-        back_panel.setAttribute("points",
-            imgfinal.slice(4*2).reduce(function(x,y){            
-                return String(x)+","+y;
-            })
-        )
-        */
-
-        for (var i = 0; i < 4; ++i) {
-            var line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-            svg.appendChild(line);
-            line.setAttribute("x1", imgfinal[(4 + i) * 2]);
-            line.setAttribute("y1", imgfinal[(4 + i) * 2 + 1]);
-            line.setAttribute("x2", imgfinal[(4 + (i + 1) % 4) * 2]);
-            line.setAttribute("y2", imgfinal[(4 + (i + 1) % 4) * 2 + 1]);
-        }
-
-
-        for (var i = 0; i < 4; ++i) {
-            var line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-            svg.appendChild(line);
-            line.setAttribute("x1", imgfinal[i * 2]);
-            line.setAttribute("y1", imgfinal[i * 2 + 1]);
-            line.setAttribute("x2", imgfinal[(i + 4) * 2]);
-            line.setAttribute("y2", imgfinal[(i + 4) * 2 + 1]);
-        }
-
-        return svg;
-    }
-
-
-    boxes_manager = {
-        display_image: () => {
-            if (!this.cfg.disableMainImageContext)
-                this.render_2d_image();
-        },
-
-        add_box: (box) => {
-            var calib = this.getCalib();
-            if (!calib) {
-                return;
-            }
-            var trans_ratio = this.get_trans_ratio();
-            if (trans_ratio) {
-                var imgfinal = box_to_2d_points(box, calib);
-                if (imgfinal) {
-                    var imgfinal = imgfinal.map(function (x, i) {
-                        if (i % 2 == 0) {
-                            return Math.round(x * trans_ratio.x);
-                        } else {
-                            return Math.round(x * trans_ratio.y);
-                        }
-                    })
-
-                    var svg_box = this.box_to_svg(box, imgfinal, trans_ratio);
-                    var svg = this.ui.querySelector("#svg-boxes");
-                    svg.appendChild(svg_box);
-                }
-            }
-        },
-
-
-        onBoxSelected: (box_obj_local_id, obj_type) => {
-            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
-            if (b) {
-                b.setAttribute("class", "box-svg-selected");
-            }
-        },
-
-
-        onBoxUnselected: (box_obj_local_id, obj_type) => {
-            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
-
-            if (b)
-                b.setAttribute("class", obj_type);
-        },
-
-        remove_box: (box_obj_local_id) => {
-            var b = this.ui.querySelector("#svg-box-local-" + box_obj_local_id);
-
-            if (b)
-                b.remove();
-        },
-
-        update_obj_type: (box_obj_local_id, obj_type) => {
-            this.onBoxSelected(box_obj_local_id, obj_type);
-        },
-
-        update_box: (box) => {
-            var b = this.ui.querySelector("#svg-box-local-" + box.obj_local_id);
-            if (!b) {
-                return;
-            }
-
-            var children = b.childNodes;
-
-            var calib = this.getCalib();
-            if (!calib) {
-                return;
-            }
-
-            var trans_ratio = this.get_trans_ratio();
-            var imgfinal = box_to_2d_points(box, calib);
-
-            if (!imgfinal) {
-                //box may go out of image
-                return;
-            }
-            var imgfinal = imgfinal.map(function (x, i) {
-                if (i % 2 == 0) {
-                    return Math.round(x * trans_ratio.x);
-                } else {
-                    return Math.round(x * trans_ratio.y);
-                }
-            })
-
-            if (imgfinal) {
-                var front_panel = children[0];
-                front_panel.setAttribute("points",
-                    imgfinal.slice(0, 4 * 2).reduce(function (x, y) {
-                        return String(x) + "," + y;
-                    })
-                )
-
-
-
-                for (var i = 0; i < 4; ++i) {
-                    var line = children[1 + i];
-                    line.setAttribute("x1", imgfinal[(4 + i) * 2]);
-                    line.setAttribute("y1", imgfinal[(4 + i) * 2 + 1]);
-                    line.setAttribute("x2", imgfinal[(4 + (i + 1) % 4) * 2]);
-                    line.setAttribute("y2", imgfinal[(4 + (i + 1) % 4) * 2 + 1]);
-                }
-
-
-                for (var i = 0; i < 4; ++i) {
-                    var line = children[5 + i];
-                    line.setAttribute("x1", imgfinal[i * 2]);
-                    line.setAttribute("y1", imgfinal[i * 2 + 1]);
-                    line.setAttribute("x2", imgfinal[(i + 4) * 2]);
-                    line.setAttribute("y2", imgfinal[(i + 4) * 2 + 1]);
-                }
-            }
-
-        }
-    }
-
 }
-
 
 class ImageContextManager {
     constructor(parentUi, selectorUi, cfg, on_img_click) {
