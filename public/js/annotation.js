@@ -123,7 +123,8 @@ function Annotation(sceneMeta, world, frameInfo) {
             },
             obj_type: box.obj_type,
             obj_id: String(box.obj_track_id),
-            obj_attr: box.obj_attr,
+            obj_trunk: box.obj_trunk,
+            obj_occlu: box.obj_occlu
             //vertices: vertices,
         };
         return ann;
@@ -139,15 +140,25 @@ function Annotation(sceneMeta, world, frameInfo) {
 
             if (b.follows)
                 ann.follows = b.follows;
+
+            ann.draw = b.draw;
             return ann;
         });
 
         anns.sort((a, b) => a.obj_id - b.obj_id);
 
+        const sd = () => {
+            for (let i = 0; i < anns.length; i++) {
+                for (let j = 0; j < this.world.annotation_2d.psr.length; j++) {
+                    if (anns[i].obj_id === this.world.annotation_2d.psr[j].obj_id) anns[i]['annotation_2d'] = this.world.annotation_2d.psr[j];
+                }
+            }
+        }
+        if (this.world.annotation_2d.psr) {
+            sd();
+        }
         return anns;
     };
-
-
 
     // to real-world position (no offset)
     this.ann_to_vector_global = function (box) {
@@ -290,7 +301,7 @@ function Annotation(sceneMeta, world, frameInfo) {
         return box;
     };
 
-    this.createCuboid = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
+    this.createCuboid = function (pos, scale, rotation, obj_type, track_id, obj_trunk, obj_occlu) {
         let mesh = this.new_bbox_cube(parseInt("0x" + globalObjectCategory.get_obj_cfg_by_type(obj_type).color.slice(1)));
         mesh.position.x = pos.x;
         mesh.position.y = pos.y;
@@ -306,7 +317,8 @@ function Annotation(sceneMeta, world, frameInfo) {
 
         mesh.obj_track_id = track_id;  //tracking id
         mesh.obj_type = obj_type;
-        mesh.obj_attr = obj_attr;
+        mesh.obj_trunk = obj_trunk;
+        mesh.obj_occlu = obj_occlu;
         mesh.obj_local_id = this.get_new_box_local_id();
 
         mesh.world = this.world;
@@ -317,14 +329,15 @@ function Annotation(sceneMeta, world, frameInfo) {
      pos:  offset position, after transformed
     */
 
-    this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_attr) {
+    this.add_box = function (pos, scale, rotation, obj_type, track_id, obj_trunk, obj_occlu) {
         let objAttr
-        if(document.querySelector("#if-default-attribute-use").checked) {
+        if (document.querySelector("#if-default-attribute-use").checked) {
             objAttr = document.querySelector("#attribute-selector").value
         } else {
-            objAttr = obj_attr;
+            objAttr = obj_trunk;
         }
-        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr)
+        let mesh = this.createCuboid(pos, scale, rotation, obj_type, track_id, objAttr, obj_occlu);
+        mesh.draw =  true; // 解决新增的box不会及时更新到照片
 
         this.boxes.push(mesh);
         this.sort_boxes();
@@ -405,14 +418,11 @@ function Annotation(sceneMeta, world, frameInfo) {
     },
 
 
-        this.proc_annotation = function (boxes) {
+        this.proc_annotation = function (boxList) {
 
-            // boxes = this.transformBoxesByEgoPose(boxes);
-            // boxes = this.transformBoxesByOffset(boxes);
-
-            // //var boxes = JSON.parse(this.responseText);
-            //console.log(ret);
-            this.boxes = this.createBoxes(boxes);  //create in future world
+            const boxes_draw_no = this.create_annotation_2d(boxList);
+            this.boxes = boxList;
+            this.boxes = this.createBoxes(this.boxes);  //create in future world
 
             this.webglGroup = new THREE.Group();
             this.webglGroup.name = "annotations";
@@ -424,11 +434,43 @@ function Annotation(sceneMeta, world, frameInfo) {
             console.log(this.boxes_load_time, this.frameInfo.scene, this.frameInfo.frame, "loaded boxes ", this.boxes_load_time - this.create_time, "ms");
 
             this.sort_boxes();
+            this.if_draw_box(boxes_draw_no);
 
             this._afterPreload();
         };
 
+    this.create_annotation_2d = (boxList) => {
+        const boxes_draw_no = [];
+        const scene = document.querySelector('#scene-selector').value;
+        const frame = document.querySelector('#frame-selector').value;
+        const data = {
+            scene: scene,
+            frame: frame,
+            obj_type: 'annotation_2d',
+            psr: []
+        }
+        for (let i = 0; i < boxList.length; i++) {
+            boxList[i].draw === false && boxes_draw_no.push(boxList[i].obj_id);
+            boxList[i].annotation_2d && data.psr.push(boxList[i].annotation_2d);
+        }
+        this.world['annotation_2d'] = data;
+        return boxes_draw_no;
+    }
+
+    this.if_draw_box = (boxes_draw_no) => {
+        const boxes = this.world.annotation.boxes;
+        for (let i = 0; i < boxes.length; i++) {
+            boxes[i]['draw'] = true;
+            for (let j = 0; j < boxes_draw_no.length; j++) { // 需要设置fraw = false的放这, 但是也在这里面设置true就设置不上了, 应该放这个循环外
+                if (boxes[i].obj_track_id === boxes_draw_no[j]) {
+                    boxes[i]['draw'] = false;
+                }
+            }
+        }
+    }
+
     this.load_annotation = function (on_load) {
+        const that = this;
         if (this.data.cfg.disableLabels) {
             on_load([]);
         } else {
@@ -440,7 +482,7 @@ function Annotation(sceneMeta, world, frameInfo) {
 
                 if (this.status == 200) {
                     let ann = _self.frameInfo.anno_to_boxes(this.responseText);
-                    on_load(ann);
+                    on_load(ann); // on_load最后不能处理2d标注数据
                 }
 
                 // end of state change: it can be after some time (async)
@@ -458,7 +500,7 @@ function Annotation(sceneMeta, world, frameInfo) {
     };
 
 
-    this.reapplyAnnotation = function (boxes, done) {
+    this.reapplyAnnotation = function (boxes, done) { // 数据转模型
         // these boxes haven't attached a world
         //boxes = this.transformBoxesByOffset(boxes);
 
@@ -468,6 +510,7 @@ function Annotation(sceneMeta, world, frameInfo) {
         let pendingBoxList = [];
 
         boxes.forEach(nb => {  // nb is annotation format, not a true box
+            console.log(nb)
             let old_box = this.boxes.find(function (x) {
                 return x.obj_track_id == nb.obj_id && x.obj_track_id != "" && nb.obj_id != "" && x.obj_type == nb.obj_type;;
             });
@@ -479,7 +522,7 @@ function Annotation(sceneMeta, world, frameInfo) {
                 old_box.position.set(nb.psr.position.x, nb.psr.position.y, nb.psr.position.z);
                 old_box.scale.set(nb.psr.scale.x, nb.psr.scale.y, nb.psr.scale.z);
                 old_box.rotation.set(nb.psr.rotation.x, nb.psr.rotation.y, nb.psr.rotation.z);
-                old_box.obj_attr = nb.obj_attr;
+                old_box.obj_trunk = nb.obj_trunk;
                 old_box.annotator = nb.annotator;
                 old_box.changed = false; // clear changed flag.
 
@@ -537,7 +580,8 @@ function Annotation(sceneMeta, world, frameInfo) {
             b.psr.rotation,
             b.obj_type,
             b.obj_id,
-            b.obj_attr);
+            b.obj_trunk,
+            b.obj_occlu);
 
         if (b.annotator) {
             mesh.annotator = b.annotator;

@@ -25,7 +25,7 @@ import { MovableView } from './popup_dialog.js';
 import { globalKeyDownManager } from './keydown_manager.js';
 import { vector_range } from "./util.js"
 import { checkScene } from './error_check.js';
-import { manager } from "./backup/manager.js";
+import { backupManager } from "./backup/manager.js";
 
 function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
@@ -387,7 +387,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 //self.autoAdjust.mark_bbox(self.selected_box);
                 //event.currentTarget.blur();
                 let id = objIdManager.generateNewUniqueId();
-                self.fastToolBox.setValue(self.selected_box.obj_type, id, self.selected_box.obj_attr);
+                self.fastToolBox.setValue(self.selected_box.obj_type, id, self.selected_box.obj_trunk, self.selected_box.obj_occlu);
 
                 self.setObjectId(id);
                 break;
@@ -469,8 +469,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             case "object-track-id-editor":
                 this.object_track_id_changed(event);
                 break;
-            case "attr-input":
-                this.object_attribute_changed(event.currentTarget.value);
+            case "object-attribute-selector":
+                this.object_attribute_changed(event);
+                break;
+            case "object-occlusion-selector":
+                this.object_occlusion_changed(event);
                 break;
             default:
                 this.handleContextMenuEvent(event);
@@ -756,9 +759,12 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                     break;
 
                 this.setObjectId(this.autoAdjust.marked_object.ann.obj_id);
-                this.fastToolBox.setValue(this.selected_box.obj_type,
+                this.fastToolBox.setValue(
+                    this.selected_box.obj_type,
                     this.selected_box.obj_track_id,
-                    this.selected_box.obj_attr);
+                    this.selected_box.obj_trunk,
+                    this.selected_box.obj_occlu
+                    );
 
                 break;
             case "cm-change-id-to-ref-in-scene":
@@ -780,9 +786,12 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
 
                 this.setObjectId(this.autoAdjust.marked_object.ann.obj_id);
-                this.fastToolBox.setValue(this.selected_box.obj_type,
+                this.fastToolBox.setValue(
+                    this.selected_box.obj_type,
                     this.selected_box.obj_track_id,
-                    this.selected_box.obj_attr);
+                    this.selected_box.obj_trunk,
+                    this.selected_box.obj_occlu
+                    );
 
                 break;
             case "cm-follow-ref":
@@ -854,7 +863,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                         let box = w.annotation.boxes.find(b => b.obj_track_id === this.selected_box.obj_track_id);
                         if (box && box !== this.selected_box) {
                             box.obj_type = this.selected_box.obj_type;
-                            box.obj_attr = this.selected_box.obj_attr;
+                            box.obj_trunk = this.selected_box.obj_trunk;
                             //saveList.push(w);
                             w.annotation.setModified();
                         }
@@ -965,17 +974,22 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.frame_changed = function (event) {
         console.log("frame_changed", event);
         var sceneName = this.editorUi.querySelector("#scene-selector").value;
-
+        
         if (sceneName.length == 0 && this.data.world) {
             sceneName = this.data.world.frameInfo.scene;
         }
         if (sceneName.length == 0) {
             return;
         }
-
+        
         var frame = event.currentTarget.value;
+        this.imageContextManager.images[0].imageEditor.annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
+
+        const frame_index = this.data.getFrameIndex();
+        const frame_length = this.data.getFrameList().length;
+        this.editorUi.querySelector('#page-now').innerText = `当前第 ${ frame_index } 页 共 ${ frame_length } 页 | `;
     };
 
 
@@ -1125,7 +1139,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 //     this.boxEditor.update();
 
                 //     // update fasttoolbox
-                //     this.fastToolBox.setValue(this.selected_box.obj_type, this.selected_box.obj_track_id, this.selected_box.obj_attr);
+                //     this.fastToolBox.setValue(this.selected_box.obj_type, this.selected_box.obj_track_id, this.selected_box.obj_trunk);
                 // }
 
 
@@ -1244,17 +1258,21 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
     };
 
-    this.object_attribute_changed = function (value) {
+    this.object_attribute_changed = function (event) {
+        let currAttr = event.currentTarget.value;
         if (this.selected_box) {
-            if (document.querySelector("#if-default-attribute-use").checked) {
-                let currAttr = document.querySelector('#attribute-selector').value;
-                this.selected_box.obj_attr = currAttr;
-                this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, currAttr);
-            } else {
-                this.selected_box.obj_attr = value;
-                this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, value);
+            this.selected_box.obj_trunk = currAttr;
+            this.floatLabelManager.set_object_attr(this.selected_box.obj_local_id, currAttr);
+            this.data.world.annotation.setModified();
+            this.header.updateModifiedStatus();
+        }
+    };
 
-            }
+    this.object_occlusion_changed = function (event) {
+        let currOccl = event.currentTarget.value;
+        if (this.selected_box) {
+            this.selected_box.obj_occlu = currOccl;
+            this.floatLabelManager.set_object_occl(this.selected_box.obj_local_id, currOccl);
             this.data.world.annotation.setModified();
             this.header.updateModifiedStatus();
         }
@@ -1492,7 +1510,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             this.boxOp.auto_rotate_xyz(box, () => {
                 box.obj_type = globalObjectCategory.guess_obj_type_by_dimension(box.scale);
                 this.floatLabelManager.set_object_type(box.obj_local_id, box.obj_type);
-                this.fastToolBox.setValue(box.obj_type, box.obj_track_id, box.obj_attr);
+                this.fastToolBox.setValue(box.obj_type, box.obj_track_id, box.obj_trunk, box.obj_occlu);
                 this.on_box_changed(box);
             });
         }
@@ -1729,7 +1747,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             //this.floatLabelManager.select_box(this.selected_box.obj_local_id);
 
             this.fastToolBox.setPos(this.floatLabelManager.getLabelEditorPos(this.selected_box.obj_local_id));
-            this.fastToolBox.setValue(object.obj_type, object.obj_track_id, object.obj_attr);
+            this.fastToolBox.setValue(object.obj_type, object.obj_track_id, object.obj_trunk, object.obj_occlu);
             this.fastToolBox.show();
 
             this.boxOp.highlightBox(this.selected_box);
@@ -1835,7 +1853,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             id = "";
         }
 
-        let box = this.add_box(pos, refbox.psr.scale, refbox.psr.rotation, refbox.obj_type, id, refbox.obj_attr);
+        let box = this.add_box(pos, refbox.psr.scale, refbox.psr.rotation, refbox.obj_type, id, refbox.obj_trunk, refbox.obj_occlu);
 
         return box;
     };
@@ -1871,8 +1889,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         return box;
     };
 
-    this.add_box = function (pos, scale, rotation, obj_type, obj_track_id, obj_attr) {
-        let box = this.data.world.annotation.add_box(pos, scale, rotation, obj_type, obj_track_id, obj_attr);
+    this.add_box = function (pos, scale, rotation, obj_type, obj_track_id, obj_trunk, obj_occlu) {
+        let box = this.data.world.annotation.add_box(pos, scale, rotation, obj_type, obj_track_id, obj_trunk, obj_occlu);
 
         this.floatLabelManager.add_label(box);
 
@@ -2058,14 +2076,14 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             */
             case 'z': // X
                 if (ev.ctrlKey) { // undo
-                    manager.undo();
+                    backupManager.undo();
                 } else {
                     this.viewManager.mainView.transform_control.showX = !this.viewManager.mainView.transform_control.showX;
                 }
                 break;
             case 'y': // X
                 if (ev.ctrlKey) { // redo
-                    manager.redo();
+                    backupManager.redo();
                 }
                 break;
             case 'x': // Y
@@ -2179,11 +2197,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     };
 
     this.use_attribute_changed = function () {
-        var ifuse = document.querySelector('#if-default-attribute-use').checked;
-        var attribute_selector = document.querySelector("#attribute-selector");
-        var attribute_label = document.querySelector('#if-default-attribute-label');
-        attribute_selector.disabled = !ifuse;
-        if(ifuse) {
+        var use = this.header.ui.querySelector('#if-default-attribute-use').checked;
+        this.header.ui.querySelector("#attribute-selector").disabled = !use;
+
+        var attribute_label = this.header.ui.querySelector('#if-default-attribute-label');
+        if(use) {
             attribute_label.style.color = '#fff';
         } else {
             attribute_label.style.color = 'rgb(173, 173, 173)';
@@ -2191,11 +2209,11 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     }
     
     this.use_category_changed = function () {
-        var ifuse = document.querySelector('#if-default-category-use').checked;
-        var category_selector = document.querySelector("#category-selector");
-        var category_label = document.querySelector("#if-default-category-label");
-        category_selector.disabled = !ifuse;
-        if(ifuse) {
+        var use = this.header.ui.querySelector('#if-default-category-use').checked;
+        this.header.ui.querySelector("#category-selector").disabled = !use;
+        
+        var category_label = this.header.ui.querySelector("#if-default-category-label");
+        if(use) {
             category_label.style.color = '#fff';
         } else {
             category_label.style.color = 'rgb(173, 173, 173)';
@@ -2203,11 +2221,14 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     }
 
     this.use_previous_frame_click = async function () {
-        var old_frame = document.querySelector("#frame-selector").value;
-        var sceneName = document.querySelector('#scene-selector').value;
+        var old_frame = this.header.ui.querySelector("#frame-selector").value;
+        var sceneName = this.header.ui.querySelector('#scene-selector').value;
+
         let meta = await this.data.readSceneMetaData(sceneName); // frameList of Scene.
-        let old_frame_index = meta.frames.findIndex((w) => { return w === old_frame });
-        var new_frame = meta.frames[Number(old_frame_index) - 1];
+        
+        let old_frame_index = meta.frames.findIndex(w => w === old_frame);
+        var new_frame = meta.frames[old_frame_index - 1];
+
         if (new_frame === undefined) {
             this.infoBox.show("Notice", `there's no previous frame before.`);
             return;
@@ -2680,7 +2701,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         if (this.selected_box) {
             //this.floatLabelManager.select_box(this.selected_box.obj_local_id)
             this.fastToolBox.show();
-            this.fastToolBox.setValue(this.selected_box.obj_type, this.selected_box.obj_track_id, this.selected_box.obj_attr);
+            this.fastToolBox.setValue(this.selected_box.obj_type, this.selected_box.obj_track_id, this.selected_box.obj_trunk, this.selected_box.obj_occlu);
         }
     };
 
@@ -2717,6 +2738,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 '}';
             sheet.insertRule(rule, sheet.cssRules.length);
         }
+
+        let obj_type_keys = Object.keys(obj_type_map)
 
         let options = ''
         for (var o in obj_type_map) {
@@ -2775,16 +2798,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         // }
 
     };
-
-    this.category_selector_changed = function () {
-        let default_category = document.getElementById('category-selector').value;
-        this.editorUi.querySelector("#floating-things #object-category-selector").value = default_category;
-    }
-
-    this.attribute_selector_changed = function () {
-        let default_attr = document.querySelector('#attribute-selector').value;
-        document.querySelector("#attr-input").value = default_attr
-    }
 
     this.setDefaultObjType = function (currVal) {
         if (this.selected_box) {

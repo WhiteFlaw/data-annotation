@@ -6,24 +6,17 @@
 	<meta charset="utf-8">
 	<link rel="icon" type="image/png" href="/static/icon2.png">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<!-- <script src="/static/js/lib/jquery-1.12.4.js"></script>
-		<link rel="stylesheet" href="/static/js/lib/jquery-ui-1.12.1/jquery-ui.min.css">
-		<script src="/static/js/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script> -->
 
 	<link type="text/css" rel="stylesheet" href="/static/css/main.css">
-
 </head>
 
 <body>
 
 	<div id="main-editor"></div>
-	<!-- div id="batch-editor"
-	</div> -->
-	<template id="editor-template"> <!-- mainEditor有一个, 最先进行 -->
+	<template id="editor-template">
 		<div id="main-ui" class="editor-ui">
 			<div id="header">
 				<div id="global-info">
-					<!-- text id="frame"></text-->
 					<div id="selectors">
 						<select id="scene-selector">
 							<option>--scene--</option>
@@ -39,9 +32,6 @@
 						<select id="frame-selector">
 							<option>--frame--</option>
 						</select>
-						<!-- <select id="camera-selector">
-									<option>--camera--</option>
-							</select> -->
 						<div id="camera-selector">
 							<span>Camera</span>
 							<div id="camera-list">
@@ -59,14 +49,11 @@
 				</div>
 
 				<div id="buttons">
+					<div id="page-now"></div>
 					<div id="use-previous-frame">使用上一帧</div>
 					<input type="checkbox" id="if-default-attribute-use" name="if-default-attribute-use">
 					<label for="if-default-attribute-use" id="if-default-attribute-label" value="y">属性预设</label>
-					<select id="attribute-selector" disabled="true">
-						<option value=""></option>
-						<option value="0">0</option>
-						<option value="1">1</option>
-					</select>
+					<select id="attribute-selector" disabled="true"></select>
 					<input type="checkbox" id="if-default-category-use" name="if-default-category-use">
 					<label for="if-default-category-use" id="if-default-category-label" value="y">分类预设</label>
 					<select id="category-selector" disabled="true">
@@ -337,9 +324,10 @@
 
 						<div class="obj-editor-row">
 							<div id="attr-editor">
-								<input title="attribute" id="attr-input" type="text" size="10" placeholder="attribute">
-								<div id="attr-selector">
-								</div>
+								<select title="attribute" id="object-attribute-selector"></select>
+							</div>
+							<div id="occl-editor">
+								<select title="occlusion" id="object-occlusion-selector"></select>
 							</div>
 						</div>
 
@@ -1234,7 +1222,8 @@
 		</div>
 
 	</template>
-	<template id="box-editor-ui-template"> <!-- batch-box-editor-group, main-box-editor-wrapper, batch-box-editor里各有一个 -->
+	<template id="box-editor-ui-template">
+		<!-- batch-box-editor-group, main-box-editor-wrapper, batch-box-editor里各有一个 -->
 		<div id="sub-views">
 			<div class="box-info non-selectable" id="box-info"></div>
 			<div class="view-manipulator" id="z-view-manipulator" tabindex="-1">
@@ -1476,7 +1465,7 @@
 			<canvas id="focuscanvas" class="non-selectable" width="320" height="240">cavas</canvas>
 		</div>
 	</template>
-	<template id="batch-editor-tools-template"> <!-- dynamic-buttons-placeholder有一个 -->
+	<template id="batch-editor-tools-template">
 		<div id="batch-editor-tools-wrapper" class="non-selectable">
 			<div id="batch-editor-tools">
 				<!-- <select title="category"  id="object-category-selector"></select>
@@ -1511,7 +1500,8 @@
 		</div>
 	</template>
 	<template id="image-wrapper-template">
-		<div class="image-wrapper">
+		<div class="image-wrapper" id="image-board">
+			<!-- <div id="custom-svg"></div> -->
 			<svg id="maincanvas-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
 				<image id="svg-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none" xlink:href="" />
 				<g id="svg-boxes"></g>
@@ -1519,11 +1509,23 @@
 			</svg>
 			<div id="move-handle">
 			</div>
-			<header id="header"></header>
+			<header id="header">
+				<div id="header-title"></div>
+				<div id="header-state"></div>
+				<div id="header-action">
+					<select name="obj_id_list" id="header-id-list"></select>
+					<div id="header-show">显示全部</div>
+					<div id="header-hide">隐藏</div>
+					<div id="header-save">保存</div>
+					<div id="header-delete">删除</div>
+					<div id="header-modify"></div>
+				</div>
+			</header>
 		</div>
 	</template>
 
 	<script src="/static/js/lib/ml/tf.min.js"></script>
+	<script src="/static/js/lib/d3/d3.min.js"></script>
 	<script type="module" src="/static/js/main.js"></script>
 </body>
 

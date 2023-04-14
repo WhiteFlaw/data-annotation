@@ -129,7 +129,8 @@ canvas {
 
 #object-category-selector,
 #object-track-id-editor,
-#attr-input,
+#object-attribute-selector,
+#object-occlusion-selector,
 #scene-selector,
 #frame-selector,
 #object-selector,
@@ -194,13 +195,9 @@ canvas {
 
 
 #object-track-id-editor,
-#attr-input {
+#object-attribute-selector,
+#object-occlusion-selector {
 	border-bottom-width: 1px;
-}
-
-#attr-input {
-	margin-right: 5px;
-	line-height: 24px;
 }
 
 #object-category-attribute,
@@ -294,8 +291,6 @@ canvas {
 	padding: 2px;
 } */
 
-
-
 #maincanvas-svg {
 	position: absolute;
 	top: 0%;
@@ -305,20 +300,65 @@ canvas {
 	padding: 0px;
 }
 
+.line-g {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 10000;
+}
+
 .image-wrapper #move-handle {
+	/* move-handle在浮动层具备尺寸会导致custom-svg可绘制空间受到挤压 */
 	position: absolute;
 	top: 0%;
 	left: 0%;
-	width: 100%;
-	height: 90%;
+	/* width: 100%;
+	height: 90%; */
 }
 
 .image-wrapper #header {
 	position: absolute;
 	top: 0%;
 	left: 0%;
-	color: red;
+	width: 100%;
+	display: flex;
 	padding-left: 5px;
+	justify-content: space-between;
+}
+
+.image-wrapper #header #header-title {
+	color: red;
+}
+
+.image-wrapper #header #header-state {
+	margin: 0;
+	color: var(--font-color);
+}
+
+.image-wrapper #header #header-action {
+	display: flex;
+	margin-right: 5px;
+	text-align: center;
+	color: var(--font-color);
+	border-color: var(--widget-background-color);
+	background-color: var(--widget-background-color);
+}
+
+#header-action div {
+	min-width: 50px;
+}
+
+#header-action div:hover {
+	background-color: var(--highlight-background-color);
+}
+
+.image-wrapper #header #header-id-list,
+.image-wrapper #header #header-delete,
+.image-wrapper #header #header-show,
+.image-wrapper #header #header-hide {
+	display: none;
 }
 
 /* line {
@@ -425,14 +465,21 @@ dynamic set obj-type css has higher priority than this one.
 
 #attr-editor {
 	position: relative;
+	width: 47%;
+	height: 20px;
 }
 
-#attr-selector {
+#occl-editor {
+	position: relative;
+	width: 33%;
+	height: 20px;
+}
+
+#object-attribute-selector,
+#object-occlusion-selector {
 	position: absolute;
-	top: 100%;
-	left: 0%;
+	width: 100%;
 	background-color: var(--widget-background-color);
-	width: 250px;
 }
 
 .attr-item {
@@ -629,7 +676,8 @@ dynamic set obj-type css has higher priority than this one.
 
 .label-obj-id-text,
 .label-obj-type-text,
-.label-obj-attr-text {
+.label-obj-attr-text,
+.label-obj-occl-text {
 	padding-left: 5px;
 }
 

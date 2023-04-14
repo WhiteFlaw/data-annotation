@@ -83,7 +83,6 @@ class Root(object):
 
       return "ok"
 
-
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def cropscene(self):

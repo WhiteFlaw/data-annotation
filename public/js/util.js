@@ -682,6 +682,11 @@ function replaceWorld(oldWorld, newWorld) { // oldWorld数据应用至newWorld
     return newWorld;
 }
 
+function getDomInfo(ele) {
+    const temObj = ele.getBoundingClientRect();
+    return temObj;
+}
+
 export {
     dotproduct, vector_range, array_as_vector_range, array_as_vector_index_range, vector4to3, vector3_nomalize, psr_to_xyz, matmul,
     matmul2,
@@ -695,5 +700,6 @@ export {
     addProto,
     copyWorld,
     setWorld,
+    getDomInfo,
     replaceWorld
 }

@@ -3,7 +3,7 @@
 import { World } from "./world.js";
 import { Debug } from "./debug.js";
 import { logger } from "./log.js"
-import { manager } from "./backup/manager.js";
+import { backupManager } from "./backup/manager.js";
 import { copyWorld, setWorld, replaceWorld } from "./util.js";
 
 class Data {
@@ -108,6 +108,14 @@ class Data {
             return world;
         else
             return null;
+    };
+
+    getFrameIndex() {
+        return this.worldList[0].frameInfo.frame_index + 1;
+    };
+    
+    getFrameList() {
+        return this.worldList[0].frameInfo.sceneMeta.frames;
     };
 
     offsetList = [[0, 0, 0]];
@@ -277,7 +285,7 @@ class Data {
             name: 'initialWorld',
             params: copyWorld(this.world)
         }
-        manager.initManager(initialAction);
+        backupManager.initManager(initialAction);
     }
 
 

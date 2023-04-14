@@ -2,7 +2,7 @@ import { Exec } from './exec.js';
 
 const executors = new Exec();
 
-class Manager {
+class BackupManager {
     constructor() {
         this.editor = null;
         
@@ -111,6 +111,6 @@ class Manager {
     }
 }
 
-const manager = new Manager();
+const backupManager = new BackupManager();
 
-export { manager }
+export { backupManager }

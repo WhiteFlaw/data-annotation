@@ -1,7 +1,7 @@
 import { Config } from "./config.js"
 import { Editor } from "./editor.js"
 import { Data } from './data.js'
-import { manager } from './backup/manager.js';
+import { backupManager } from './backup/manager.js';
 
 let pointsGlobalConfig = new Config();
 window.pointsGlobalConfig = pointsGlobalConfig;
@@ -37,7 +37,7 @@ async function createMainEditor() {
   window.editor = editor;
   editor.run();
 
-  manager.initEditor(editor);
+  backupManager.initEditor(editor);
 
   return editor;
 }

@@ -697,7 +697,7 @@ class ProjectiveView{
             let theta = 0;
 
             svg.onmousemove = (event)=>{
-                
+
                 mouse_cur_pos={x: event.layerX,y:event.layerY,};
                 
                 let handle_center_cur_pos = {

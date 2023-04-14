@@ -66,11 +66,12 @@ class ObjectCategory {
         // Misc: { color: '#008888', size: [4.5, 1.8, 1.5] },
         Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] },
         Others: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        // Unknown1: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        // Unknown2: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        // Unknown3: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        // Unknown4: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        // Unknown5: { color: '#008888', size: [4.5, 1.8, 1.5] },
+        // 武汉项目 新增4类
+        vehicle_other: { color: '#ffa600', size: [4.5, 1.8, 1.5] },
+        two_wheel: { color: '#58508d', size: [1.6, 0.6, 1.2] },
+        person: { color: '#bc5090', size: [0.4, 0.5, 1.7] },
+        three_wheel: { color: '#ff6361', size: [4.5, 1.8, 1.5] },
+        // 武汉项目 End
     };
 
 
@@ -88,7 +89,11 @@ class ObjectCategory {
         // "Scooter", 
         // "ScooterRider", 
         "Bicycle", 
-        "BicycleRider"
+        "BicycleRider",
+        "vehicle_other",
+        "two_wheel",
+        "person",
+        "three_wheel"
     ];
 
     guess_obj_type_by_dimension(scale) {
