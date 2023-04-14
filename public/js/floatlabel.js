@@ -93,7 +93,7 @@ class FastToolBox {
 
     setAttrOptions() {
 
-        let attrs = [-1, 0, 1, 2, 3]; // object-attribute-selector
+        let attrs = [ -1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 ]; // object-attribute-selector
 
         let items = ``;
 
@@ -108,7 +108,7 @@ class FastToolBox {
 
     setOcclOptions() {
 
-        let attrs = [-1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]; // object-attribute-selector
+        let attrs = [ -1, 0, 1, 2, 3 ]; // object-attribute-selector
 
         let items = ``;
 
