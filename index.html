@@ -305,8 +305,10 @@
 
 
 						<div class="obj-editor-row">
+							<label for="object-category-selector">类型</label>
 							<select title="category" id="object-category-selector"></select>
 
+							<label for="object-track-id-editor">编号</label>
 							<input title="tracking id" list="obj-ids-of-scene" id="object-track-id-editor" type="text"
 								size="5" placeholder="track id"></input>
 							<datalist id="obj-ids-of-scene"></datalist>
@@ -323,18 +325,15 @@
 						</div>
 
 						<div class="obj-editor-row">
-							<div id="attr-editor">
-								<select title="attribute" id="object-attribute-selector"></select>
-							</div>
-							<div id="occl-editor">
-								<select title="occlusion" id="object-occlusion-selector"></select>
-							</div>
+							<label for="object-trunk-selector">截断</label>
+							<select title="attribute" id="object-trunk-selector"></select>
+
+							<label for="object-occlusion-selector">遮挡</label>
+							<select title="occlusion" id="object-occlusion-selector"></select>
 						</div>
 
 					</div>
 				</div>
-
-
 
 				<div id="main-box-editor-wrapper"></div>
 				<div id="batch-box-editor">
@@ -342,13 +341,10 @@
 					<div id="batch-box-editor-group"></div>
 				</div>
 
-
-
 			</div>
 
 			<div id="context-menu-wrapper" class="non-selectable">
 				<div id="context-menu">
-
 
 					<div class="menu-item" id="cm-new">
 						<div class="menu-item-icon"></div>

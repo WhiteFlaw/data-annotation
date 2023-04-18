@@ -76,9 +76,9 @@ class FastToolBox {
         this.ui.querySelector("#object-track-id-editor").value = obj_track_id;
 
         if (obj_trunk) {
-            this.ui.querySelector("#object-attribute-selector").value = obj_trunk;
+            this.ui.querySelector("#object-trunk-selector").value = obj_trunk;
         } else {
-            this.ui.querySelector("#object-attribute-selector").value = "";
+            this.ui.querySelector("#object-trunk-selector").value = "";
         }
 
         this.ui.querySelector("#object-occlusion-selector").value = obj_occlu;
@@ -93,7 +93,7 @@ class FastToolBox {
 
     setAttrOptions() {
 
-        let attrs = [ -1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 ]; // object-attribute-selector
+        let attrs = [ -1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 ]; // object-trunk-selector
 
         let items = ``;
 
@@ -101,14 +101,14 @@ class FastToolBox {
             items += `<option class='attr-item'>${a}</option>`
         });
 
-        this.ui.querySelector("#object-attribute-selector").innerHTML = items;
+        this.ui.querySelector("#object-trunk-selector").innerHTML = items;
         document.querySelector("#attribute-selector").innerHTML = items; // also set options for header attribute-selector
 
     }
 
     setOcclOptions() {
 
-        let attrs = [ -1, 0, 1, 2, 3 ]; // object-attribute-selector
+        let attrs = [ -1, 0, 1, 2, 3 ]; // object-trunk-selector
 
         let items = ``;
 
@@ -139,7 +139,7 @@ class FastToolBox {
         });
 
         this.ui.querySelector("#object-category-selector").onchange = event => this.eventHandler(event);
-        this.ui.querySelector("#object-attribute-selector").onchange = event => this.eventHandler(event);
+        this.ui.querySelector("#object-trunk-selector").onchange = event => this.eventHandler(event);
         this.ui.querySelector("#object-occlusion-selector").onchange = event => this.eventHandler(event);
 
         this.ui.querySelector("#object-track-id-editor").onchange = event => this.eventHandler(event);

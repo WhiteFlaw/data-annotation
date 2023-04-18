@@ -469,7 +469,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             case "object-track-id-editor":
                 this.object_track_id_changed(event);
                 break;
-            case "object-attribute-selector":
+            case "object-trunk-selector":
                 this.object_attribute_changed(event);
                 break;
             case "object-occlusion-selector":
