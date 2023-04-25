@@ -83,7 +83,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.playControl = new PlayControl(this.data);
 
         this.configUi = new ConfigUi(editorUi.querySelector("#config-button"), editorUi.querySelector("#config-wrapper"), this);
-        
+
         this.header = new Header(editorUi.querySelector("#header"), this.data, this.editorCfg,
             (e) => {
                 this.scene_changed(e.currentTarget.value);
@@ -764,7 +764,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                     this.selected_box.obj_track_id,
                     this.selected_box.obj_trunk,
                     this.selected_box.obj_occlu
-                    );
+                );
 
                 break;
             case "cm-change-id-to-ref-in-scene":
@@ -791,7 +791,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                     this.selected_box.obj_track_id,
                     this.selected_box.obj_trunk,
                     this.selected_box.obj_occlu
-                    );
+                );
 
                 break;
             case "cm-follow-ref":
@@ -974,24 +974,28 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.frame_changed = function (event) {
         console.log("frame_changed", event);
         var sceneName = this.editorUi.querySelector("#scene-selector").value;
-        
+
         if (sceneName.length == 0 && this.data.world) {
             sceneName = this.data.world.frameInfo.scene;
         }
         if (sceneName.length == 0) {
             return;
         }
-        
+
         var frame = event.currentTarget.value;
         this.imageContextManager.images[0].imageEditor.annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
 
-        const frame_index = this.data.getFrameIndex();
-        const frame_length = this.data.getFrameList().length;
-        this.editorUi.querySelector('#page-now').innerText = `当前第 ${ frame_index } 页 共 ${ frame_length } 页 | `;
+        this.updateCounting(sceneName, frame);
     };
 
+    this.updateCounting = function (scene, frame) {
+        const frames = this.data.getMetaBySceneName(scene).frames;
+        const frameIndex = frames.findIndex(f => f === frame);
+
+        this.editorUi.querySelector('#page-now').innerText = `当前第 ${frameIndex + 1} 页 共 ${frames.length} 页 | `;
+    }
 
     this.ensureBoxTrackIdExist = function () {
         if (!this.selected_box.obj_track_id) {
@@ -2201,19 +2205,19 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.header.ui.querySelector("#attribute-selector").disabled = !use;
 
         var attribute_label = this.header.ui.querySelector('#if-default-attribute-label');
-        if(use) {
+        if (use) {
             attribute_label.style.color = '#fff';
         } else {
             attribute_label.style.color = 'rgb(173, 173, 173)';
         }
     }
-    
+
     this.use_category_changed = function () {
         var use = this.header.ui.querySelector('#if-default-category-use').checked;
         this.header.ui.querySelector("#category-selector").disabled = !use;
-        
+
         var category_label = this.header.ui.querySelector("#if-default-category-label");
-        if(use) {
+        if (use) {
             category_label.style.color = '#fff';
         } else {
             category_label.style.color = 'rgb(173, 173, 173)';
@@ -2225,7 +2229,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         var sceneName = this.header.ui.querySelector('#scene-selector').value;
 
         let meta = await this.data.readSceneMetaData(sceneName); // frameList of Scene.
-        
+
         let old_frame_index = meta.frames.findIndex(w => w === old_frame);
         var new_frame = meta.frames[old_frame_index - 1];
 
@@ -2273,6 +2277,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         var scene_meta = this.data.get_current_world_scene_meta();
 
         var frame_index = this.data.world.frameInfo.frame_index - 1;
+        console.log(frame_index);
 
         if (frame_index < 0) {
             console.log("first frame");
@@ -2282,20 +2287,20 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
         this.load_world(scene_meta.scene, scene_meta.frames[frame_index]);
 
+        this.updateCounting(scene_meta.scene, scene_meta.frames[frame_index]);
     };
 
     this.last_frame = function () {
         let scene_meta = this.data.get_current_world_scene_meta();
         this.load_world(scene_meta.scene, scene_meta.frames[scene_meta.frames.length - 1]);
     };
+
     this.first_frame = function () {
         let scene_meta = this.data.get_current_world_scene_meta();
         this.load_world(scene_meta.scene, scene_meta.frames[0]);
     };
 
     this.next_frame = function () {
-
-
 
         if (!this.data.meta)
             return;
@@ -2313,6 +2318,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
 
         this.load_world(scene_meta.scene, scene_meta.frames[frame_index]);
+        this.updateCounting(scene_meta.scene, scene_meta.frames[frame_index]);
     };
 
     this.select_next_object = function () {

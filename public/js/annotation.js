@@ -441,8 +441,8 @@ function Annotation(sceneMeta, world, frameInfo) {
 
     this.create_annotation_2d = (boxList) => {
         const boxes_draw_no = [];
-        const scene = document.querySelector('#scene-selector').value;
-        const frame = document.querySelector('#frame-selector').value;
+        const scene = this.world.frameInfo.scene;
+        const frame = this.world.frameInfo.frame;
         const data = {
             scene: scene,
             frame: frame,

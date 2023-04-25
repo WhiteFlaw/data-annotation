@@ -110,14 +110,6 @@ class Data {
             return null;
     };
 
-    getFrameIndex() {
-        return this.worldList[0].frameInfo.frame_index + 1;
-    };
-    
-    getFrameList() {
-        return this.worldList[0].frameInfo.sceneMeta.frames;
-    };
-
     offsetList = [[0, 0, 0]];
     lastSeedOffset = [0, 0, 0];
     offsetsAliveCount = 0;
@@ -442,7 +434,6 @@ class Data {
     getMetaBySceneName = (sceneName) => {
         return this.meta[sceneName];
     };
-
 
     get_current_world_scene_meta() {
         return this.getMetaBySceneName(this.world.frameInfo.scene);
