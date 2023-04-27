@@ -8,6 +8,8 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
 	<link type="text/css" rel="stylesheet" href="/static/css/main.css">
+	<link type="text/css" rel="stylesheet" href="/static/css/frame-list.css">
+	<link type="text/css" rel="stylesheet" href="/static/css/image-manager.css">
 </head>
 
 <body>
@@ -1218,8 +1220,7 @@
 		</div>
 
 	</template>
-	<template id="box-editor-ui-template">
-		<!-- batch-box-editor-group, main-box-editor-wrapper, batch-box-editor里各有一个 -->
+	<template id="box-editor-ui-template"> <!-- 三视图区 -->
 		<div id="sub-views">
 			<div class="box-info non-selectable" id="box-info"></div>
 			<div class="view-manipulator" id="z-view-manipulator" tabindex="-1">
@@ -1495,10 +1496,41 @@
 			</div>
 		</div>
 	</template>
+	<template id="image-manager-ui-template"> <!-- 2D视图区-->
+		<div id="image-manager-wrapper">
+			<div id="img-manager-front">
+				<div id="img-manager-front-header" class="img-manager-header">相机-前</div>
+				<svg id="img-manager-front-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
+					<image id="svg-front-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none"
+						href="" />
+					<g id="svg-front-boxes"></g>
+					<g id="svg-front-points"></g>
+				</svg>
+			</div>
+			<div id="img-manager-left">
+				<div id="img-manager-left-header" class="img-manager-header">相机-左</div>
+				<svg id="img-manager-left-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
+					<image id="svg-left-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none"
+						href="" />
+					<g id="svg-left-boxes"></g>
+					<g id="svg-left-points"></g>
+				</svg>
+			</div>
+			<div id="img-manager-right">
+				<div id="img-manager-right-header" class="img-manager-header">相机-右</div>
+				<svg id="img-manager-right-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
+					<image id="svg-right-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none"
+						href="" />
+					<g id="svg-right-boxes"></g>
+					<g id="svg-right-points"></g>
+				</svg>
+			</div>
+		</div>
+	</template>
 	<template id="image-wrapper-template">
 		<div class="image-wrapper" id="image-board">
 			<svg id="maincanvas-svg" viewbox="0 0 2048 1536" preserveAspectRatio="none">
-				<image id="svg-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none" xlink:href="" />
+				<image id="svg-image" x="0" y="0" width="2048" height="1536" preserveAspectRatio="none" href="" />
 				<g id="svg-boxes"></g>
 				<g id="svg-points"></g>
 			</svg>
@@ -1517,6 +1549,29 @@
 					<div id="header-modify"></div>
 				</div>
 			</header>
+		</div>
+	</template>
+	<template id="frame-manager-ui-template"> <!-- 序列帧区 -->
+		<div id="frame-manager-wrapper">
+			<div id="frame-manager-tools">
+				<div id="frame-manager-pagination">
+					<div id="frame-manager-previous">
+						<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="15" height="15">
+							<path d='M10,3 L10,12 L2,8 L10,3' style='fill: rgb(102, 107, 124);' />
+						</svg>
+					</div>
+					<input id="frame-manager-index"></input>
+					/
+					<div id="frame-manager-length">10</div>
+					<div id="frame-manager-next">
+						<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="15" height="15">
+							<path d='M7,3 L7,12 L14,7 L7,3' style='fill: rgb(102, 107, 124)' />
+						</svg>
+					</div>
+				</div>
+			</div>
+			<!-- 以前是监听frame-selector的变化事件, 现在由frame-manager-list分发点击事件 -->
+			<div id="frame-manager-list"></div> <!-- 这个待会从帧生成的地方innerHTML -->
 		</div>
 	</template>
 

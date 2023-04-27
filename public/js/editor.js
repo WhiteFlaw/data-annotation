@@ -5,7 +5,10 @@ import { FastToolBox, FloatLabelManager } from "./floatlabel.js";
 import { Mouse } from "./mouse.js";
 import { BoxEditor, BoxEditorManager } from "./box_editor.js";
 import { ImageContextManager } from "./image.js";
+import { ImageViewer } from "./image.js";
 import { globalObjectCategory } from "./obj_cfg.js";
+import { backupManager } from "./backup/manager.js";
+import { FrameManager } from './frame_list.js';
 
 import { objIdManager } from "./obj_id_list.js";
 import { Header } from "./header.js";
@@ -25,7 +28,6 @@ import { MovableView } from './popup_dialog.js';
 import { globalKeyDownManager } from './keydown_manager.js';
 import { vector_range } from "./util.js"
 import { checkScene } from './error_check.js';
-import { backupManager } from "./backup/manager.js";
 
 function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
@@ -67,6 +69,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     this.header = null;
     this.imageContextManager = null;
+    this.imageViewer = null;
     this.boxOp = null;
     this.boxEditorManager = null;
     this.params = {};
@@ -130,7 +133,19 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             this.editorUi.querySelector("#camera-selector"),
             this.editorCfg,
             (lidar_points) => this.on_img_click(lidar_points));
+        
+        this.imageViewer = new ImageViewer(
+            this.editorUi.querySelector("#content"),
+        )
 
+        this.frameManager = new FrameManager(
+            this.editorUi.querySelector("#content"),
+            this.data,
+            (e) => { this.frame_changed(e) },
+            () => { this.previous_frame() },
+            () => { this.next_frame() },
+            () => { this.certain_frame() }
+        )
 
         if (!this.editorCfg.disableRangeCircle)
             this.addRangeCircle();
@@ -961,8 +976,13 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             return "<option value=" + f + ">" + f + "</option>";
         }).reduce(function (x, y) { return x + y; }, "<option>--frame--</option>");
 
-        this.editorUi.querySelector("#frame-selector").innerHTML = frame_selector_str;
+        var frame_list_str = ''
+        for(let i = 0; i < meta.frames.length; i++) {
+            frame_list_str += `<div value="${meta.frames[i]}" class="frame-list-div" id="frame-list-${i + 1}">${i + 1}</div>`
+        }
 
+        this.editorUi.querySelector("#frame-selector").innerHTML = frame_selector_str;
+        this.editorUi.querySelector('#frame-manager-list').innerHTML = frame_list_str;
 
         if (meta.camera) {
             this.imageContextManager.updateCameraList(meta.camera);
@@ -973,6 +993,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     this.frame_changed = function (event) {
         console.log("frame_changed", event);
+        if(event.target.attributes.value === undefined) return; // 点歪
         var sceneName = this.editorUi.querySelector("#scene-selector").value;
         
         if (sceneName.length == 0 && this.data.world) {
@@ -982,7 +1003,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             return;
         }
         
-        var frame = event.currentTarget.value;
+        // var frame = event.currentTarget.value;
+        var frame = event.target.attributes.value.value;
         this.imageContextManager.images[0].imageEditor.annotate_pic_clear();
         this.load_world(sceneName, frame); // editor.js 2313
         event.currentTarget.blur();
@@ -991,7 +1013,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         const frame_length = this.data.getFrameList().length;
         this.editorUi.querySelector('#page-now').innerText = `当前第 ${ frame_index } 页 共 ${ frame_length } 页 | `;
     };
-
 
     this.ensureBoxTrackIdExist = function () {
         if (!this.selected_box.obj_track_id) {
@@ -2255,12 +2276,12 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     }
 
     this.use_previous_frame = async function () {
-        var old_frame = document.querySelector("#frame-selector").value;
-        var sceneName = document.querySelector('#scene-selector').value;
-        let meta = await this.data.readSceneMetaData(sceneName); // frameList of Scene.
-        let old_frame_index = meta.frames.findIndex((w) => { return w === old_frame });
-        var new_frame = meta.frames[Number(old_frame_index) - 1];
+        var old_frame = this.header.querySelector("#frame-selector").value;
+        var sceneName = this.header.querySelector('#scene-selector').value;
+
+        var new_frame = this.data.world.frameInfo.frame_index - 1;
         var new_world = await this.data.getWorld(sceneName, new_frame); // world in previous frame.
+        
         this.change_world(old_frame, new_world, () => { }, true);
         this.nonuse_previous_frame()
     }
@@ -2280,17 +2301,9 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             return;
         }
 
+        console.log(scene_meta.scene, scene_meta.frames[frame_index])
         this.load_world(scene_meta.scene, scene_meta.frames[frame_index]);
 
-    };
-
-    this.last_frame = function () {
-        let scene_meta = this.data.get_current_world_scene_meta();
-        this.load_world(scene_meta.scene, scene_meta.frames[scene_meta.frames.length - 1]);
-    };
-    this.first_frame = function () {
-        let scene_meta = this.data.get_current_world_scene_meta();
-        this.load_world(scene_meta.scene, scene_meta.frames[0]);
     };
 
     this.next_frame = function () {
@@ -2314,6 +2327,24 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
         this.load_world(scene_meta.scene, scene_meta.frames[frame_index]);
     };
+
+    this.certain_frame = function (frameIndex) {
+        let scene_meta = this.data.get_current_world_scene_meta();
+        console.log(scene_meta.scene)
+        console.log(frameIndex)
+        this.load_world(scene_meta.scene, scene_meta.frames[frameIndex]);
+    }
+
+    this.last_frame = function () {
+        let scene_meta = this.data.get_current_world_scene_meta();
+        this.load_world(scene_meta.scene, scene_meta.frames[scene_meta.frames.length - 1]);
+    };
+
+    this.first_frame = function () {
+        let scene_meta = this.data.get_current_world_scene_meta();
+        this.load_world(scene_meta.scene, scene_meta.frames[0]);
+    };
+
 
     this.select_next_object = function () {
 
@@ -2370,6 +2401,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.render();
         this.imageContextManager.attachWorld(world);
         this.imageContextManager.render_2d_image();
+        this.imageViewer.render_image();
         this.render2dLabels(world);
         if (updateFrameInfo) {
             this.update_frame_info(world.frameInfo.scene, world.frameInfo.frame);

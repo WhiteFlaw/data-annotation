@@ -778,10 +778,11 @@ dynamic set obj-type css has higher priority than this one.
 	display: none;
 }
 
-
 #main-box-editor-wrapper #sub-views {
 	display: inline-block;
 	position: relative;
+	top: 100px;
+	left: 1200px;
 	width: 320px;
 	height: 100%;
 	resize: both;
@@ -836,7 +837,6 @@ dynamic set obj-type css has higher priority than this one.
 
 #batch-box-editor .ui-button:hover {
 	background-color: var(--highlight-background-color);
-	;
 }
 
 
@@ -867,7 +867,7 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 #z-view-manipulator {
-	height: 35%;
+	height: 20%;
 }
 
 #y-view-manipulator {
@@ -1171,8 +1171,6 @@ td {
 	overflow-y: auto;
 }
 
-
-
 .log-object-frame-id {
 	cursor: pointer;
 }
@@ -1191,6 +1189,7 @@ td {
 .sub-views-size {
 	display: flex;
 	justify-content: space-between;
+	background-color: rgb(57, 59, 62); /* 换成颜色变量 */
 }
 
 /*将标注物体的长宽高高亮显示*/

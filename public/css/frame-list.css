@@ -1,0 +1,82 @@
+#frame-manager-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    width: 60%;
+    height: 10%;
+    background-color: rgb(57, 59, 62);
+}
+
+#frame-manager-tools {
+    display: flex;
+    height: 30%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 待会改下sub-views的left, 改成百分比 */
+
+#frame-manager-pagination {
+    display: flex;
+    height: 100%;
+    max-width: 100px;
+    border-radius: 3px;
+    align-items: center;
+    color: #fff;
+    border: 1px solid rgb(102, 107, 124);
+    background-color: rgb(44, 45, 46);
+}
+
+#frame-manager-previous,
+#frame-manager-next {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+}
+
+#frame-manager-index {
+    width: 20%;
+    height: 50%;
+    border-radius: 3px;
+    outline: none;
+    text-align: center;
+    color: #fff;
+    border: 1px solid rgb(102, 107, 124);
+    background-color: rgb(57, 59, 62);
+}
+
+#frame-manager-list {
+    margin-top: 1%;
+    display: flex;
+    justify-content: start;
+}
+
+#frame-manager-list div {
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.frame-list-div {
+    cursor: pointer;
+    color: rgb(51, 152, 113);
+    background-color: rgb(44, 45, 46);
+    border: 1px solid rgb(51, 152, 113);
+}
+
+.frame-manager-choosen {
+    cursor: not-allowed;
+    color: #fff;
+    border-color: rgb(72, 75, 84);
+    background-color: rgb(70, 111, 255);
+}
+
+#frame-manager-list div:not(:first-child) {
+    margin-left: 5px;
+}
+
+#frame-manager-list div:hover {
+    color: #fff;
+    background-color: rgb(82, 106, 235);
+}

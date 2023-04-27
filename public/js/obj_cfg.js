@@ -13,24 +13,21 @@ class ObjectCategory {
         // ScooterRider: { color: '#ff8800', size: [1.6, 0.6, 1.6], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
         // Scooter: { color: '#aaaa00', size: [1.6, 0.6, 1.0] },
 
-
-        BicycleRider: { color: '#88ff00', size: [1.6, 0.6, 1.7], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
+        // BicycleRider: { color: '#88ff00', size: [1.6, 0.6, 1.7], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
         Bicycle: { color: '#fcaafc', size: [1.8, 0.7, 1] },
         Cyclist: { color: '#ff8800', size: [1.5, 0.6, 1] },
-// 
+
         // Motorcycle: { color: '#aaaa00', size: [1.6, 0.6, 1.2], attr: ["umbrella"] },
         // MotorcyleRider: { color: '#ff8800', size: [1.6, 0.6, 1.6], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
-// 
-// 
-// 
+
         // PoliceCar: { color: '#86af49', size: [4.5, 1.8, 1.5] },
         // TourCar: { color: '#86af49', size: [4.4, 1.5, 2.2] },
-// 
+
         // RoadWorker: { color: '#ff0000', size: [0.4, 0.5, 1.7] },
         // Child: { color: '#ff0000', size: [0.4, 0.5, 1.2] },
-// 
+
         // //Crowd:          {color: '#ff0000',  size:[1.6, 0.6, 1.2]},
-// 
+
         // BabyCart: { color: '#ff0000', size: [0.8, 0.5, 1.0] },
         // Cart: { color: '#ff0000', size: [0.8, 0.5, 1.0] },
         // Cone: { color: '#ff0000', size: [0.3, 0.3, 0.6] },
@@ -41,19 +38,17 @@ class ObjectCategory {
         // RoadBarrel: { color: '#ff0000', size: [0.5, 0.5, 0.6] },
         // TrafficBarrier: { color: '#ff0000', size: [1.5, 0.3, 1.2] },
         // LongVehicle: { color: '#ff0000', size: [16, 3, 3] },
-// 
-// 
+
         // BicycleGroup: { color: '#ff0000', size: [1.6, 0.6, 1.2] },
-// 
-// 
+
         // ConcreteTruck: { color: '#00ffff', size: [10., 2.8, 3] },
         // Tram: { color: '#00ffff', size: [10., 2.8, 3] },
         // Excavator: { color: '#00ffff', size: [6., 3, 3] },
-// 
+
         // Animal: { color: '#00aaff', size: [1.6, 0.6, 1.2] },
-// 
+
         // TrashCan: { color: '#00aaff', size: [0.6, 0.4, 1.0] },
-// 
+
         // ForkLift: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // Trimotorcycle: { color: '#00aaff', size: [2.6, 1.0, 1.6] },
         Tricycle: { color: '#00aaff', size: [2.8, 1.3, 1.5] },
@@ -61,16 +56,16 @@ class ObjectCategory {
         // Crane: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // RoadRoller: { color: '#00aaff', size: [2.7, 1.5, 2.0] },
         // Bulldozer: { color: '#00aaff', size: [3.0, 2.0, 2.0] },
-// 
+
         // DontCare: { color: '#00ff88', size: [4, 4, 3] },
         // Misc: { color: '#008888', size: [4.5, 1.8, 1.5] },
         Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] },
         Others: { color: '#008888', size: [4.5, 1.8, 1.5] },
         // 武汉项目 新增4类
-        vehicle_other: { color: '#ffa600', size: [4.5, 1.8, 1.5] },
-        two_wheel: { color: '#58508d', size: [1.6, 0.6, 1.2] },
-        person: { color: '#bc5090', size: [0.4, 0.5, 1.7] },
-        three_wheel: { color: '#ff6361', size: [4.5, 1.8, 1.5] },
+        // vehicle_other: { color: '#ffa600', size: [4.5, 1.8, 1.5] },
+        // two_wheel: { color: '#58508d', size: [1.6, 0.6, 1.2] },
+        // person: { color: '#bc5090', size: [0.4, 0.5, 1.7] },
+        // three_wheel: { color: '#ff6361', size: [4.5, 1.8, 1.5] },
         // 武汉项目 End
     };
 

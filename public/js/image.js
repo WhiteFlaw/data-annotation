@@ -188,8 +188,6 @@ function BoxImageContext(ui) {
     }
 }
 
-
-
 class ImageContext extends MovableView {
 
     constructor(parentUi, name, autoSwitch, cfg, on_img_click) {
@@ -240,8 +238,9 @@ class ImageContext extends MovableView {
     }
 
     clear_main_canvas() {
-
-        var boxes = this.ui.querySelector("#svg-boxes").children;
+        if(this.name === '') return;
+        
+        var boxes = document.querySelector(`#svg-${this.name}-boxes`).children// this.ui.querySelector("#svg-boxes").children;
 
         if (boxes.length > 0) {
             for (var c = boxes.length - 1; c >= 0; c--) {
@@ -249,7 +248,7 @@ class ImageContext extends MovableView {
             }
         }
 
-        var points = this.ui.querySelector("#svg-points").children;
+        var points = document.querySelector(`#svg-${this.name}-points`).children// this.ui.querySelector("#svg-points").children;
 
         if (points.length > 0) {
             for (var c = points.length - 1; c >= 0; c--) {
@@ -257,7 +256,6 @@ class ImageContext extends MovableView {
             }
         }
     }
-
 
     attachWorld(world) {
         this.world = world;
@@ -347,10 +345,11 @@ class ImageContext extends MovableView {
     show_image() {
         var svgimage = this.ui.querySelector("#svg-image");
 
+
         // active img is set by global, it's not set sometimes.
         var img = this.world.cameras.getImageByName(this.name);
         if (img) {
-            svgimage.setAttribute("xlink:href", img.src);
+            svgimage.setAttribute("href", img.src);
         }
 
         this.img = img;
@@ -358,6 +357,39 @@ class ImageContext extends MovableView {
         if (this.world !== null) {
             this.imageEditor.annotate_pic_clear();
             this.imageEditor.annotate_pic_reapply(this.name);
+        }
+    }
+
+    show_all_image() {
+        var svgFrontImage = document.querySelector("#svg-front-image");
+        var svgLeftImage = document.querySelector("#svg-left-image");
+        var svgRightImage = document.querySelector("#svg-right-image");
+
+        var imgs = this.world.cameras.getAllImage();
+
+        if (Object.keys(imgs).length > 0) {
+            svgFrontImage.setAttribute("href", imgs.front.src);
+            svgLeftImage.setAttribute("href", imgs.left.src);
+            svgRightImage.setAttribute("href", imgs.right.src);
+        }
+
+        this.imgs = imgs;
+    }
+
+    show_2d_image() { // ?
+        // active img is set by global, it's not set sometimes.
+        var imgs = this.world.cameras.getAllImage();
+
+        if (imgs.length > 0) {
+            console.log(imgs);
+            // svgimage.setAttribute("href", img.src);
+        }
+
+        this.img = img;
+        
+        if (this.world !== null) {
+           this.imageEditor.annotate_pic_clear();
+           this.imageEditor.annotate_pic_reapply(this.name);
         }
     }
 
@@ -411,14 +443,18 @@ class ImageContext extends MovableView {
     };
 
     render_2d_image() {
-
-
         if (this.cfg.disableMainImageContext)
             return;
         this.clear_main_canvas();
 
         this.show_image();
+        this.show_all_image();
+        
         this.draw_svg();
+    }
+
+    render_image() { // 2D图像区渲染
+        this.show_2d_image();
     }
 
     hide_canvas() {
@@ -448,7 +484,8 @@ class ImageContext extends MovableView {
             return;
         }
 
-        let svg = this.ui.querySelector("#svg-boxes");
+        let svg0 = this.ui.querySelector("#svg-boxes");
+        let svg1 = document.querySelector(`#svg-${this.name}-boxes`);
 
         // draw boxes
         this.world.annotation.boxes.forEach((box) => {
@@ -456,13 +493,15 @@ class ImageContext extends MovableView {
                 var imgfinal = box_to_2d_points(box, calib);
                 if (imgfinal) {
                     var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
-                    svg.appendChild(box_svg);
+                    //svg0.appendChild(box_svg);
+                    svg1.appendChild(box_svg);
                     this.imageEditor.annotate_pic_anno_click(box_svg.getAttribute('id'));
                 }
             }
         });
 
-        svg = this.ui.querySelector("#svg-points");
+        svg0 = this.ui.querySelector("#svg-points");
+        svg1 = document.querySelector(`#svg-${this.name}-points`);
 
         // draw radar points
         if (this.cfg.projectRadarToImage) {
@@ -473,7 +512,8 @@ class ImageContext extends MovableView {
                 // there may be none after projecting
                 if (ptsOnImg && ptsOnImg.length > 0) {
                     let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio, radar.cssStyleSelector);
-                    svg.appendChild(pts_svg);
+                    // svg0.appendChild(pts_svg);
+                    svg1.appendChild(pts_svg);
                 }
             });
         }
@@ -486,7 +526,8 @@ class ImageContext extends MovableView {
             // there may be none after projecting
             if (ptsOnImg && ptsOnImg.length > 0) {
                 let pts_svg = this.points_to_svg(ptsOnImg, trans_ratio);
-                svg.appendChild(pts_svg);
+                // svg0.appendChild(pts_svg);
+                svg1.appendChild(pts_svg);
             }
         }
 
@@ -662,6 +703,19 @@ class ImageContext extends MovableView {
 
         }
     }
+}
+
+class ImageViewer { // 2D视图区
+    constructor(parentUi) {
+        let template = document.getElementById("image-manager-ui-template");
+        let imageManagerUi = template.content.cloneNode(true);
+        parentUi.appendChild(imageManagerUi);
+
+        let ui = parentUi.lastElementChild;
+
+        this.ui = ui;
+    }
+    render_image() { }
 }
 
 class ImageEditor {
@@ -843,15 +897,15 @@ class ImageEditor {
 
     get_obj_id_by_id(id) { // 如果是3D转那么返回'3D'
         let res = null;
-        if(id.substring(0, 11) === 'rect-label-') {
+        if (id.substring(0, 11) === 'rect-label-') {
             res = id.substring(11, id.length);
             return res;
         }
-        if(id.substring(0, 7) === 'rect-g-') {
+        if (id.substring(0, 7) === 'rect-g-') {
             res = d3.select(`#${id} > rect`).attr('obj_id');
             return res;
         }
-        if(id.substring(0, 14) === 'svg-box-local-') { // 
+        if (id.substring(0, 14) === 'svg-box-local-') { // 
             res = id.substring(14, id.length);
             return res;
         }
@@ -873,17 +927,18 @@ class ImageEditor {
 
     annotate_pic_box_color() {
         const allRect = d3.selectAll("#rect-g > g > rect")._groups[0]; // allRect没来得及变就直接执行了, 找不到对应id
-        for(let i = 0; i < allRect.length; i++) { // 需要判定一下, 如果在finish上色, 但是save上色不需要
-            if(d3.select(allRect[i]).attr('obj_id')) {
+        for (let i = 0; i < allRect.length; i++) { // 需要判定一下, 如果在finish上色, 但是save上色不需要
+            if (d3.select(allRect[i]).attr('obj_id')) {
                 d3.select(allRect[i])
-                .attr('fill', this.get_color_by_obj_id(d3.select(allRect[i]).attr('obj_id')))
-                .style('stroke', this.get_color_by_obj_id(d3.select(allRect[i]).attr('obj_id')))
+                    .attr('fill', this.get_color_by_obj_id(d3.select(allRect[i]).attr('obj_id')))
+                    .style('stroke', this.get_color_by_obj_id(d3.select(allRect[i]).attr('obj_id')))
             }
         }
     }
 
     get_color_by_obj_id(obj_id) {
         const type = this.get_box_by_obj_id(obj_id).obj_type;
+        if (!globalObjectCategory.obj_type_map[type]) return '#fff';
         return globalObjectCategory.obj_type_map[type].color;
     }
 
@@ -923,7 +978,10 @@ class ImageEditor {
         this.annotation_2d.psr = this.annotation_2d.psr.filter((item) => { // 当前方向不再存在的rect从annotation_2d.psr内去除
             return !(item.vector === this.vector && this.allRect_find(allRect, item) === false);
         })
+        console.log(this.annotation_2d.psr);
     }
+    // 输出处理完的annotation_2d看看都存了什么东西, 应该是错的
+    // 如果对, 那么ann_2d在world和本地应该是一致的, 但是现在保存后this.world里的annotation_2d不是最新 
 
     allRect_find(allRect, rect) { // allRect没有数组方法
         let target = false;
@@ -1199,7 +1257,7 @@ class ImageEditor {
             if (timer !== null) {
                 clearTimeout(timer);
             }
-            timer = setTimeout( that.annotate_pic_update_label.bind(that), 400); 
+            timer = setTimeout(that.annotate_pic_update_label.bind(that), 400);
             // setTimeout回调函数this指向window
             // bind创建新函数, 参数作为新函数this
         }()
@@ -1214,7 +1272,7 @@ class ImageEditor {
 
     annotate_pic_add_label(obj_id) {
         const pos = this.get_rect_by_obj_id(obj_id);
-        if(pos === undefined) return;
+        if (pos === undefined) return;
 
         const box = this.get_box_by_obj_id(obj_id);
 
@@ -1249,6 +1307,7 @@ class ImageContextManager {
     constructor(parentUi, selectorUi, cfg, on_img_click) {
         this.parentUi = parentUi;
         this.selectorUi = selectorUi;
+        this.cameras = null;
         this.cfg = cfg;
         this.on_img_click = on_img_click;
 
@@ -1308,6 +1367,8 @@ class ImageContextManager {
     }
 
     updateCameraList(cameras) {
+        this.cameras = cameras;
+        console.log(cameras);
 
         let autoCamera = '<div class="camera-item" id="camera-item-auto">auto</div>';
 
@@ -1327,7 +1388,6 @@ class ImageContextManager {
         ui.innerHTML = camera_selector_str;
         ui.style.display = "none";
 
-        this.setDefaultBestCamera(cameras[0]);
     }
 
     setDefaultBestCamera(c) {
@@ -1361,7 +1421,6 @@ class ImageContextManager {
             image.render_2d_image();
         }
 
-
         let selectorName = autoSwitch ? "auto" : name;
 
         let ui = this.selectorUi.querySelector("#camera-item-" + selectorName);
@@ -1378,8 +1437,6 @@ class ImageContextManager {
         this.selectorUi.querySelector("#camera-item-" + selectorName).className = "camera-item";
         this.images = this.images.filter(x => x != image);
         image.remove();
-
-
     }
 
     setBestCamera(camera) {
@@ -1598,4 +1655,4 @@ function choose_best_camera_for_point(scene_meta, center) {
 }
 
 
-export { ImageContextManager, BoxImageContext };
+export { ImageContextManager, BoxImageContext, ImageViewer };

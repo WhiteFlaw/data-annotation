@@ -296,8 +296,6 @@ function Annotation(sceneMeta, world, frameInfo) {
 
         //box.computeLineDistances();
 
-
-
         return box;
     };
 
