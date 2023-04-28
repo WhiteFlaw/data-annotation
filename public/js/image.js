@@ -206,6 +206,11 @@ class ImageContext/*  extends MovableView  */{ // image-wrapper
     world = null;
     name = 'front';
 
+    init_image_op() {
+        this.imageEditor = new ImageEditor();
+        this.imageEditor.annotate_pic_init();
+    }
+
     setBestCamera(name) {
         this.name = name;
         this.update_image();
@@ -213,6 +218,7 @@ class ImageContext/*  extends MovableView  */{ // image-wrapper
 
     attachWorld(world) {
         this.world = world;
+        this.imageEditor.attachWorld(world);
     }
 
     update_image() {
@@ -227,12 +233,11 @@ class ImageContext/*  extends MovableView  */{ // image-wrapper
 
         this.img = img;
 
-        /* if (this.world !== null) {
+        if (this.world !== null) {
             this.imageEditor.annotate_pic_clear();
             this.imageEditor.annotate_pic_reapply(this.name);
-        } */
+        }
     }
-
 }
 
 class ImageViewer { // 2D视图区
@@ -1280,7 +1285,6 @@ class ImageEditor { // 图片编辑器
     }
 }
 
-// 在图片管理器往2D视图区加图片
 class ImageContextManager { // 图片管理器
     constructor(parentUi, selectorUi, cfg, on_img_click) {
         this.parentUi = parentUi;
@@ -1291,61 +1295,10 @@ class ImageContextManager { // 图片管理器
 
         this.addImage("", true);
 
-
-        this.selectorUi.onmouseenter = function (event) {
-            if (this.timerId) {
-                clearTimeout(this.timerId);
-                this.timerId = null;
-            }
-
-            event.target.querySelector("#camera-list").style.display = "";
-
-        };
-
-
-        this.selectorUi.onmouseleave = function (event) {
-            let ui = event.target.querySelector("#camera-list");
-
-            this.timerId = setTimeout(() => {
-                ui.style.display = "none";
-                this.timerId = null;
-            },
-                200);
-
-        };
-
-        this.selectorUi.querySelector("#camera-list").onclick = (event) => {
-            let cameraName = event.target.innerText;
-
-            if (cameraName == "auto") {
-
-                let existed = this.images.find(x => x.autoSwitch);
-
-                if (existed) {
-                    this.removeImage(existed);
-                }
-                else {
-                    this.addImage("", true);
-                }
-
-            }
-            else {
-                let existed = this.images.find(x => !x.autoSwitch && x.name == cameraName);
-
-                if (existed) {
-                    this.removeImage(existed);
-
-                }
-                else {
-                    this.addImage(cameraName);
-                }
-            }
-        };
-
     }
     images = [];
 
-    updateCameraList(cameras) {
+    updateCameraList(cameras) { // 改成给下拉框赋值
         this.cameras = cameras;
 
         let autoCamera = '<div class="camera-item" id="camera-item-auto">auto</div>';

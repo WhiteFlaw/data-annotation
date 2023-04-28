@@ -439,12 +439,12 @@ function Annotation(sceneMeta, world, frameInfo) {
 
     this.create_annotation_2d = (boxList) => {
         const boxes_draw_no = [];
-        const scene = document.querySelector('#scene-selector').value;
-        const frame = document.querySelector('#frame-selector').value;
+        const scene = world.frameInfo.scene;
+        const frame = world.frameInfo.frame;
         const data = {
+            obj_type: 'annotation_2d',
             scene: scene,
             frame: frame,
-            obj_type: 'annotation_2d',
             psr: []
         }
         for (let i = 0; i < boxList.length; i++) {

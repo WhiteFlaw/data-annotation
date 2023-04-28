@@ -9,7 +9,6 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.boxUi = ui.querySelector("#box");
     this.refObjUi = ui.querySelector("#ref-obj");
     this.sceneSelectorUi = ui.querySelector("#scene-selector");
-    this.frameSelectorUi = ui.querySelector("#frame-selector");
     this.objectSelectorUi = ui.querySelector("#object-selector");
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
@@ -28,10 +27,6 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
 
     if (cfg.disableSceneSelector) {
         this.sceneSelectorUi.style.display = "none";
-    }
-
-    if (cfg.disableFrameSelector) {
-        this.frameSelectorUi.style.display = "none";
     }
 
     if (cfg.disableCameraSelector) {
@@ -69,7 +64,6 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
 
     this.sceneSelectorUi.onchange = (e) => { this.onSceneChanged(e); };
     this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
-    this.frameSelectorUi.onchange = (e) => { this.onFrameChanged(e); };
     this.cameraSelectorUi.onchange = (e) => { this.onCameraChanged(e); };
     this.attributeUseUi.onchange = () => { this.onAttributeUseChanged(); }; // enable default attribute
     this.categoryUseUi.onchange = () => { this.onCategoryUseChanged(); }; // enable default category
@@ -111,15 +105,6 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
             this.refObjUi.innerHTML = "| Ref: " + marked_object.scene + "/" + marked_object.frame + ": " + marked_object.ann.obj_type + "-" + marked_object.ann.obj_id;
         },
 
-        this.set_frame_info = function (scene, frame, on_scene_changed) {
-
-            if (this.sceneSelectorUi.value != scene) {
-                this.sceneSelectorUi.value = scene;
-                on_scene_changed(scene);
-            }
-
-            this.frameSelectorUi.value = frame;
-        },
 
         this.clear_frame_info = function (scene, frame) {
 

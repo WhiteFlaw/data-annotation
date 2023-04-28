@@ -1,11 +1,12 @@
-var FrameManager = function (parentUi, data, onFrameChanged, toPreviousFrame, toNextFrame, toCertainFrame) {
+const FrameManager = function (parentUi, data, onFrameChanged, toPreviousFrame, toNextFrame, toCertainFrame) {
     let template = document.getElementById("frame-manager-ui-template");
     let frameList = template.content.cloneNode(true);
     parentUi.appendChild(frameList);
 
     this.data = data;
-    this.frameIndex = null; // 保持frameIndex是数字, 省下很多麻烦
-    this.eventList = []; // 双端队列, 最大2, 记录上次操作
+    this.frame = null;
+    this.frameIndex = null; // 保持frameIndex是数字
+    this.eventList = []; // 操作队列
 
     this.onFrameChanged = onFrameChanged;
     this.toPreviousFrame = toPreviousFrame;
@@ -36,7 +37,6 @@ var FrameManager = function (parentUi, data, onFrameChanged, toPreviousFrame, to
 
     this.frameManagerIndexUi.onblur = () => {
         var frameIndex = this.frameManagerIndexUi.value;
-        console.log(this.frameManagerIndexUi.value) // ???
         this.toCertainFrame(this.frameManagerIndexUi.value);
         this.after_certain(frameIndex);
     }
@@ -71,12 +71,16 @@ var FrameManager = function (parentUi, data, onFrameChanged, toPreviousFrame, to
     }
 
     this.update_frame_list = function () {
+        let target = null;
         if(this.eventList.length === 1) {
-            this.frameManagerListUi.querySelector(`#frame-list-${this.eventList[0]}`).classList.toggle('frame-manager-choosen', true);
+            target = this.frameManagerListUi.querySelector(`#frame-list-${this.eventList[0]}`)
+            target.classList.toggle('frame-manager-choosen', true);
         } else {
             this.frameManagerListUi.querySelector(`#frame-list-${this.eventList[0]}`).classList.remove('frame-manager-choosen', true);
-            this.frameManagerListUi.querySelector(`#frame-list-${this.eventList[1]}`).classList.toggle('frame-manager-choosen', true);
+            target = this.frameManagerListUi.querySelector(`#frame-list-${this.eventList[1]}`)
+            target.classList.toggle('frame-manager-choosen', true);
         }
+        this.frame = target.getAttribute('value');
     }
 
     this.update_event_list = function(frameIndex) {
@@ -84,6 +88,21 @@ var FrameManager = function (parentUi, data, onFrameChanged, toPreviousFrame, to
         if (this.eventList.length > 2) {
             this.eventList.shift();
         }
+    }
+
+    this.getFrameIndex = function(frame) {
+        const frames = this.data.getMetaBySceneName(this.scene).frames;
+        const frameIndex = frames.findIndex(f => f === frame);
+        return frameIndex + 1;
+    }
+
+    this.set_frame_info = function(scene, frame) {
+        this.frame = frame;
+        this.scene = scene;
+        this.frameIndex = this.getFrameIndex(frame);
+        this.frameManagerIndexUi.value = this.frameIndex;
+        this.update_event_list(this.frameIndex);
+        this.update_frame_list();
     }
 }
 
