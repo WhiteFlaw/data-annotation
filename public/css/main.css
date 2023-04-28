@@ -781,8 +781,7 @@ dynamic set obj-type css has higher priority than this one.
 #main-box-editor-wrapper #sub-views {
 	display: inline-block;
 	position: relative;
-	top: 100px;
-	left: 1200px;
+	left: calc(100vw - 320px);
 	width: 320px;
 	height: 100%;
 	resize: both;

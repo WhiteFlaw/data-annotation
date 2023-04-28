@@ -4,18 +4,20 @@ class ObjectCategory {
 
 
     obj_type_map = {
-        Car: { color: '#86af49', size: [4.5, 1.8, 1.5], attr: ["door open", "trunk open"] },
-        Pedestrian: { color: '#ff0000', size: [0.4, 0.5, 1.7], attr: ["umbrella", "sitting", "squating", "bending over", "luggage"] },
-        // Van: { color: '#00ff00', size: [4.5, 1.8, 1.5], attr: ["door open", "trunk open"] },
         Bus: { color: '#ffff00', size: [13, 3, 3.5] },
+        Bicycle: { color: '#fcaafc', size: [1.8, 0.7, 1] },
+        Car: { color: '#86af49', size: [4.5, 1.8, 1.5], attr: ["door open", "trunk open"] },
+        Cyclist: { color: '#ff8800', size: [1.5, 0.6, 1] },
+        Others: { color: '#008888', size: [4.5, 1.8, 1.5] },
+        Pedestrian: { color: '#ff0000', size: [0.4, 0.5, 1.7], attr: ["umbrella", "sitting", "squating", "bending over", "luggage"] },
         Truck: { color: '#00ffff', size: [10., 2.8, 3] },
+        Tricycle: { color: '#00aaff', size: [2.8, 1.3, 1.5] },
+        // Van: { color: '#00ff00', size: [4.5, 1.8, 1.5], attr: ["door open", "trunk open"] },
 
         // ScooterRider: { color: '#ff8800', size: [1.6, 0.6, 1.6], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
         // Scooter: { color: '#aaaa00', size: [1.6, 0.6, 1.0] },
 
         // BicycleRider: { color: '#88ff00', size: [1.6, 0.6, 1.7], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
-        Bicycle: { color: '#fcaafc', size: [1.8, 0.7, 1] },
-        Cyclist: { color: '#ff8800', size: [1.5, 0.6, 1] },
 
         // Motorcycle: { color: '#aaaa00', size: [1.6, 0.6, 1.2], attr: ["umbrella"] },
         // MotorcyleRider: { color: '#ff8800', size: [1.6, 0.6, 1.6], attr: ["umbrella", "1 passenger", "2 passengers", "3 passengers"] },
@@ -51,7 +53,6 @@ class ObjectCategory {
 
         // ForkLift: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // Trimotorcycle: { color: '#00aaff', size: [2.6, 1.0, 1.6] },
-        Tricycle: { color: '#00aaff', size: [2.8, 1.3, 1.5] },
         // FreightTricycle: { color: '#00aaff', size: [2.6, 1.0, 1.6] },
         // Crane: { color: '#00aaff', size: [5.0, 1.2, 2.0] },
         // RoadRoller: { color: '#00aaff', size: [2.7, 1.5, 2.0] },
@@ -59,14 +60,13 @@ class ObjectCategory {
 
         // DontCare: { color: '#00ff88', size: [4, 4, 3] },
         // Misc: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] },
-        Others: { color: '#008888', size: [4.5, 1.8, 1.5] },
         // 武汉项目 新增4类
         // vehicle_other: { color: '#ffa600', size: [4.5, 1.8, 1.5] },
         // two_wheel: { color: '#58508d', size: [1.6, 0.6, 1.2] },
         // person: { color: '#bc5090', size: [0.4, 0.5, 1.7] },
         // three_wheel: { color: '#ff6361', size: [4.5, 1.8, 1.5] },
         // 武汉项目 End
+        Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] }
     };
 
 
@@ -76,19 +76,14 @@ class ObjectCategory {
     }
 
     popularCategories = [
-        "Car", 
-        "Pedestrian", 
-        // "Van", 
-        "Bus", 
-        "Truck", 
-        // "Scooter", 
-        // "ScooterRider", 
-        "Bicycle", 
-        "BicycleRider",
-        "vehicle_other",
-        "two_wheel",
-        "person",
-        "three_wheel"
+        'Bus',
+        'Bicycle',
+        'Car',
+        'Cyclist',
+        'Others',
+        'Pedestrian',
+        'Truck',
+        'Tricycle'
     ];
 
     guess_obj_type_by_dimension(scale) {
