@@ -1,7 +1,7 @@
 
 import { saveWorldList } from "./save.js"
 
-var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onAttributeUseChanged, onCategoryUseChanged, onUsePreviousFrameClicked) {
+var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSelected, onCameraChanged, onAttributeUseChanged, onCategoryUseChanged, onUsePreviousFrameClicked, onUndoClicked, onRedoClicked) {
 
     this.ui = ui;
     this.data = data;
@@ -9,12 +9,14 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.boxUi = ui.querySelector("#box");
     this.refObjUi = ui.querySelector("#ref-obj");
     this.sceneSelectorUi = ui.querySelector("#scene-selector");
-    this.objectSelectorUi = ui.querySelector("#object-selector");
+    // this.objectSelectorUi = ui.querySelector("#object-selector");
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
     this.categoryUseUi = ui.querySelector('#if-default-category-use');
     this.attributeUseUi = ui.querySelector('#if-default-attribute-use');
     this.usePreviousFrameUi = ui.querySelector('#use-previous-frame');
+    this.undoUi = ui.querySelector('#undo');
+    this.redoUi = ui.querySelector('#redo');
 
     this.onSceneChanged = onSceneChanged;
     this.onFrameChanged = onFrameChanged; // editor.js--this.frame_changed()
@@ -23,7 +25,8 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.onCategoryUseChanged = onCategoryUseChanged;
     this.onAttributeUseChanged = onAttributeUseChanged;
     this.onUsePreviousFrameClicked = onUsePreviousFrameClicked;
-
+    this.onUndoClicked = onUndoClicked;
+    this.onRedoClicked = onRedoClicked;
 
     if (cfg.disableSceneSelector) {
         this.sceneSelectorUi.style.display = "none";
@@ -63,21 +66,23 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
 
 
     this.sceneSelectorUi.onchange = (e) => { this.onSceneChanged(e); };
-    this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
+    // this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
     this.cameraSelectorUi.onchange = (e) => { this.onCameraChanged(e); };
     this.attributeUseUi.onchange = () => { this.onAttributeUseChanged(); }; // enable default attribute
     this.categoryUseUi.onchange = () => { this.onCategoryUseChanged(); }; // enable default category
     this.usePreviousFrameUi.onclick = () => { this.onUsePreviousFrameClicked(); }; // use previous frame.
+    this.undoUi.onclick = () => { this.onUndoClicked(); };
+    this.redoUi.onclick = () => { this.onRedoClicked(); };
 
-    this.setObject = function (id) {
+    /* this.setObject = function (id) {
         this.objectSelectorUi.value = id;
-    }
+    } */
 
-    this.clear_box_info = function () {
+    /* this.clear_box_info = function () {
         this.boxUi.innerHTML = '';
-    };
+    }; */
 
-    this.update_box_info = function (box) {
+    /* this.update_box_info = function (box) {
         var scale = box.scale;
         var pos = box.position;
         var rotation = box.rotation;
@@ -99,32 +104,31 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
         if (box.follows) {
             this.boxUi.innerHTML += "| F:" + box.follows.obj_track_id;
         }
-    },
+    }, */
 
-        this.set_ref_obj = function (marked_object) {
-            this.refObjUi.innerHTML = "| Ref: " + marked_object.scene + "/" + marked_object.frame + ": " + marked_object.ann.obj_type + "-" + marked_object.ann.obj_id;
-        },
+    /* this.set_ref_obj = function (marked_object) {
+        this.refObjUi.innerHTML = "| Ref: " + marked_object.scene + "/" + marked_object.frame + ": " + marked_object.ann.obj_type + "-" + marked_object.ann.obj_id;
+    }, */
 
 
-        this.clear_frame_info = function (scene, frame) {
+    /* this.clear_frame_info = function (scene, frame) {
 
-        },
+    }, */
 
-        this.updateModifiedStatus = function () {
-            let frames = this.data.worldList.filter(w => w.annotation.modified);
-            if (frames.length > 0) {
-                this.ui.querySelector("#changed-mark").className = 'ui-button alarm-mark';
-            }
-            else {
-                this.ui.querySelector("#changed-mark").className = 'ui-button';
-            }
+    this.updateModifiedStatus = function () {
+        let frames = this.data.worldList.filter(w => w.annotation.modified);
+        if (frames.length > 0) {
+            this.ui.querySelector("#changed-mark").className = 'ui-button alarm-mark';
         }
+        else {
+            this.ui.querySelector("#changed-mark").className = 'ui-button';
+        }
+    }
 
     this.updateSaveFeedback = function () {
-        const feedback = document.querySelector("#save-feedback");
+        const feedback = this.ui.querySelector("#save-feedback");
         feedback.style.display = 'block';
-        const reHide = () => feedback.style.display = 'none';
-        setTimeout(reHide, 2000);
+        setTimeout(() => feedback.style.display = 'none', 2000);
     }
 
     this.ui.querySelector("#changed-mark").onmouseenter = () => {

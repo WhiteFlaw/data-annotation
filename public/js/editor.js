@@ -97,6 +97,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             () => { this.use_attribute_changed() }, // enable the default attribute.
             () => { this.use_category_changed() }, // enable the default category.
             () => { this.use_previous_frame_click() }, // use previous frame.
+            () => { this.undo_click() },
+            () => { this.redo_click() }
         );
 
         this.frameManager = new FrameManager(
@@ -431,7 +433,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                     if (!this.ensurePreloaded())
                         break;
 
-                    this.header.setObject(this.selected_box.obj_track_id);
+                    // this.header.setObject(this.selected_box.obj_track_id);
                     this.editBatch(
                         this.data.world.frameInfo.scene,
                         this.data.world.frameInfo.frame,
@@ -1004,7 +1006,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
         const frame_index = this.data.getFrameIndex();
         const frame_length = this.data.getFrameList().length;
-        this.editorUi.querySelector('#page-now').innerText = `当前第 ${frame_index} 页 共 ${frame_length} 页 | `;
     };
 
     this.ensureBoxTrackIdExist = function () {
@@ -1072,7 +1073,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         if (!this.ensurePreloaded())
             return;
 
-        this.header.setObject(this.selected_box.obj_track_id);
+        // this.header.setObject(this.selected_box.obj_track_id);
 
         this.editBatch(
             this.data.world.frameInfo.scene,
@@ -1123,7 +1124,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.boxEditor.hide();
         this.hideGridLines();
         //this.controlGui.hide();
-        this.editorUi.querySelector("#selectors").style.display = 'none';
+        this.editorUi.querySelector("#tools").style.display = 'none';
         //this.editorUi.querySelector("#object-selector").style.display='none';
         this.currentMainEditor = this.boxEditorManager;
 
@@ -1160,7 +1161,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                 this.showGridLines();
                 this.render();
                 //this.controlGui.show();
-                this.editorUi.querySelector("#selectors").style.display = 'inherit';
+                this.editorUi.querySelector("#tools").style.display = 'inherit';
 
                 if (targetFrame) {
                     this.load_world(this.data.world.frameInfo.scene, targetFrame, () => {  // onfinished
@@ -2252,6 +2253,14 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.previousFrameUi.style.display = 'block';
     }
 
+    this.undo_click = function () {
+        backupManager.undo();
+    }
+
+    this.redo_click = function () {
+        backupManager.redo();
+    }
+
     this.usePreviousFrameExitUi.onclick = () => {
         this.nonuse_previous_frame();
     }
@@ -2604,7 +2613,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
         this.clear = function () {
 
-            this.header.clear_box_info();
+            // this.header.clear_box_info();
             //this.editorUi.querySelector("#image").innerHTML = '';
 
             this.unselectBox(null);
@@ -2692,7 +2701,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.onSelectedBoxChanged = function (box) {
 
         if (box) {
-            this.header.update_box_info(box);
+            // this.header.update_box_info(box);
             // this.floatLabelManager.update_position(box, true);
             // this.fastToolBox.setPos(this.floatLabelManager.getLabelEditorPos(box.obj_local_id));
             this.imageContextManager.boxes_manager.onBoxSelected(box.obj_local_id, box.obj_type);
@@ -2706,7 +2715,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             //this.updateSubviewRangeByWindowResize(box);
 
         } else {
-            this.header.clear_box_info();
+            // this.header.clear_box_info();
         }
 
     };

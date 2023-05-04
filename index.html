@@ -18,38 +18,61 @@
 	<template id="editor-template">
 		<div id="main-ui" class="editor-ui">
 			<div id="header">
-				<div id="global-info">
-					<div id="selectors">
-						<select id="scene-selector">
-							<option>--scene--</option>
-						</select>
-						<div id='btn-reload-scene-list' class="ui-button" title="reload scene list">
-							<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
-								class="svg-button">
-								<g>
-									<path d="M 12 20 A 8 8 0 1 1 20 12  M 21 9 L 20 12 L 18 10" />
-								</g>
-							</svg>
-						</div>
-						<div id="camera-selector">
-							<span>Camera</span>
-							<div id="camera-list">
-							</div>
-						</div>
-
-					</div>
-
-					<select id="object-selector">
-						<option>--object--</option>
+				<div id="tools">
+					<select id="scene-selector">
+						<option>--scene--</option>
 					</select>
 
-					<text id="box"></text>
-					<text id="ref-obj"></text>
+					<select id="camera-selector">
+						<option>--camera--</option>
+					</select>
+
+					<div id="undo" class="header-button" title="undo">
+						<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
+							class="svg-button">
+							<g>
+								<path d="M 12 20 A 8 8 0 1 1 20 12  M 21 9 L 20 12 L 18 10" />
+							</g>
+						</svg>
+						<span>撤销</span>
+					</div>
+
+					<div id="redo" class="header-button" title="redo">
+						<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
+							class="svg-button">
+							<g>
+								<path d="M 12 20 A 8 8 0 1 1 20 12  M 21 9 L 20 12 L 18 10" />
+							</g>
+						</svg>
+						<span>恢复</span>
+					</div>
+					<div id='btn-reload-scene-list' class="header-button" title="reload scene list">
+						<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
+							class="svg-button">
+							<g>
+								<path d="M 12 20 A 8 8 0 1 1 20 12  M 21 9 L 20 12 L 18 10" />
+							</g>
+						</svg>
+						<span>刷新</span>
+					</div>
+					<div id="use-previous-frame" class="header-button" title="use previous world">
+						<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
+							class="svg-button">
+							<g>
+								<path d="M 12 20 A 8 8 0 1 1 20 12  M 21 9 L 20 12 L 18 10" />
+							</g>
+						</svg>
+						使用上帧
+					</div>
 				</div>
+				<!-- <select id="object-selector">
+						<option>--object--</option>
+					</select> -->
+
+				<!-- <text id="box"></text> -->
+				<!-- <text id="ref-obj"></text> -->
 
 				<div id="buttons">
-					<div id="page-now"></div>
-					<div id="use-previous-frame">使用上一帧</div>
 					<input type="checkbox" id="if-default-attribute-use" name="if-default-attribute-use">
 					<label for="if-default-attribute-use" id="if-default-attribute-label" value="y">属性预设</label>
 					<select id="attribute-selector" disabled="true"></select>

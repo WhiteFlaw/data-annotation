@@ -103,36 +103,12 @@ canvas {
 	/* height: 100%; */
 }
 
-#global-info {
-	/* position: absolute; */
-	top: 0px;
-	color: var(--font-color);
-	background-color: var(--widget-background-color);
-	width: auto;
-	font-size: inherit;
-	padding: 0px;
-	box-sizing: border-box;
-	text-align: left;
-	z-index: 3;
-	/* TODO Solve this in HTML */
-	font-size: smaller;
-	display: flex;
-
-}
-
-#selectors {
-	background-color: inherit;
-	color: inherit;
-	border-width: 0;
-	display: inline-flex;
-}
-
 #object-category-selector,
 #object-track-id-editor,
 #object-trunk-selector,
 #object-occlusion-selector,
 #scene-selector,
-#object-selector,
+/* #object-selector,*/
 #camera-selector,
 #obj-ids-of-scene {
 	background-color: inherit;
@@ -280,11 +256,35 @@ canvas {
 	margin: 0;
 }
 
+#header {
+	display: flex;
+	justify-content: space-between;
+}
+
 #header #buttons {
 	display: flex;
-	position: absolute;
-	right: 0;
-	top: 0;
+	background-color: var(--widget-background-color);	
+}
+
+#header #tools {
+	display: flex;
+	width: auto;
+	height: 45px;
+	padding: 0px;
+	z-index: 3;
+	text-align: center;
+	font-size: smaller;
+	box-sizing: border-box;
+	color: var(--font-color);
+	background-color: var(--widget-background-color);
+}
+
+.header-button {
+	display: flex;
+	height: 45px;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
 }
 
 #config-button {
@@ -1187,7 +1187,8 @@ td {
 .sub-views-size {
 	display: flex;
 	justify-content: space-between;
-	background-color: rgb(57, 59, 62); /* 换成颜色变量 */
+	background-color: rgb(57, 59, 62);
+	/* 换成颜色变量 */
 }
 
 /*将标注物体的长宽高高亮显示*/

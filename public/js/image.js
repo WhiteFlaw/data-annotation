@@ -1299,7 +1299,7 @@ class ImageContextManager { // 图片管理器
     images = [];
 
     updateCameraList(cameras) { // 改成给下拉框赋值
-        this.cameras = cameras;
+        /* this.cameras = cameras;
 
         let autoCamera = '<div class="camera-item" id="camera-item-auto">auto</div>';
 
@@ -1317,7 +1317,7 @@ class ImageContextManager { // 图片管理器
 
         let ui = this.selectorUi.querySelector("#camera-list");
         ui.innerHTML = camera_selector_str;
-        ui.style.display = "none";
+        ui.style.display = "none"; */
 
     }
 
@@ -1353,9 +1353,9 @@ class ImageContextManager { // 图片管理器
 
         let selectorName = autoSwitch ? "auto" : name;
 
-        let ui = this.selectorUi.querySelector("#camera-item-" + selectorName);
+        /* let ui = this.selectorUi.querySelector("#camera-item-" + selectorName);
         if (ui)
-            ui.className = "camera-item camera-selected";
+            ui.className = "camera-item camera-selected"; */
 
 
         return image;
@@ -1364,7 +1364,7 @@ class ImageContextManager { // 图片管理器
     removeImage(image) {
 
         let selectorName = image.autoSwitch ? "auto" : image.name;
-        this.selectorUi.querySelector("#camera-item-" + selectorName).className = "camera-item";
+        // this.selectorUi.querySelector("#camera-item-" + selectorName).className = "camera-item";
         this.images = this.images.filter(x => x != image);
         image.remove();
     }

@@ -55,7 +55,7 @@ class ObjectIdManager {
             this.objectList.push(obj);
             this.sortObjIdList();
 
-            this.setObjdIdListOptions();
+            // this.setObjdIdListOptions();
 
             if (obj.id > this.maxId) {
                 this.maxId = parseInt(obj.id);
@@ -90,7 +90,7 @@ class ObjectIdManager {
                 if (self.maxId < 0) // this is -infinity if there is no ids.
                     self.maxId = 0;
 
-                self.setObjdIdListOptions();
+                // self.setObjdIdListOptions();
 
                 if (done)
                     done(ret)
