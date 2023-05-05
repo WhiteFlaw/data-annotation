@@ -617,7 +617,7 @@ function BoxEditorManager(parentUi, viewManager, objectTrackView,
 
         
         // set obj selector
-        // this.globalHeader.setObject(objTrackId);
+        this.globalHeader.setObject(objTrackId);
     };
     
     this.onContextMenu = function(event, boxEditor)

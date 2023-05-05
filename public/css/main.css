@@ -108,7 +108,7 @@ canvas {
 #object-trunk-selector,
 #object-occlusion-selector,
 #scene-selector,
-/* #object-selector,*/
+#object-selector,
 #camera-selector,
 #obj-ids-of-scene {
 	background-color: inherit;
@@ -194,14 +194,9 @@ canvas {
 }
 
 #use-previous-frame {
-	background-color: var(--widget-background-color);
-	border-color: var(--widget-background-color);
 	color: var(--font-color);
-	margin-right: 10px;
-}
-
-#use-previous-frame:hover {
-	background-color: var(--highlight-background-color);
+	border-color: var(--widget-background-color);
+	background-color: var(--widget-background-color);
 }
 
 #if-default-use-label {
@@ -277,6 +272,10 @@ canvas {
 	box-sizing: border-box;
 	color: var(--font-color);
 	background-color: var(--widget-background-color);
+}
+
+#header #tools > div:hover {
+	background-color: var(--highlight-background-color);
 }
 
 .header-button {
@@ -671,10 +670,6 @@ dynamic set obj-type css has higher priority than this one.
 .label-out-view {
 	display: none;
 }
-
-
-
-
 
 
 #batch-editor-tools-wrapper {

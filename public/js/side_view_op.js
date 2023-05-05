@@ -81,15 +81,12 @@ class ProjectiveView{
     
         ui.onkeydown = this.on_key_down.bind(this);
         ui.onmouseenter = (event)=>{
-
             if (this.isActive())
             {
                 ui.focus();
 
                 ui.querySelector("#v-buttons").style.display="inherit";
 
-                if (this.on_focus)
-                    this.on_focus();
             }
         };
         ui.onmouseleave = (event)=>{
@@ -1474,6 +1471,7 @@ class ProjectiveViewOps{
 
     isActive()
     {
+        console.trace();
         return !!this.box;
     }
 

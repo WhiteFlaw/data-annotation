@@ -363,17 +363,15 @@ class ImageViewer { // 2D视图区
         add_box: (box) => {
             var calib = this.getCalib(); // 获取当前方向矩阵
             // getCalib内应该返回各个各个方向的矩阵, 而不是只返回当前方向
-            if (!calib) {
-                return;
-            }
             var trans_ratio = this.get_trans_ratio();
             if (trans_ratio) {
                 for (let i = 0; i < this.names.length; i++) {
-
+                    if (!calib[this.names[i]]) {
+                        break;
+                    }
+                    
                     var imgfinal = box_to_2d_points(box, calib[this.names[i]]); // 根据当前方向的矩阵和box转换svg
-                    // 然后根据图片尺寸再处理一下svg
-                    // 那增加box的时候直接传三份不同方向的矩阵和同一个box进入box_to_2d_points内生成各个方向的svg
-                    // 然后分别加入三张图
+
                     if (imgfinal) {
                         var imgfinal = imgfinal.map(function (x, i) {
                             if (i % 2 == 0) {
@@ -425,14 +423,15 @@ class ImageViewer { // 2D视图区
             var children = b.childNodes;
 
             var calib = this.getCalib();
-            if (!calib) {
-                return;
-            }
-
+            
             var trans_ratio = this.get_trans_ratio();
-
+            
             for (let j = 0; j < this.names.length; j++) {
-
+                
+                if (!calib[this.names[j]]) {
+                    return;
+                }
+                console.log(calib[this.names[j]]);
                 var imgfinal = box_to_2d_points(box, calib[this.names[j]]);
 
                 if (!imgfinal) {
@@ -495,15 +494,12 @@ class ImageViewer { // 2D视图区
             var trans_ratio = this.get_trans_ratio();
 
             var calib = this.getCalib();
-            if (!calib) {
-                return;
-            }
-
+            
             let svg = this.ui.querySelector(`#svg-${this.names[i]}-boxes`);
-
+            
             // draw boxes
             this.world.annotation.boxes.forEach((box) => {
-                if (box.draw) {
+                if (box.draw && calib[this.names[i]]) {
                     var imgfinal = box_to_2d_points(box, calib[this.names[i]]);
                     if (imgfinal) {
                         var box_svg = this.box_to_svg(box, imgfinal, trans_ratio, this.get_selected_box() == box);
@@ -694,8 +690,9 @@ class ImageViewer { // 2D视图区
         this.draw_svg();
     }
 
-    hide_canvas() {
-        this.ui.style.display = "none";
+    hide_canvas() { // 切帧后不该执行
+        console.trace();
+        // this.ui.style.display = "none";
     }
 
     show_canvas() {
@@ -1453,6 +1450,8 @@ class ImageContextManager { // 图片管理器
 }
 
 function box_to_2d_points(box, calib) {
+    console.trace();
+    console.log(calib);
     var scale = box.scale;
     var pos = box.position;
     var rotation = box.rotation;

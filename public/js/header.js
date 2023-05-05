@@ -9,7 +9,7 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.boxUi = ui.querySelector("#box");
     this.refObjUi = ui.querySelector("#ref-obj");
     this.sceneSelectorUi = ui.querySelector("#scene-selector");
-    // this.objectSelectorUi = ui.querySelector("#object-selector");
+    this.objectSelectorUi = ui.querySelector("#object-selector");
     this.cameraSelectorUi = ui.querySelector("#camera-selector");
     this.changedMarkUi = ui.querySelector("#changed-mark");
     this.categoryUseUi = ui.querySelector('#if-default-category-use');
@@ -66,7 +66,7 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
 
 
     this.sceneSelectorUi.onchange = (e) => { this.onSceneChanged(e); };
-    // this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
+    this.objectSelectorUi.onchange = (e) => { this.onObjectSelected(e); };
     this.cameraSelectorUi.onchange = (e) => { this.onCameraChanged(e); };
     this.attributeUseUi.onchange = () => { this.onAttributeUseChanged(); }; // enable default attribute
     this.categoryUseUi.onchange = () => { this.onCategoryUseChanged(); }; // enable default category
@@ -74,22 +74,22 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
     this.undoUi.onclick = () => { this.onUndoClicked(); };
     this.redoUi.onclick = () => { this.onRedoClicked(); };
 
-    /* this.setObject = function (id) {
+    this.setObject = function (id) {
         this.objectSelectorUi.value = id;
-    } */
+    }
 
     /* this.clear_box_info = function () {
         this.boxUi.innerHTML = '';
     }; */
 
-    /* this.update_box_info = function (box) {
+    this.update_box_info = function (box) {
         var scale = box.scale;
-        var pos = box.position;
+        /* var pos = box.position;
         var rotation = box.rotation;
         var points_number = box.world.lidar.get_box_points_number(box);
-        let distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y).toFixed(2);
+        let distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y).toFixed(2); */
 
-        this.boxUi.innerHTML = "<span>" + box.obj_type + "-" + box.obj_track_id +
+        /* this.boxUi.innerHTML = "<span>" + box.obj_type + "-" + box.obj_track_id +
             (box.annotator ? ("</span> | <span title='annotator'>" + box.annotator) : "") +
             "</span> | <span title='distance'>" + distance +
             "</span> | <span title='position'>" + pos.x.toFixed(2) + " " + pos.y.toFixed(2) + " " + pos.z.toFixed(2) +
@@ -97,14 +97,14 @@ var Header = function (ui, data, cfg, onSceneChanged, onFrameChanged, onObjectSe
             "</span> | <span title='rotation'>" +
             (rotation.x * 180 / Math.PI).toFixed(2) + " " + (rotation.y * 180 / Math.PI).toFixed(2) + " " + (rotation.z * 180 / Math.PI).toFixed(2) +
             "</span> | <span title = 'points'>" +
-            points_number + "</span> ";
+            points_number + "</span> "; */
         document.getElementById('sub-views-size-top-val').innerHTML = `宽：${scale.y.toFixed(2)} 长：${scale.x.toFixed(2)}`
         document.getElementById('sub-views-size-left-val').innerHTML = `长：${scale.x.toFixed(2)} 高：${scale.z.toFixed(2)}`
         document.getElementById('sub-views-size-front-val').innerHTML = `宽：${scale.y.toFixed(2)} 高：${scale.z.toFixed(2)}`
         if (box.follows) {
             this.boxUi.innerHTML += "| F:" + box.follows.obj_track_id;
         }
-    }, */
+    },
 
     /* this.set_ref_obj = function (marked_object) {
         this.refObjUi.innerHTML = "| Ref: " + marked_object.scene + "/" + marked_object.frame + ": " + marked_object.ann.obj_type + "-" + marked_object.ann.obj_id;

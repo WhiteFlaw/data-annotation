@@ -356,6 +356,7 @@ function Annotation(sceneMeta, world, frameInfo) {
     };
 
     this.remove_box = function (box) {
+        console.trace();
         console.log("removeBox");
         // this.world.data.dbg.free();
         box.geometry.dispose();

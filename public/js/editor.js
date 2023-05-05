@@ -87,8 +87,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.configUi = new ConfigUi(editorUi.querySelector("#config-button"), editorUi.querySelector("#config-wrapper"), this);
 
         this.header = new Header(
-            editorUi.querySelector("#header"), 
-            this.data, 
+            editorUi.querySelector("#header"),
+            this.data,
             this.editorCfg,
             (e) => { this.scene_changed(e.currentTarget.value) },
             (e) => { this.frame_changed(e) },
@@ -139,7 +139,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             this.editorCfg,
             (lidar_points) => this.on_img_click(lidar_points)
         );
-        
+
         this.imageContext = new ImageContext(
             this.editorUi.querySelector("#content"),
             this.editorCfg
@@ -433,7 +433,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
                     if (!this.ensurePreloaded())
                         break;
 
-                    // this.header.setObject(this.selected_box.obj_track_id);
+                    this.header.setObject(this.selected_box.obj_track_id);
                     this.editBatch(
                         this.data.world.frameInfo.scene,
                         this.data.world.frameInfo.frame,
@@ -978,6 +978,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         }
 
         this.editorUi.querySelector('#frame-manager-list').innerHTML = frame_list_str;
+        this.editorUi.querySelector('#frame-manager-length').innerHTML = meta.frames.length;
 
         if (meta.camera) {
             this.imageContextManager.updateCameraList(meta.camera);
@@ -1073,7 +1074,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         if (!this.ensurePreloaded())
             return;
 
-        // this.header.setObject(this.selected_box.obj_track_id);
+        this.header.setObject(this.selected_box.obj_track_id);
 
         this.editBatch(
             this.data.world.frameInfo.scene,
@@ -1125,7 +1126,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.hideGridLines();
         //this.controlGui.hide();
         this.editorUi.querySelector("#tools").style.display = 'none';
-        //this.editorUi.querySelector("#object-selector").style.display='none';
+        this.editorUi.querySelector("#object-selector").style.display='none';
         this.currentMainEditor = this.boxEditorManager;
 
         this.boxEditorManager.edit(this.data,
@@ -2557,7 +2558,8 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     };
 
 
-    this.remove_box = function (box, render = true) {
+    this.remove_box = function (box, render = true) { // 检查一下正常分支会不会走到这里
+        console.log("清除box")
         if (box === this.selected_box) {
             this.unselectBox(null, true);
             this.unselectBox(null, true); //twice to safely unselect.
@@ -2701,7 +2703,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
     this.onSelectedBoxChanged = function (box) {
 
         if (box) {
-            // this.header.update_box_info(box);
+            this.header.update_box_info(box);
             // this.floatLabelManager.update_position(box, true);
             // this.fastToolBox.setPos(this.floatLabelManager.getLabelEditorPos(box.obj_local_id));
             this.imageContextManager.boxes_manager.onBoxSelected(box.obj_local_id, box.obj_type);
