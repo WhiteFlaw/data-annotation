@@ -258,6 +258,7 @@ canvas {
 
 #header #buttons {
 	display: flex;
+	align-items: center;
 	background-color: var(--widget-background-color);	
 }
 
@@ -775,7 +776,7 @@ dynamic set obj-type css has higher priority than this one.
 #main-box-editor-wrapper #sub-views {
 	display: inline-block;
 	position: relative;
-	left: calc(100vw - 320px);
+	left: calc(100vw - 325px);
 	width: 320px;
 	height: 100%;
 	resize: both;
