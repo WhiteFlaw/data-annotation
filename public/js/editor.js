@@ -991,7 +991,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         console.log("frame_changed", event);
         if (event.target.attributes.value === undefined) return; // 点歪
         var sceneName = this.editorUi.querySelector("#scene-selector").value;
-
+        
         if (sceneName.length == 0 && this.data.world) {
             sceneName = this.data.world.frameInfo.scene;
         }

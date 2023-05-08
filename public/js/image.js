@@ -359,6 +359,9 @@ class ImageViewer { // 2D视图区
             }
         }
 
+        x = Math.round(x * 2048 / div.clientWidth);
+        y = Math.round(y * 1536 / div.clientHeight);
+        return [x, y];
 
         var front_panel = document.createElementNS("http://www.w3.org/2000/svg", 'polygon');
         svg.appendChild(front_panel);
@@ -572,7 +575,6 @@ class ImageViewer { // 2D视图区
                     svg.appendChild(pts_svg);
                 }
             }
-
         }
     }
 
@@ -1328,7 +1330,6 @@ class ImageContextManager { // 图片管理器
         this.on_img_click = on_img_click;
 
         this.addImage("", true);
-
     }
     images = [];
 
