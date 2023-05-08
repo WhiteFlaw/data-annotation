@@ -1,8 +1,7 @@
 // size is the dimension of the object in x/y/z axis, with unit meter.
 
 class ObjectCategory {
-
-
+    
     obj_type_map = {
         Bus: { color: '#ffff00', size: [13, 3, 3.5] },
         Bicycle: { color: '#fcaafc', size: [1.8, 0.7, 1] },
@@ -66,10 +65,8 @@ class ObjectCategory {
         // person: { color: '#bc5090', size: [0.4, 0.5, 1.7] },
         // three_wheel: { color: '#ff6361', size: [4.5, 1.8, 1.5] },
         // 武汉项目 End
-        Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] }
+        Unknown: { color: '#008888', size: [4.5, 1.8, 1.5] }, // 该项为必需
     };
-
-
 
     constructor() {
 

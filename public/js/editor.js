@@ -1009,6 +1009,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         const frame_length = this.data.getFrameList().length;
     };
 
+
     this.ensureBoxTrackIdExist = function () {
         if (!this.selected_box.obj_track_id) {
             this.infoBox.show("Error", "Please assign object track ID.");
@@ -2304,14 +2305,10 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
             return;
         }
 
-        console.log(scene_meta.scene, scene_meta.frames[frame_index])
         this.load_world(scene_meta.scene, scene_meta.frames[frame_index]);
-
     };
 
     this.next_frame = function () {
-
-
 
         if (!this.data.meta)
             return;
@@ -2333,8 +2330,6 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
 
     this.certain_frame = function (frameIndex) {
         let scene_meta = this.data.get_current_world_scene_meta();
-        console.log(scene_meta.scene)
-        console.log(frameIndex)
         this.load_world(scene_meta.scene, scene_meta.frames[frameIndex]);
     }
 
@@ -2403,6 +2398,7 @@ function Editor(editorUi, wrapperUi, editorCfg, data, name = "editor") {
         this.unselectBox(null, true);
         this.render();
         this.imageContext.attachWorld(world);
+        this.imageContext.update_image();
         this.imageContextManager.attachWorld(world);
         this.imageContextManager.render_2d_image();
         this.render2dLabels(world);

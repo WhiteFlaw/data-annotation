@@ -1,5 +1,5 @@
 
-import { vector4to3, vector3_nomalize, psr_to_xyz, matmul, getDomInfo } from "./util.js"
+import { vector4to3, vector3_nomalize, psr_to_xyz, matmul, getDomInfo, deepCopy } from "./util.js"
 import { globalObjectCategory } from './obj_cfg.js';
 import { MovableView } from "./popup_dialog.js";
 import { saveWorldList } from "./save.js";
@@ -188,7 +188,7 @@ function BoxImageContext(ui) {
     }
 }
 
-class ImageContext/*  extends MovableView  */{ // image-wrapper
+class ImageContext/*  extends MovableView  */ { // image-wrapper
 
     constructor(parentUi) {
         // create ui
@@ -227,6 +227,8 @@ class ImageContext/*  extends MovableView  */{ // image-wrapper
         // active img is set by global, it's not set sometimes.
         var img = this.world.cameras.getImageByName(this.name);
 
+        this.imageEditor.getImagePixelRatio(img.naturalWidth, img.naturalHeight);
+
         if (img) {
             svgimage.setAttribute("href", img.src);
         }
@@ -241,7 +243,7 @@ class ImageContext/*  extends MovableView  */{ // image-wrapper
 }
 
 class ImageViewer { // 2D视图区
-    constructor(parentUi, name, autoSwitch, cfg, on_img_click) {
+    constructor(parentUi, cfg) {
         let template = document.getElementById("image-manager-ui-template");
         let imageManagerUi = template.content.cloneNode(true);
         parentUi.appendChild(imageManagerUi);
@@ -251,6 +253,7 @@ class ImageViewer { // 2D视图区
 
         this.cfg = cfg;
     }
+
     img_lidar_point_map = {};
     get_selected_box = null;
     drawing = false;
@@ -263,6 +266,38 @@ class ImageViewer { // 2D视图区
 
     world = null;
     img = null;
+
+    getImagePixelRatio() {
+        const img = this.world.cameras.getImageByName(this.name);
+        const size = {
+            x: img.naturalWidth,
+            y: img.naturalHeight
+        }
+        return size;
+    }
+
+    // TODO 检查是否被调用
+    get_trans_ratio() {
+        var img = this.world.cameras.getImageByName(this.name);
+
+        if (!img || img.width == 0) {
+            return null;
+        }
+
+        var clientWidth, clientHeight;
+
+        const size = this.getImagePixelRatio();
+
+        clientWidth = size.x;
+        clientHeight = size.y;
+
+        var trans_ratio = {
+            x: clientWidth / img.naturalWidth,
+            y: clientHeight / img.naturalHeight,
+        };
+
+        return trans_ratio;
+    }
 
     setImageName(name) {
         this.name = name;
@@ -299,7 +334,7 @@ class ImageViewer { // 2D视图区
     };
 
     box_to_svg(box, box_corners, trans_ratio, selected) {
-        
+
         var imgfinal = box_corners.map(function (x, i) {
             if (i % 2 == 0) {
                 return Math.round(x * trans_ratio.x);
@@ -369,7 +404,7 @@ class ImageViewer { // 2D视图区
                     if (!calib[this.names[i]]) {
                         break;
                     }
-                    
+
                     var imgfinal = box_to_2d_points(box, calib[this.names[i]]); // 根据当前方向的矩阵和box转换svg
 
                     if (imgfinal) {
@@ -423,11 +458,11 @@ class ImageViewer { // 2D视图区
             var children = b.childNodes;
 
             var calib = this.getCalib();
-            
+
             var trans_ratio = this.get_trans_ratio();
-            
+
             for (let j = 0; j < this.names.length; j++) {
-                
+
                 if (!calib[this.names[j]]) {
                     return;
                 }
@@ -494,9 +529,9 @@ class ImageViewer { // 2D视图区
             var trans_ratio = this.get_trans_ratio();
 
             var calib = this.getCalib();
-            
+
             let svg = this.ui.querySelector(`#svg-${this.names[i]}-boxes`);
-            
+
             // draw boxes
             this.world.annotation.boxes.forEach((box) => {
                 if (box.draw && calib[this.names[i]]) {
@@ -572,22 +607,6 @@ class ImageViewer { // 2D视图区
         }).reduce((a, b) => a + b, "#");
     }
 
-    to_polyline_attr(points) {
-        return points.reduce(function (x, y) {
-            return String(x) + "," + y;
-        }
-        )
-    }
-
-    to_viewbox_coord(x, y) {
-        var div = this.ui.querySelector("#maincanvas-svg");
-
-        x = Math.round(x * 2048 / div.clientWidth);
-        y = Math.round(y * 1536 / div.clientHeight);
-        return [x, y];
-
-    }
-
     getCalib() {
         var scene_meta = this.world.sceneMeta;
 
@@ -603,26 +622,26 @@ class ImageViewer { // 2D视图区
 
         return calib;
     }
-    // 加3D操作3D的步骤全部移动到imageViewer,
 
-    get_trans_ratio() {
-        const img = this.world.cameras.getImageByName(this.name);
-
-        if (!img || img.width == 0) {
-            return null;
+    // TODO 检查是否被调用
+    to_polyline_attr(points) {
+        return points.reduce(function (x, y) {
+            return String(x) + "," + y;
         }
+        )
+    }
 
-        var clientWidth, clientHeight;
+    // TODO 检查是否被调用
+    to_viewbox_coord(x, y) {
+        var div = this.ui.querySelector("#maincanvas-svg");
 
-        clientWidth = 2048;
-        clientHeight = 1536;
+        const imgSize = this.getImagePixelRatio();
 
-        var trans_ratio = {
-            x: clientWidth / img.naturalWidth,
-            y: clientHeight / img.naturalHeight,
-        };
+        x = Math.round(x * imgSize.x / div.clientWidth);
+        y = Math.round(y * imgSize.y / div.clientHeight);
 
-        return trans_ratio;
+        return [x, y];
+
     }
 
     show_all_image() {
@@ -680,7 +699,7 @@ class ImageViewer { // 2D视图区
         return svg;
     }
 
-    render_2d_image() { // 渲染方法在图片内, 那么同时渲染至两处该是合理的
+    render_2d_image() {
         if (this.cfg.disableMainImageContext) return;
 
         this.clear_main_canvas();
@@ -691,7 +710,6 @@ class ImageViewer { // 2D视图区
     }
 
     hide_canvas() { // 切帧后不该执行
-        console.trace();
         // this.ui.style.display = "none";
     }
 
@@ -704,7 +722,11 @@ class ImageEditor { // 图片编辑器
 
     world = null;
     start = false; // 当前是否正在拖放添加矩形
+    startDom = null; // 当前正在添加(鼠标未弹起)的矩形id
+    rectData = null; // 鼠标坐标, 数组[x, y]
+    nowSelect_id = 'id_now_select_default'; // 当前选中的标注(2D/3D)
     topDot = null; // 拖拽模式下鼠标拖拽顶点的斜对顶点
+    objId_3d = null; // 当前受选3D标注的obj_id
     vector = null; // 当前向量
     isDrag = false; // 当前是否为拖拽(移动)模式
     rectData = null; // 鼠标坐标, 数组[x, y]
@@ -712,14 +734,28 @@ class ImageEditor { // 图片编辑器
     obj_id_3d = null; // 当前受选3D标注的obj_id
     basic_color = '#fff';
     ui = d3.select('#image-board');
-    id_now_select = 'id_now_select_default'; // 当前选中的标注(2D/3D)
-    annotation_2d = { obj_type: 'annotation_2d', psr: [] };
+    basic_color = '#fff'
+    imgSize = {
+        x: 2048,
+        y: 1536
+    }
+    annotation_2d = {
+        obj_type: 'annotation_2d',
+        psr: []
+    }
+
+    getImagePixelRatio(width, height) {
+        this.imgSize.x = width;
+        this.imgSize.y = height;
+        this.ui.select('#maincanvas-svg').attr('viewBox', `0 0 ${width} ${height}`);
+        this.ui.select('#svg-image').attr('width', width).attr('height', height);
+    }
 
     getRate() {
-        const boardData = getDomInfo(document.querySelector('#image-board'));
+        const boardData = document.querySelector('#maincanvas-svg');
         const rates = {
-            rateX: 2048 / boardData.width,
-            rateY: 1536 / boardData.height
+            x: this.imgSize.x / boardData.clientWidth,
+            y: this.imgSize.y / boardData.clientHeight
         }
         return rates;
     }
@@ -755,8 +791,8 @@ class ImageEditor { // 图片编辑器
         // 星标
         const positionXY = svg.append('g').attr('class', 'line-g');
         svg.append('g').attr('id', 'rect-g'); // 标注组
-        positionXY.append('line').attr('id', 'line-x').attr('x1', 0).attr('y1', 0).attr('x2', 2048).attr('y2', 0).style('stroke', 'white').attr('stroke-width', 0);
-        positionXY.append('line').attr('id', 'line-y').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 1536).style('stroke', 'white').attr('stroke-width', 0);
+        positionXY.append('line').attr('id', 'line-x').attr('x1', 0).attr('y1', 0).attr('x2', this.imgSize.x).attr('y2', 0).style('stroke', 'white').attr('stroke-width', 0);
+        positionXY.append('line').attr('id', 'line-y').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', this.imgSize.y).style('stroke', 'white').attr('stroke-width', 0);
         positionXY.append('circle').attr('id', 'line-circle').attr('cx', -10).attr('cy', -10).attr('r', 5).attr('fill', 'red');
 
         // 这个时刻没有world, 不能在此重应用
@@ -765,7 +801,7 @@ class ImageEditor { // 图片编辑器
 
     annotate_pic_set_id() {
         const id = this.ui.select('#header-id-list').property('value');
-        d3.select(`#${this.id_now_select}-rect`).attr(`obj_id`, id);
+        d3.select(`#${this.nowSelect_id}-rect`).attr(`obj_id`, id);
     }
 
     annotate_pic_clear() { // 清除全部标注
@@ -774,7 +810,6 @@ class ImageEditor { // 图片编辑器
     }
 
     annotate_pic_reapply(vector) {
-        // if (this.vector === vector) return;
         this.vector = vector;
         const data = this.world.annotation_2d.psr;
         const container = d3.select('#rect-g');
@@ -795,10 +830,8 @@ class ImageEditor { // 图片编辑器
 
             this.annotate_pic_mouse_enter(rect);
             this.annotate_pic_anno_click(rect);
-            // 在此处add_label, annotate_pic_update_label取不到DOM信息, 务必在reapply完成后添加label
         })
         this.annotate_pic_update_label();
-        // 此时dom仍未完成, 不能在此对box上色
     }
 
     get_box_by_obj_id(obj_id) {
@@ -843,14 +876,14 @@ class ImageEditor { // 图片编辑器
             hide.style('display', 'none');
 
             d3.selectAll('#rect-g > g > circle').remove();
-            d3.select(`#${this.id_now_select}-rect`).style('stroke', this.basic_color).attr('fill', this.basic_color);
+            d3.select(`#${this.nowSelect_id}-rect`).style('stroke', this.basic_color).attr('fill', this.basic_color);
         }
         this.isDrag = !this.isDrag;
         this.annotate_pic_box_color();
     }
 
     annotate_pic_hide() { // 隐藏
-        const svg = d3.select(`#${this.id_now_select}`);
+        const svg = d3.select(`#${this.nowSelect_id}`);
         if (svg.style('visibility') === 'visible') {
             svg.style('visibility', 'hidden');
         }
@@ -862,16 +895,16 @@ class ImageEditor { // 图片编辑器
     }
 
     annotate_pic_delete() { // 删除
-        if (this.obj_id_3d !== null) { // 如果是3D转2D那么仅隐藏
-            const rect = this.get_box_by_obj_id(this.obj_id_3d);
-            if (rect.obj_track_id === this.obj_id_3d) {
+        if (this.objId_3d !== null) { // 如果是3D转2D那么仅隐藏
+            const rect = this.get_box_by_obj_id(this.objId_3d);
+            if (rect.obj_track_id === this.objId_3d) {
                 rect['draw'] = false;
             }
         }
-        const target_obj_id = this.get_obj_id_by_id(this.id_now_select);
+        const target_obj_id = this.get_obj_id_by_id(this.nowSelect_id);
         this.annotate_pic_remove_label(target_obj_id);
 
-        d3.select(`#${this.id_now_select}`).remove();
+        d3.select(`#${this.nowSelect_id}`).remove();
     }
 
     get_obj_id_by_id(id) { // 如果是3D转那么返回'3D'
@@ -884,7 +917,7 @@ class ImageEditor { // 图片编辑器
             res = d3.select(`#${id} > rect`).attr('obj_id');
             return res;
         }
-        if (id.substring(0, 14) === 'svg-box-local-') { // 
+        if (id.substring(0, 14) === 'svg-box-local-') {
             res = id.substring(14, id.length);
             return res;
         }
@@ -896,7 +929,8 @@ class ImageEditor { // 图片编辑器
 
         if (this.annotate_pic_filter(allRect) === false) return;
 
-        this.world['annotation_2d'] = this.annotation_2d; // annotation.js - toBoxAnnotations()
+        this.world['annotation_2d'] = deepCopy(this.annotation_2d); // annotation.js - toBoxAnnotations()
+        // annotatin_2d引用类型直接加进去会统一所有世界的2D标注信息...
         saveWorldList([this.world]);
 
         sta.text('保存成功.').style('color', '#ffffff');
@@ -905,8 +939,8 @@ class ImageEditor { // 图片编辑器
     }
 
     annotate_pic_box_color() {
-        const allRect = d3.selectAll("#rect-g > g > rect")._groups[0]; // allRect没来得及变就直接执行了, 找不到对应id
-        for (let i = 0; i < allRect.length; i++) { // 需要判定一下, 如果在finish上色, 但是save上色不需要
+        const allRect = d3.selectAll("#rect-g > g > rect")._groups[0];
+        for (let i = 0; i < allRect.length; i++) {
             if (d3.select(allRect[i]).attr('obj_id')) {
                 d3.select(allRect[i])
                     .attr('fill', this.get_color_by_obj_id(d3.select(allRect[i]).attr('obj_id')))
@@ -915,9 +949,10 @@ class ImageEditor { // 图片编辑器
         }
     }
 
-    get_color_by_obj_id(obj_id) {
+    get_color_by_obj_id(obj_id) { // obj_id可能错误, 但是this.world.annotation.boxes不会错
         const type = this.get_box_by_obj_id(obj_id).obj_type;
-        if (!globalObjectCategory.obj_type_map[type]) return '#fff';
+        if (globalObjectCategory.obj_type_map[type] === undefined) return '#ffffff';
+
         return globalObjectCategory.obj_type_map[type].color;
     }
 
@@ -974,20 +1009,20 @@ class ImageEditor { // 图片编辑器
     }
 
     annotate_pic_after_switch() { // 受选标注切换后
-        if (this.id_now_select.substring(0, 7) === 'rect-g-') { // 若之前选中2D标注
-            d3.select(`#${this.id_now_select}-rect`).style('stroke', this.basic_color).attr('fill', this.basic_color);
-            d3.selectAll(`#${this.id_now_select} > circle`).attr('fill', this.basic_color);
+        if (this.nowSelect_id.substring(0, 7) === 'rect-g-') { // 若之前选中2D标注
+            d3.select(`#${this.nowSelect_id}-rect`).style('stroke', this.basic_color).attr('fill', this.basic_color);
+            d3.selectAll(`#${this.nowSelect_id} > circle`).attr('fill', this.basic_color);
             return;
         }
-        d3.select(`#${this.id_now_select}`).attr('fill', '');
+        d3.select(`#${this.nowSelect_id}`).attr('fill', '');
     }
 
     annotate_pic_select_3d(obj_local_id) {
         const boxes = this.world.annotation.boxes;
         const target = boxes.find((item) => {
-            return Number(item.obj_local_id) === Number(obj_local_id);
+            return Number(item.obj_local_id) === Number(obj_local_id); // box类型不稳定
         })
-        this.obj_id_3d = target.obj_track_id;
+        this.objId_3d = target.obj_track_id;
         this.ui.select('#header-id-list').property('value', target.obj_track_id);
     }
 
@@ -1019,12 +1054,12 @@ class ImageEditor { // 图片编辑器
                 const fillColor = d3.select(this).style('stroke');
                 d3.select(this).attr('fill', fillColor);
 
-                if (d3.select(this).attr('id') !== that.id_now_select) {
+                if (d3.select(this).attr('id') !== that.nowSelect_id) {
                     that.annotate_pic_after_switch();
                 }
 
-                that.id_now_select = d3.select(this).attr('id');
-                let local_id = that.get_obj_id_by_id(that.id_now_select);
+                that.nowSelect_id = d3.select(this).attr('id');
+                let local_id = that.get_obj_id_by_id(that.nowSelect_id);
                 that.annotate_pic_select_3d(local_id);
             });
             return;
@@ -1033,12 +1068,12 @@ class ImageEditor { // 图片编辑器
             if (that.isDrag === false) return;
 
             d3.select(this).style('stroke', 'red').attr('fill', 'red');
-            if (d3.select(this).attr('id') !== `${that.id_now_select}-rect`) {
+            if (d3.select(this).attr('id') !== `${that.nowSelect_id}-rect`) {
                 that.annotate_pic_after_switch();
             }
 
-            that.id_now_select = d3.select(this).attr('id').substring(0, d3.select(this).attr('id').length - 5);
-            d3.selectAll(`#${that.id_now_select} > circle`).attr('fill', 'red');
+            that.nowSelect_id = d3.select(this).attr('id').substring(0, d3.select(this).attr('id').length - 5);
+            d3.selectAll(`#${that.nowSelect_id} > circle`).attr('fill', 'red');
 
             let obj_id = d3.select(this).attr('obj_id') === null ? `` : d3.select(this).attr('obj_id');
 
@@ -1051,7 +1086,7 @@ class ImageEditor { // 图片编辑器
             const that = this;
             const id = new Date().getTime() + '';
 
-            const xy = [(+e.offsetX) * this.getRate().rateX, (+e.offsetY) * this.getRate().rateY];
+            const xy = [(+e.offsetX) * this.getRate().x, (+e.offsetY) * this.getRate().y];
 
             const rect = d3.select('#rect-g')
                 .append('g')
@@ -1076,14 +1111,14 @@ class ImageEditor { // 图片编辑器
     annotate_pic_mouse_move(e) {
         if (!this.isDrag) {
             const xy = [(+e.offsetX), (+e.offsetY)];
-            const xy0 = xy[0] * this.getRate().rateX;
-            const xy1 = xy[1] * this.getRate().rateY;
+            const xy0 = xy[0] * this.getRate().x;
+            const xy1 = xy[1] * this.getRate().y;
 
             // 更新星标
             d3.select('#line-x')
                 .attr('x1', 0)
                 .attr('y1', xy1)
-                .attr('x2', 2048)
+                .attr('x2', this.imgSize.x)
                 .attr('y2', xy1)
                 .style('stroke', 'white')
                 .attr('stroke-width', 2);
@@ -1092,7 +1127,7 @@ class ImageEditor { // 图片编辑器
                 .attr('x1', xy0)
                 .attr('y1', 0)
                 .attr('x2', xy0)
-                .attr('y2', 1536)
+                .attr('y2', this.imgSize.y)
                 .style('stroke', 'white')
                 .attr('stroke-width', 2);
 
@@ -1172,8 +1207,8 @@ class ImageEditor { // 图片编辑器
             })
             .on('drag', function (e) {
                 const dot = [
-                    (+e.sourceEvent.offsetX) * that.getRate().rateX,
-                    (+e.sourceEvent.offsetY) * that.getRate().rateY
+                    (+e.sourceEvent.offsetX) * that.getRate().x,
+                    (+e.sourceEvent.offsetY) * that.getRate().y
                 ] // 获取点坐标
                 if (widget._groups[0][0].localName === 'circle') {
                     // 判断新点相对于旧点的信息, 获取新点坐标
@@ -1222,8 +1257,8 @@ class ImageEditor { // 图片编辑器
         for (let i = 0; i < rectAll.length; i++) {
             if (d3.select(rectAll[i]).attr('obj_id') === obj_id) {
                 return {
-                    x: (Number(d3.select(rectAll[i]).attr('x')) + Number(d3.select(rectAll[i]).attr('width'))) / this.getRate().rateX,
-                    y: Number(d3.select(rectAll[i]).attr('y')) / this.getRate().rateY
+                    x: (Number(d3.select(rectAll[i]).attr('x')) + Number(d3.select(rectAll[i]).attr('width'))) / this.getRate().x,
+                    y: Number(d3.select(rectAll[i]).attr('y')) / this.getRate().y
                 };
             }
         }
@@ -1244,7 +1279,8 @@ class ImageEditor { // 图片编辑器
 
     annotate_pic_update_label() {
         this.annotate_pic_clear_label();
-        this.world.annotation_2d.psr.forEach((item) => {
+        this.world.annotation_2d.psr.forEach((item) => { // ?这psr是最新的?
+            // 这tm不是最新的psr, 点保存了也不是
             this.annotate_pic_add_label(item.obj_id);
         })
     }
@@ -1254,6 +1290,7 @@ class ImageEditor { // 图片编辑器
         if (pos === undefined) return;
 
         const box = this.get_box_by_obj_id(obj_id);
+        if (!box) return;
 
         let label_text = '<div class="rect-label-obj-type">';
         label_text += box.obj_type;
@@ -1335,7 +1372,7 @@ class ImageContextManager { // 图片管理器
         if (autoSwitch && this.bestCamera && !name)
             name = this.bestCamera;
 
-        let image = new ImageViewer(this.parentUi, name, autoSwitch, this.cfg, this.on_img_click);
+        let image = new ImageViewer(this.parentUi, this.cfg);
 
         this.images.push(image);
 
@@ -1445,13 +1482,9 @@ class ImageContextManager { // 图片管理器
             this.images.forEach(i => i.boxes_manager.update_box(box));
         }
     }
-
-
 }
 
 function box_to_2d_points(box, calib) {
-    console.trace();
-    console.log(calib);
     var scale = box.scale;
     var pos = box.position;
     var rotation = box.rotation;
