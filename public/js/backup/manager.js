@@ -103,7 +103,7 @@ class BackupManager {
         this.editor = editor;
     }
     initManager(action) { // data.js--_doPreload(), 切帧后应reset;
-        const frame = document.querySelector("#frame-selector").value;
+        const frame = this.editor.frameManager.frame;
         if (frame === this.nowFrame) return;
         this.nowFrame = frame;
         this.reset();

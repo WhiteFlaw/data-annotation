@@ -1,0 +1,33 @@
+#image-manager-wrapper {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: 600px;
+    width: 300px;
+    resize: both;
+    overflow: hidden;
+    background-color: rgb(57, 59, 62);
+}
+
+#image-manager-wrapper > div {
+    top: 0%;
+    height: 33.3%;
+    border: 0px;
+	padding: 0px;
+}
+
+#image-manager-wrapper .img-manager  {
+	top: 0%;
+	width: 100%;
+	height: calc(100% - 30px);
+	border: 0px;
+	padding: 0px;
+}
+
+.img-manager-header {
+    display: flex;
+    height: 30px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(36, 37, 37);
+}

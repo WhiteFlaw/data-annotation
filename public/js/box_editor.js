@@ -244,10 +244,7 @@ function BoxEditor(parentUi, boxEditorManager, viewManager, cfg, boxOp,
             this.hide();
     };
 
-    
-    
-
-    this.hide = function(){
+    this.hide = function() { // 阻止三视图隐藏
         this.ui.style.display="none";
 
 
@@ -258,6 +255,7 @@ function BoxEditor(parentUi, boxEditorManager, viewManager, cfg, boxOp,
             this.parentUi.style.display="none";
         }
     }
+    
     this.show = function(){
         this.ui.style.display="";//"inline-block";
         if (!this.boxEditorManager){

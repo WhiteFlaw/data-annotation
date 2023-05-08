@@ -163,6 +163,10 @@ function Images(sceneMeta, sceneName, frame){
     this.getImageByName = function(name){
         return this.content[name];
     };
+    
+    this.getAllImage = function(){
+        return this.content;
+    };
 
     // this.activate = function(name){
     //     this.active_name = name;

@@ -103,36 +103,11 @@ canvas {
 	/* height: 100%; */
 }
 
-#global-info {
-	/* position: absolute; */
-	top: 0px;
-	color: var(--font-color);
-	background-color: var(--widget-background-color);
-	width: auto;
-	font-size: inherit;
-	padding: 0px;
-	box-sizing: border-box;
-	text-align: left;
-	z-index: 3;
-	/* TODO Solve this in HTML */
-	font-size: smaller;
-	display: flex;
-
-}
-
-#selectors {
-	background-color: inherit;
-	color: inherit;
-	border-width: 0;
-	display: inline-flex;
-}
-
 #object-category-selector,
 #object-track-id-editor,
 #object-trunk-selector,
 #object-occlusion-selector,
 #scene-selector,
-#frame-selector,
 #object-selector,
 #camera-selector,
 #obj-ids-of-scene {
@@ -219,14 +194,9 @@ canvas {
 }
 
 #use-previous-frame {
-	background-color: var(--widget-background-color);
-	border-color: var(--widget-background-color);
 	color: var(--font-color);
-	margin-right: 10px;
-}
-
-#use-previous-frame:hover {
-	background-color: var(--highlight-background-color);
+	border-color: var(--widget-background-color);
+	background-color: var(--widget-background-color);
 }
 
 #if-default-use-label {
@@ -281,11 +251,40 @@ canvas {
 	margin: 0;
 }
 
+#header {
+	display: flex;
+	justify-content: space-between;
+}
+
 #header #buttons {
 	display: flex;
-	position: absolute;
-	right: 0;
-	top: 0;
+	align-items: center;
+	background-color: var(--widget-background-color);	
+}
+
+#header #tools {
+	display: flex;
+	width: auto;
+	height: 45px;
+	padding: 0px;
+	z-index: 3;
+	text-align: center;
+	font-size: smaller;
+	box-sizing: border-box;
+	color: var(--font-color);
+	background-color: var(--widget-background-color);
+}
+
+#header #tools > div:hover {
+	background-color: var(--highlight-background-color);
+}
+
+.header-button {
+	display: flex;
+	height: 45px;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
 }
 
 #config-button {
@@ -674,10 +673,6 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 
-
-
-
-
 #batch-editor-tools-wrapper {
 	width: auto;
 	display: flex;
@@ -778,10 +773,10 @@ dynamic set obj-type css has higher priority than this one.
 	display: none;
 }
 
-
 #main-box-editor-wrapper #sub-views {
 	display: inline-block;
 	position: relative;
+	left: calc(100vw - 325px);
 	width: 320px;
 	height: 100%;
 	resize: both;
@@ -836,7 +831,6 @@ dynamic set obj-type css has higher priority than this one.
 
 #batch-box-editor .ui-button:hover {
 	background-color: var(--highlight-background-color);
-	;
 }
 
 
@@ -867,7 +861,7 @@ dynamic set obj-type css has higher priority than this one.
 }
 
 #z-view-manipulator {
-	height: 35%;
+	height: 20%;
 }
 
 #y-view-manipulator {
@@ -1171,8 +1165,6 @@ td {
 	overflow-y: auto;
 }
 
-
-
 .log-object-frame-id {
 	cursor: pointer;
 }
@@ -1191,6 +1183,8 @@ td {
 .sub-views-size {
 	display: flex;
 	justify-content: space-between;
+	background-color: rgb(57, 59, 62);
+	/* 换成颜色变量 */
 }
 
 /*将标注物体的长宽高高亮显示*/
